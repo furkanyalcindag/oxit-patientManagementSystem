@@ -1,7 +1,8 @@
 from django.conf.urls import url, include
 from django.urls import path
 
-from patlaks.Views import CompetitorViews, CompetitorApiViews2
+from patlaks.Views import CompetitorViews, CompetitorApiViews2, CompetitorPanelViews
+
 
 app_name = 'patlaks'
 
@@ -24,6 +25,13 @@ urlpatterns = [
 
     url(r'get-references/$', CompetitorViews.GetChildrenCompetitors.as_view(), name='get-100-score'),
 
+
+
+    #Panel Bilgileri
+
+    url(r'yarismacilar/$', CompetitorPanelViews.get_competitors, name='competitor-list'),
+
+    url(r'send-notifications/$', CompetitorPanelViews.send_notifications, name='send-notification'),
 
 
     ]

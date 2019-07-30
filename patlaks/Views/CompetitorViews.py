@@ -107,7 +107,7 @@ class GetTop100(APIView):
         datetime_end = datetime(year, month, num_days, 23, 59)
 
         user_request = User.objects.get(pk=user_pk)
-        competitor_request = Competitor.objects.get(user=user_request)
+        #competitor_request = Competitor.objects.get(user=user_request)
         scores = Score.objects.filter(creationDate__range=(datetime_start, datetime_end)).order_by('score')[:100]
         serializer_context = {
             'request': request,

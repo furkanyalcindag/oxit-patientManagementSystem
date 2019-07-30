@@ -50,6 +50,7 @@ urlpatterns = [
     path('patlaks/', include('patlaks.urls')),
 
 
+
 ]
 
 urlpatterns += staticfiles_urlpatterns()

@@ -278,7 +278,7 @@
 
                     {% if menu.is_parent %}
 
-                        <li class="treeview active">
+                        <li class="treeview">
                         <a href="#">
                             <i class="fa {{ menu.fa_icon }}"></i>
                             <span>{{ menu.name }}</span>
@@ -648,6 +648,12 @@
 
         //Date picker
         $('#datepicker').datepicker({
+            autoclose: true,
+            language: 'tr',
+            format: 'dd/mm/yyyy',
+        })
+
+        $('#datepicker2').datepicker({
             autoclose: true,
             language: 'tr',
             format: 'dd/mm/yyyy',
