@@ -58,44 +58,31 @@
                 <div class="box-body">
                     <div class="box box-primary">
                         <div class="box-header with-border">
-                            <h3 class="box-title">Bildirim</h3>
+                            <h3 class="box-title">Mesaj</h3>
                         </div>
                         <!-- /.box-header -->
                         <!-- form start -->
                         <form method="post" role="form">
                             <div class="box-body">
                                 {% csrf_token %}
+
                                 <div class="form-group">
-                                    <label> {{ form_notification.title.label }}</label>
-                                    {{ form_notification.title }}
+                                    <label> Kullanıcı Adı</label>
+                                    {{ form_message.to }}
                                 </div>
                                 <div class="form-group">
-                                    <label> {{ form_notification.body.label }}</label>
-                                    {{ form_notification.body }}
+                                    <label> {{ form_message.body.label }}</label>
+                                    {{ form_message.body }}
                                 </div>
-                                <div class="row">
-                                    <div class="form-group col-md-3">
-                                        <label> Doğum Yılı Başlangıç</label>
-                                        {{ filter_form.startYear }}
-                                    </div>
-                                    <div class="form-group col-md-3">
-                                        <label> Doğum Yılı Son</label>
-                                        {{ filter_form.endYear }}
-                                    </div>
-                                    <div class="form-group col-md-3">
-                                        <label> Cinsiyet</label><br>
-                                        {{ filter_form.gender }}
-                                    </div>
 
-                                    <div class="form-group col-md-3">
-                                        <br>
-                                        <button type="submit" class="btn btn-primary" style="width: 200px">Gönder
-                                        </button>
 
-                                    </div>
-
+                                <div class="form-group col-md-3">
+                                    <br>
+                                    <button type="submit" class="btn btn-primary" style="width: 200px">Gönder
+                                    </button>
 
                                 </div>
+
                             </div>
                             <!-- /.box-body -->
 
@@ -106,23 +93,23 @@
                                 <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Başlık</th>
+
                                     <th>Mesaj</th>
-                                    <th>Grup</th>
+                                    <th>Kime</th>
                                     <th>Durum</th>
                                     <th>Gönderme Zamanı</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% if notifications.all %}
-                                    {% for notification in  notifications %}
+                                {% if messages.all %}
+                                    {% for message in  messages %}
                                         <tr>
                                             <td>{{ forloop.counter }} </td>
-                                            <td>{{ notification.title }}</td>
-                                            <td>{{ notification.body }}</td>
-                                            <td>{{ notification.to }}</td>
-                                            <td>{{ notification.is_send }}</td>
-                                            <td>{{ notification.creationDate }}</td>
+
+                                            <td>{{ message.body }}</td>
+                                            <td>{{ message.to.user.username }}</td>
+                                            <td>{{ message.is_send }}</td>
+                                            <td>{{ message.creationDate }}</td>
 
                                         </tr>
                                     {% endfor %}

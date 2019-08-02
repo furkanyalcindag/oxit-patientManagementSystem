@@ -27,8 +27,8 @@ class CompetitorSerializer1(serializers.Serializer):
     gender = serializers.CharField()
     email = serializers.CharField(write_only=True)
     first_name = serializers.CharField(write_only=True)
-    last_name = serializers.CharField(write_only=True)
-    #email = serializers.CharField(write_only=True)
+    # last_name = serializers.CharField(write_only=True, required=False)
+    # email = serializers.CharField(write_only=True)
     password = serializers.CharField(write_only=True)
     imei = serializers.CharField(required=False)
     iban = serializers.CharField(required=False)
@@ -52,7 +52,7 @@ class CompetitorSerializer1(serializers.Serializer):
 
         user = User.objects.create_user(username=validated_data.get('email'),
                                         first_name=validated_data.get('first_name'),
-                                        last_name=validated_data.get('last_name')
+                                        last_name=validated_data.get('first_name')
                                         , email='xxxxx@xxx.com')
         user.set_password(validated_data.get('password'))
         user.save()
@@ -61,14 +61,40 @@ class CompetitorSerializer1(serializers.Serializer):
         imei = validated_data.get('imei')
         iban = validated_data.get('iban')
         gcm = validated_data.get('gcm_registerID')
-        country = Country.objects.get(pk=validated_data.get('country_post'))
+        # country = Country.objects.get(pk=validated_data.get('country_post'))
         birthYear = validated_data.get('birthYear')
         city = validated_data.get('city')
 
-        competitor = Competitor.objects.create(user=user, gender=gender, birthDate=birthDate, gcm_registerID=gcm,
-                                               city=city, birthYear=birthYear)
+        competitor = Competitor.objects.create(user=user, gender=gender, gcm_registerID=gcm,
+                                               city=city, birth_year=birthYear)
 
         return competitor
+
+
+class CompetitorEditSerializer(serializers.Serializer):
+    gender = serializers.CharField(required=False)
+    email = serializers.CharField(write_only=True, required=False)
+    first_name = serializers.CharField(write_only=True, required=False)
+    birthYear = serializers.IntegerField(required=False,)
+    city = serializers.CharField(required=False)
+
+    def create(self, validated_data):
+        user_pk = self.context['request']._request.META['HTTP_AUTHORIZATION'].split(' ')[1]
+
+        decodedPayload = jwt.decode(user_pk, SECRET_KEY)
+
+        user_request = User.objects.get(pk=decodedPayload['user_id'])
+        competitor_request = Competitor.objects.get(user=user_request)
+
+        user_request.first_name = validated_data.get('first_name')
+        user_request.username = validated_data.get('email')
+        competitor_request.gender = validated_data.get('gender')
+        competitor_request.birth_year = validated_data.get('birthYear')
+        competitor_request.city = validated_data.get('city')
+        user_request.save()
+        competitor_request.save()
+
+        return competitor_request
 
 
 class ReferenceSerializer(serializers.Serializer):
@@ -94,6 +120,22 @@ class ReferenceSerializer(serializers.Serializer):
         return competitor_request
 
 
+class PasswordSerializer(serializers.Serializer):
+    password = serializers.CharField(write_only=True)
+
+    def create(self, validated_data):
+        user_pk = self.context['request']._request.META['HTTP_AUTHORIZATION'].split(' ')[1]
+
+        decodedPayload = jwt.decode(user_pk, SECRET_KEY)
+        user_request = User.objects.get(pk=decodedPayload['user_id'])
+
+        user_request.set_password(validated_data.get('password'))
+
+        user_request.save()
+
+        return user_request
+
+
 class ScoreSerializer(serializers.Serializer):
     score = serializers.IntegerField(write_only=True)
 
@@ -116,7 +158,7 @@ class SelfScoreSerializer(serializers.Serializer):
 class TopScoreSerializer(serializers.Serializer):
     competitor = CompetitorSerializer()
     score = serializers.IntegerField()
-    creationDate = serializers.DateTimeField()
+    #creationDate = serializers.DateTimeField()
 
 
 class CompetitorSerializerReference(serializers.Serializer):

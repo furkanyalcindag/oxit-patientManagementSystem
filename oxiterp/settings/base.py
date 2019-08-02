@@ -61,6 +61,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
+
 ROOT_URLCONF = 'oxiterp.urls'
 
 TEMPLATES = [
@@ -75,7 +78,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.i18n',
-                'education.services.general_methods.getMenu'
+                'patlaks.services.general_methods.getMenu'
 
                 # "education.services.general_methods.append_privileges",
             ],
@@ -155,6 +158,6 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (os.path.join('oxiterp/static'),)
 
-LOGIN_REDIRECT_URL = '/patient'
+LOGIN_REDIRECT_URL = '/patlaks'
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'

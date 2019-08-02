@@ -3,6 +3,7 @@ from datetime import datetime
 
 import jwt
 from django.contrib.auth.models import User
+from django.db.models import Min
 from pytz import unicode
 from rest_framework import status
 from rest_framework.request import Request
@@ -13,7 +14,8 @@ from rest_framework.views import APIView
 from oxiterp.settings.base import SECRET_KEY
 from patlaks.models import Competitor, Score
 from patlaks.serializers.CompetitorSerializer import CompetitorSerializer, CompetitorSerializer1, ReferenceSerializer, \
-    ScoreSerializer, SelfScoreSerializer, TopScoreSerializer, CompetitorSerializerReference
+    ScoreSerializer, SelfScoreSerializer, TopScoreSerializer, CompetitorSerializerReference, PasswordSerializer, \
+    CompetitorEditSerializer
 
 
 class CompetitorList(APIView):
@@ -65,14 +67,54 @@ class AddReference(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# skor ekleme
+# referans ekleme
+class ChangePassword(APIView):
+
+    def post(self, request, format=None):
+        serializer = PasswordSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Password Changed"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UpdateCompetitor(APIView):
+
+    def post(self, request, format=None):
+        serializer = CompetitorEditSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Competitor was updated"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # skor ekleme
+
+
 class AddScore(APIView):
 
     def post(self, request, format=None):
         serializer = ScoreSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
-            serializer.save()
-            return Response({"message": "Score added"}, status=status.HTTP_201_CREATED)
+            s = serializer.save()
+            datetime_current = datetime.today()
+            year = datetime_current.year
+            month = datetime_current.month
+            num_days = calendar.monthrange(year, month)[1]
+
+            datetime_start = datetime(year, month, 1, 0, 0)
+
+            datetime_end = datetime(year, month, num_days, 23, 59)
+
+            # competitor_request = Competitor.objects.get(user=user_request)
+            scores = Score.objects.filter(creationDate__range=(datetime_start, datetime_end)).order_by('score')[:100]
+            i = 1
+            for score in scores:
+                if score.id == s.id:
+                    return Response({"message": "Score added", "rank": i}, status=status.HTTP_201_CREATED)
+                i += 1
+
+            return Response({"message": "Score added", "is_rank": False}, status=status.HTTP_201_CREATED)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -107,12 +149,25 @@ class GetTop100(APIView):
         datetime_end = datetime(year, month, num_days, 23, 59)
 
         user_request = User.objects.get(pk=user_pk)
-        #competitor_request = Competitor.objects.get(user=user_request)
-        scores = Score.objects.filter(creationDate__range=(datetime_start, datetime_end)).order_by('score')[:100]
+        # competitor_request = Competitor.objects.get(user=user_request)
+        # scores = Score.objects.filter(creationDate__range=(datetime_start, datetime_end)).order_by('score')[:100]
         serializer_context = {
             'request': request,
         }
-        serializer = TopScoreSerializer(scores, many=True, context=serializer_context)
+
+        scores = Score.objects.filter(creationDate__range=(datetime_start, datetime_end)).values(
+            'competitor').annotate(score=Min('score')).order_by('score')[:100]
+
+        my_objects = []
+
+        for score in scores:
+            new = Competitor.objects.get(id=score['competitor'])
+            newScore = Score()
+            newScore.competitor = new
+            newScore.score = score['score']
+            my_objects.append(newScore)
+
+        serializer = TopScoreSerializer(my_objects, many=True, context=serializer_context)
 
         return Response(serializer.data)
 
@@ -129,8 +184,7 @@ class GetChildrenCompetitors(APIView):
         username = []
 
         for competitor in competitors:
-            username.append({'username':competitor.user.username})
-
+            username.append({'username': competitor.user.username})
 
         serializer = CompetitorSerializerReference(username, many=True)
         return Response(serializer.data)
