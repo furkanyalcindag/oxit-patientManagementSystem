@@ -26,7 +26,9 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
+import accounts
 import patlaks
+from accounts import views
 from patlaks.Views import CompetitorApiViews
 from patlaks.Views.CompetitorApiViews import topic_content_list
 from patlaks.Views.CompetitorViews import CreateCompetitor
@@ -41,13 +43,14 @@ urlpatterns = [
     #path('', include('accounts.urls')),
     #path('accounts/', include('django.contrib.auth.urls'))
     path('accounts/', include('accounts.urls')),
+    path('',views.login, name='index'),
     path('egitim/', include('education.urls')),
 
     path('api-auth/', include('rest_framework.urls')),
     path('api/token/', TokenObtainPairView.as_view()),
     path('api/token/refresh', TokenRefreshView.as_view()),
     path('competitor', CreateCompetitor.as_view()),
-    path('', include('patlaks.urls')),
+    path('patlaks', include('patlaks.urls')),
 
 
 

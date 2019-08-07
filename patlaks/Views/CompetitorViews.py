@@ -13,9 +13,10 @@ from rest_framework.views import APIView
 
 from oxiterp.settings.base import SECRET_KEY
 from patlaks.models import Competitor, Score
+from patlaks.models.Message import Message
 from patlaks.serializers.CompetitorSerializer import CompetitorSerializer, CompetitorSerializer1, ReferenceSerializer, \
     ScoreSerializer, SelfScoreSerializer, TopScoreSerializer, CompetitorSerializerReference, PasswordSerializer, \
-    CompetitorEditSerializer
+    CompetitorEditSerializer, MessageSerializer, CompetitorNotificationSerializer, BankInformationSerializer
 
 
 class CompetitorList(APIView):
@@ -34,6 +35,39 @@ class CompetitorList(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CompetitorGet(APIView):
+    def get(self, request, format=None):
+        user_pk = request.user.id
+
+        user_request = User.objects.get(pk=user_pk)
+        competitor_request = Competitor.objects.get(user=user_request)
+        serializer_context = {
+            'request': request,
+        }
+        serializer = CompetitorSerializer(competitor_request, context=serializer_context)
+        return Response(serializer.data)
+
+
+class NotificationGet(APIView):
+    def get(self, request, format=None):
+        user_pk = request.user.id
+
+        user_request = User.objects.get(pk=user_pk)
+        competitor_request = Competitor.objects.get(user=user_request)
+        serializer_context = {
+            'request': request,
+        }
+        serializer = CompetitorNotificationSerializer(competitor_request, context=serializer_context)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        serializer = CompetitorNotificationSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Notification settings changed"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -90,6 +124,34 @@ class UpdateCompetitor(APIView):
     # skor ekleme
 
 
+class UpdateBank(APIView):
+    ''' def get(self, request, format=None):
+         user_pk = request.user.id
+
+         user_request = User.objects.get(pk=user_pk)
+         competitor_request = Competitor.objects.get(user=user_request)
+         serializer_context = {
+             'request': request,
+             'first_name': user_request.first_name,
+             'iban': competitor_request.iban
+
+         }
+         array = []
+
+         yourdata = [{"first_name": user_request.first_name, "comments": 0}, {"likes": 4, "comments": 23}]
+
+         # array.append({'iban': competitor_request.iban, 'first_name': user_request.first_name})
+         serializer = BankInformationSerializer(many=True, context=serializer_context)
+         return Response(serializer.data) '''
+
+    def post(self, request, format=None):
+        serializer = BankInformationSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Competitor was updated"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class AddScore(APIView):
 
     def post(self, request, format=None):
@@ -106,7 +168,9 @@ class AddScore(APIView):
             datetime_end = datetime(year, month, num_days, 23, 59)
 
             # competitor_request = Competitor.objects.get(user=user_request)
-            scores = Score.objects.filter(creationDate__range=(datetime_start, datetime_end)).order_by('score')[:100]
+            # scores = Score.objects.filter(creationDate__range=(datetime_start, datetime_end)).order_by('score')[:100]
+            scores = Score.objects.filter(creationDate__range=(datetime_start, datetime_end)).values(
+                'competitor').annotate(score=Min('score')).order_by('score')[:100]
             i = 1
             for score in scores:
                 if score.id == s.id:
@@ -131,6 +195,25 @@ class GetCompetitorScore(APIView):
             'request': request,
         }
         serializer = SelfScoreSerializer(scores, many=True, context=serializer_context)
+        return Response(serializer.data)
+
+
+# yarışmacı skoru
+class GetCompetitorMessage(APIView):
+
+    def get(self, request, format=None):
+        user_pk = request.user.id
+
+        user_pk = request._request.META['HTTP_AUTHORIZATION'].split(' ')[1]
+        decodedPayload = jwt.decode(user_pk, SECRET_KEY)
+        user_request = User.objects.get(pk=decodedPayload['user_id'])
+        # user_request = User.objects.get(pk=user_pk)
+        competitor_request = Competitor.objects.get(user=user_request)
+        messages = Message.objects.filter(to=competitor_request)
+        serializer_context = {
+            'request': request,
+        }
+        serializer = MessageSerializer(messages, many=True, context=serializer_context)
         return Response(serializer.data)
 
 

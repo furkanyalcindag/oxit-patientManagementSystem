@@ -26,7 +26,14 @@ urlpatterns = [
 
     url(r'get-100-score/$', CompetitorViews.GetTop100.as_view(), name='get-100-score'),
 
-    url(r'get-references/$', CompetitorViews.GetChildrenCompetitors.as_view(), name='get-100-score'),
+    url(r'get-references/$', CompetitorViews.GetChildrenCompetitors.as_view(), name='get-references'),
+
+    url(r'get-messages/$', CompetitorViews.GetCompetitorMessage.as_view(), name='get-message'),
+
+    url(r'get-competitor/$', CompetitorViews.CompetitorGet.as_view(), name='get-competitor'),
+
+    url(r'notification-settings/$', CompetitorViews.NotificationGet.as_view(), name='notification-settings'),
+    url(r'bank-info/$', CompetitorViews.UpdateBank, name='update-bank'),
 
     # Panel Bilgileri
 
@@ -38,10 +45,14 @@ urlpatterns = [
 
 
 
+
+
     url(r'send-message/$', CompetitorPanelViews.send_message, name='send-message'),
+
+    url(r'add-menu/$', CompetitorPanelViews.menu, name='add-menu'),
 
     url('', CompetitorPanelViews.dashboard, name='dashboard'),
 
-    url(r'add-menu/$', CompetitorPanelViews.menu, name='add-menu'),
+
 
 ]

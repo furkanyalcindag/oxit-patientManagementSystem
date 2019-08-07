@@ -25,3 +25,4 @@ class Competitor(models.Model):
     gcm_registerID = models.CharField(max_length=512, verbose_name='token', null=True, blank=True)
     birth_year = models.IntegerField(verbose_name='Doğum Yılı', blank=True, null=True)
     city = models.CharField(max_length=255, verbose_name="Şehir",blank=True, null=True)
+    notification = models.BooleanField(default=True)

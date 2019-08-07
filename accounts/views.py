@@ -33,7 +33,7 @@ def login(request):
             # correct username and password login the user
             auth.login(request, user)
             #return render(request, 'patient/:patient/index', context={})
-            return redirect('education:list')
+            return redirect('patlaks:dashboard')
 
         else:
             messages.add_message(request, messages.SUCCESS, 'todo')
