@@ -100,7 +100,7 @@ class BankInformationSerializer(serializers.Serializer):
 class CompetitorEditSerializer(serializers.Serializer):
     gender = serializers.CharField(required=False)
     email = serializers.CharField(write_only=True, required=False)
-    # first_name = serializers.CharField(write_only=True, required=False)
+    first_name = serializers.CharField(write_only=True, required=False)
     birthYear = serializers.IntegerField(required=False, )
     city = serializers.CharField(required=False)
     username = serializers.CharField()

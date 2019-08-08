@@ -33,7 +33,7 @@ urlpatterns = [
     url(r'get-competitor/$', CompetitorViews.CompetitorGet.as_view(), name='get-competitor'),
 
     url(r'notification-settings/$', CompetitorViews.NotificationGet.as_view(), name='notification-settings'),
-    url(r'bank-info/$', CompetitorViews.UpdateBank, name='update-bank'),
+    url(r'bank-info/$', CompetitorViews.UpdateBank.as_view(), name='update-bank'),
 
     # Panel Bilgileri
 

@@ -125,24 +125,24 @@ class UpdateCompetitor(APIView):
 
 
 class UpdateBank(APIView):
-    ''' def get(self, request, format=None):
-         user_pk = request.user.id
+    def get(self, request, format=None):
+        user_pk = request.user.id
 
-         user_request = User.objects.get(pk=user_pk)
-         competitor_request = Competitor.objects.get(user=user_request)
-         serializer_context = {
-             'request': request,
-             'first_name': user_request.first_name,
-             'iban': competitor_request.iban
+        user_request = User.objects.get(pk=user_pk)
+        competitor_request = Competitor.objects.get(user=user_request)
+        serializer_context = {
+            'request': request,
+            'first_name': user_request.first_name,
+            'iban': competitor_request.iban
 
-         }
-         array = []
+        }
+        array = []
 
-         yourdata = [{"first_name": user_request.first_name, "comments": 0}, {"likes": 4, "comments": 23}]
+        yourdata = [{"first_name": user_request.first_name, "iban": competitor_request.iban}]
 
-         # array.append({'iban': competitor_request.iban, 'first_name': user_request.first_name})
-         serializer = BankInformationSerializer(many=True, context=serializer_context)
-         return Response(serializer.data) '''
+        # array.append({'iban': competitor_request.iban, 'first_name': user_request.first_name})
+        serializer = BankInformationSerializer(yourdata,many=True, context=serializer_context)
+        return Response(serializer.data)
 
     def post(self, request, format=None):
         serializer = BankInformationSerializer(data=request.data, context={'request': request})
