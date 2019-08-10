@@ -196,11 +196,14 @@ class AddScore(APIView):
                 'competitor').annotate(score=Min('score')).order_by('score')[:100]
             i = 1
             for score in scores:
-                if score.id == s.id:
+                if s.score < score['score']:
                     return Response({"message": "Score added", "rank": i}, status=status.HTTP_201_CREATED)
                 i += 1
 
-            return Response({"message": "Score added", "is_rank": False}, status=status.HTTP_201_CREATED)
+            if i <100:
+                return Response({"message": "Score added", "rank": i}, status=status.HTTP_201_CREATED)
+            else:
+                return Response({"message": "Score added", "is_rank": False}, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
