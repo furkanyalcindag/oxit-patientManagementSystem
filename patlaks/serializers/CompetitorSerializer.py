@@ -176,7 +176,7 @@ class PasswordForgotSerializer(serializers.Serializer):
             user.set_password(password)
             user.save()
             res = send_mail("Reset Password-Patlaks", "Yeni şifreniz :" + password, "register@eymo.net",
-                            ["fyalcindag@oxityazilim.com"])
+                            [user.email])
             return res
 
         except User.DoesNotExist:
