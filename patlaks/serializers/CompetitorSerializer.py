@@ -2,6 +2,8 @@ import datetime
 
 import jwt
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from django.http import Http404
 from rest_framework import serializers
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.response import Response
@@ -100,7 +102,7 @@ class BankInformationSerializer(serializers.Serializer):
 class CompetitorEditSerializer(serializers.Serializer):
     gender = serializers.CharField(required=False)
     email = serializers.CharField(write_only=True, required=False)
-    first_name = serializers.CharField(write_only=True, required=False)
+    # first_name = serializers.CharField(write_only=True, required=False)
     birthYear = serializers.IntegerField(required=False, )
     city = serializers.CharField(required=False)
     username = serializers.CharField()
@@ -113,7 +115,7 @@ class CompetitorEditSerializer(serializers.Serializer):
         user_request = User.objects.get(pk=decodedPayload['user_id'])
         competitor_request = Competitor.objects.get(user=user_request)
 
-        user_request.first_name = validated_data.get('first_name')
+        # user_request.first_name = validated_data.get('first_name')
         user_request.username = validated_data.get('username')
         user_request.email = validated_data.get('email')
         competitor_request.gender = validated_data.get('gender')
@@ -164,6 +166,23 @@ class ReferenceSerializer(serializers.Serializer):
         return competitor_request
 
 
+class PasswordForgotSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+
+    def create(self, validated_data):
+        try:
+            user = User.objects.get(email=validated_data.get('email'))
+            password = User.objects.make_random_password()
+            user.set_password(password)
+            user.save()
+            res = send_mail("Reset Password-Patlaks", "Yeni şifreniz :" + password, "register@eymo.net",
+                            ["fyalcindag@oxityazilim.com"])
+            return res
+
+        except User.DoesNotExist:
+            raise Http404("Girilen maile ait bir kullanıcı bulunamadı.")
+
+
 class PasswordSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
 
@@ -192,6 +211,20 @@ class ScoreSerializer(serializers.Serializer):
         score = Score(competitor=competitor_request, score=validated_data.get('score'))
         score.save()
         return score
+
+
+class GCMTokenSerializer(serializers.Serializer):
+    gcm_registerID = serializers.CharField(write_only=True)
+
+    def create(self, validated_data):
+        user_pk = self.context['request']._request.META['HTTP_AUTHORIZATION'].split(' ')[1]
+        decodedPayload = jwt.decode(user_pk, SECRET_KEY)
+        user_request = User.objects.get(pk=decodedPayload['user_id'])
+        competitor_request = Competitor.objects.get(user=user_request)
+        competitor_request.gcm_registerID = validated_data.get('gcm_registerID')
+
+        competitor_request.save()
+        return competitor_request
 
 
 class SelfScoreSerializer(serializers.Serializer):

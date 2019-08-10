@@ -8,6 +8,7 @@ import serializers
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
 from django.db.models import Max, Min
 from django.http import JsonResponse, request
 from django.shortcuts import render, redirect
@@ -295,3 +296,5 @@ def menu(request):
     menuAddmob.save()
 
     return JsonResponse({"success": "OK"})
+
+

@@ -35,6 +35,10 @@ urlpatterns = [
     url(r'notification-settings/$', CompetitorViews.NotificationGet.as_view(), name='notification-settings'),
     url(r'bank-info/$', CompetitorViews.UpdateBank.as_view(), name='update-bank'),
 
+    url(r'forgot-password/$', CompetitorViews.ForgotPassword.as_view(), name='mail'),
+
+    url(r'update-token/$', CompetitorViews.GCMTokenUpdate.as_view(), name='token-update'),
+
     # Panel Bilgileri
 
     url(r'competitor/$', CompetitorPanelViews.get_competitors, name='competitor-list'),
@@ -52,6 +56,7 @@ urlpatterns = [
     url(r'add-menu/$', CompetitorPanelViews.menu, name='add-menu'),
 
     url('', CompetitorPanelViews.dashboard, name='dashboard'),
+
 
 
 

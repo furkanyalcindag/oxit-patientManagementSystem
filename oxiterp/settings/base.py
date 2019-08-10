@@ -152,6 +152,13 @@ DATE_INPUT_FORMATS = ('%d-%m-%Y', '%Y-%m-%d')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'mail.eymo.net'
+EMAIL_PORT = '587'
+EMAIL_HOST_USER = 'register@eymo.net'
+EMAIL_HOST_PASSWORD = 'oxit21furkan'
+EMAIL_USE_TLS = True
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 STATIC_URL = '/static/'

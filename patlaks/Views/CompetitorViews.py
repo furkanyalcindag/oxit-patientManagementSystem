@@ -16,7 +16,8 @@ from patlaks.models import Competitor, Score
 from patlaks.models.Message import Message
 from patlaks.serializers.CompetitorSerializer import CompetitorSerializer, CompetitorSerializer1, ReferenceSerializer, \
     ScoreSerializer, SelfScoreSerializer, TopScoreSerializer, CompetitorSerializerReference, PasswordSerializer, \
-    CompetitorEditSerializer, MessageSerializer, CompetitorNotificationSerializer, BankInformationSerializer
+    CompetitorEditSerializer, MessageSerializer, CompetitorNotificationSerializer, BankInformationSerializer, \
+    PasswordForgotSerializer, GCMTokenSerializer
 
 
 class CompetitorList(APIView):
@@ -109,6 +110,28 @@ class ChangePassword(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response({"message": "Password Changed"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# referans ekleme
+class ForgotPassword(APIView):
+
+    def post(self, request, format=None):
+        serializer = PasswordForgotSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "new password sent to your mail"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# referans ekleme
+class GCMTokenUpdate(APIView):
+
+    def post(self, request, format=None):
+        serializer = GCMTokenSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Token is updated"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

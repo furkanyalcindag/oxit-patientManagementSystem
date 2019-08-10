@@ -50,7 +50,7 @@ urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view()),
     path('api/token/refresh', TokenRefreshView.as_view()),
     path('competitor', CreateCompetitor.as_view()),
-    path('patlaks', include('patlaks.urls')),
+    path('patlaks/', include('patlaks.urls')),
 
 
 
