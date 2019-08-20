@@ -70,12 +70,17 @@ def send_notifications(request):
                                competitor.gcm_registerID,
                            "data": {"title": title, "alert": message}
                            }
-                r = requests.post("https://fcm.googleapis.com/fcm/send", data=json.dumps(payload), headers=headers)
 
-                if json.loads(r.text)['success'] == 0:
-                    failure = failure + 1
+                if competitor.notification:
+
+                    r = requests.post("https://fcm.googleapis.com/fcm/send", data=json.dumps(payload), headers=headers)
+
+                    if json.loads(r.text)['success'] == 0:
+                        failure = failure + 1
+                    else:
+                        success = success + 1
                 else:
-                    success = success + 1
+                    failure = failure+1
 
             notification = Notification(title=title, body=message,
                                         to=str(competitor_filter.cleaned_data['startYear']) + '-' +
@@ -155,7 +160,7 @@ def send_message(request):
             except Exception as e:
                 messages.success(request, "Mesaj Gönderilemedi")
 
-            return redirect('patlaks:send-notification')
+            return redirect('patlaks:send-message')
 
         # payload = {"registration_ids":
         #   [

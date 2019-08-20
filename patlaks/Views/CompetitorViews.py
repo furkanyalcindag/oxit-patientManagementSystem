@@ -99,7 +99,9 @@ class AddReference(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response({"message": "Reference added"}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(serializer.errors, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        #return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # referans ekleme
@@ -164,7 +166,7 @@ class UpdateBank(APIView):
         yourdata = [{"first_name": user_request.first_name, "iban": competitor_request.iban}]
 
         # array.append({'iban': competitor_request.iban, 'first_name': user_request.first_name})
-        serializer = BankInformationSerializer(yourdata,many=True, context=serializer_context)
+        serializer = BankInformationSerializer(yourdata, many=True, context=serializer_context)
         return Response(serializer.data)
 
     def post(self, request, format=None):
@@ -190,18 +192,25 @@ class AddScore(APIView):
 
             datetime_end = datetime(year, month, num_days, 23, 59)
 
+            user_request = User.objects.get(pk=request.user.id)
+            competitor_request = Competitor.objects.get(user=user_request)
+
+            #score_competitor = Score.objects.filter(competitor=competitor_request).filter(
+            #    creationDate__range=(datetime_start, datetime_end)).order_by('score')[:1]
+
             # competitor_request = Competitor.objects.get(user=user_request)
             # scores = Score.objects.filter(creationDate__range=(datetime_start, datetime_end)).order_by('score')[:100]
             scores = Score.objects.filter(creationDate__range=(datetime_start, datetime_end)).values(
                 'competitor').annotate(score=Min('score')).order_by('score')[:100]
             i = 1
+
             for score in scores:
                 if s.score < score['score']:
                     return Response({"message": "Score added", "rank": i}, status=status.HTTP_201_CREATED)
                 i += 1
 
-            if i <100:
-                return Response({"message": "Score added", "rank": i}, status=status.HTTP_201_CREATED)
+            if i < 100:
+                return Response({"message": "Score added", "rank": i - 1}, status=status.HTTP_201_CREATED)
             else:
                 return Response({"message": "Score added", "is_rank": False}, status=status.HTTP_201_CREATED)
 

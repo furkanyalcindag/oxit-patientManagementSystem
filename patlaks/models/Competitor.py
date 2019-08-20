@@ -26,3 +26,4 @@ class Competitor(models.Model):
     birth_year = models.IntegerField(verbose_name='Doğum Yılı', blank=True, null=True)
     city = models.CharField(max_length=255, verbose_name="Şehir",blank=True, null=True)
     notification = models.BooleanField(default=True)
+    reference_count = models.IntegerField(default=0, null=True, blank=True)

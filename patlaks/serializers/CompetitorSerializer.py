@@ -7,6 +7,7 @@ from django.http import Http404
 from rest_framework import serializers
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.response import Response
+from rest_framework.validators import UniqueValidator
 
 from oxiterp.serializers import UserSerializer
 from oxiterp.settings.base import SECRET_KEY
@@ -27,7 +28,7 @@ class CompetitorSerializer1(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     user = UserSerializer(read_only=True)
     gender = serializers.CharField()
-    email = serializers.CharField(write_only=True)
+    email = serializers.CharField(write_only=True, validators=[UniqueValidator(queryset=User.objects.all())])
     # first_name = serializers.CharField(required=False, write_only=True)
     # last_name = serializers.CharField(write_only=True, required=False)
     # email = serializers.CharField(write_only=True)
@@ -72,10 +73,16 @@ class CompetitorSerializer1(serializers.Serializer):
             competitor = Competitor.objects.create(user=user, gender=gender, gcm_registerID=gcm,
                                                    city=city, birth_year=birthYear)
         else:
-            userc = User.objects.get(username=validated_data.get('reference'))
-            competitorc = Competitor.objects.get(user=userc)
-            competitor = Competitor.objects.create(user=user, gender=gender, gcm_registerID=gcm,
-                                                   city=city, birth_year=birthYear, reference=competitorc)
+            try:
+                userc = User.objects.get(username=validated_data.get('reference'))
+                competitorc = Competitor.objects.get(user=userc)
+                competitor = Competitor.objects.create(user=user, gender=gender, gcm_registerID=gcm,
+                                                       city=city, birth_year=birthYear, reference=competitorc)
+                competitor.reference_count = 1
+                competitor.save()
+            except:
+                user.delete()
+                user.save()
 
         return competitor
 
@@ -158,10 +165,22 @@ class ReferenceSerializer(serializers.Serializer):
         decodedPayload = jwt.decode(user_pk, SECRET_KEY)
         user_request = User.objects.get(pk=decodedPayload['user_id'])
         competitor_request = Competitor.objects.get(user=user_request)
-        user_reference = User.objects.get(username=validated_data.get('reference_user_name'))
-        competitor_reference = Competitor.objects.get(user=user_reference)
-        competitor_request.reference = competitor_reference
-        competitor_request.save()
+        if competitor_request.reference_count < 2:
+
+            user_reference = User.objects.get(username=validated_data.get('reference_user_name'))
+            if competitor_request.user is user_reference:
+                serializers.ValidationError("self reference")
+            else:
+
+                if competitor_request is Competitor.objects.get(reference=user_reference).reference:
+                    serializers.ValidationError("looping reference")
+                else:
+                    competitor_reference = Competitor.objects.get(user=user_reference)
+                    competitor_request.reference = competitor_reference
+                    competitor_request.reference_count = competitor_request.reference_count + 1
+                    competitor_request.save()
+        else:
+            serializers.ValidationError("limited reference")
 
         return competitor_request
 
