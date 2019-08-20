@@ -47,6 +47,8 @@ urlpatterns = [
 
     url(r'get-top-100/$', CompetitorPanelViews.get100, name='get-top'),
 
+    url(r'get-top-100-by-month/$', CompetitorPanelViews.get100_by_month, name='get-100-by-month'),
+
 
 
 

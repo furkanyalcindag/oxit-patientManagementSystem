@@ -201,6 +201,51 @@ def get100(request):
     return render(request, 'get-top-100.html', {'scores': my_objects})
 
 
+
+
+@login_required
+def get100_by_month(request):
+    datetime_current = datetime.datetime.today()
+    year = datetime_current.year
+    month = datetime_current.month
+    num_days = calendar.monthrange(year, month)[1]
+
+    datetime_start = datetime.datetime(year, month, 1, 0, 0)
+
+    datetime_end = datetime.datetime(year, month, num_days, 23, 59)
+
+    # scores = Score.objects.filter(creationDate__range=(datetime_start, datetime_end)).order_by('score')[:100]
+
+    scores = Score.objects.filter(creationDate__range=(datetime_start, datetime_end)).values(
+        'competitor').annotate(score=Min('score')).order_by('score')[:100]
+
+    my_objects = []
+
+
+    if request.method=='POST':
+        num_days = calendar.monthrange(year, int(request.POST['month']))[1]
+        datetime_start = datetime.datetime(year, int(request.POST['month']), 1, 0, 0)
+
+        datetime_end = datetime.datetime(year, int(request.POST['month']), num_days, 23, 59)
+
+        # scores = Score.objects.filter(creationDate__range=(datetime_start, datetime_end)).order_by('score')[:100]
+
+        scores = Score.objects.filter(creationDate__range=(datetime_start, datetime_end)).values(
+            'competitor').annotate(score=Min('score')).order_by('score')[:100]
+
+
+    for score in scores:
+        new = Competitor.objects.get(id=score['competitor'])
+        newScore = Score()
+        newScore.competitor = new
+        newScore.score = score['score']
+        my_objects.append(newScore)
+
+    return render(request, 'get-top-100-by-month.html', {'scores': my_objects})
+
+
+
+
 @login_required
 def get_username(request):
     if request.POST:
