@@ -71,7 +71,7 @@ class CompetitorSerializer1(serializers.Serializer):
 
         if validated_data.get('reference') is None:
             competitor = Competitor.objects.create(user=user, gender=gender, gcm_registerID=gcm,
-                                                   city=city, birth_year=birthYear)
+                                                   city=city, birth_year=birthYear, reference_count=0)
         else:
             try:
                 userc = User.objects.get(username=validated_data.get('reference'))
