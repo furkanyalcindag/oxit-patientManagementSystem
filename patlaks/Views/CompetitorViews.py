@@ -88,7 +88,8 @@ class CreateCompetitor(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response({"message": "User created"}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(serializer.errors, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 # referans ekleme
@@ -201,18 +202,18 @@ class AddScore(APIView):
             # competitor_request = Competitor.objects.get(user=user_request)
             # scores = Score.objects.filter(creationDate__range=(datetime_start, datetime_end)).order_by('score')[:100]
             scores = Score.objects.filter(creationDate__range=(datetime_start, datetime_end)).values(
-                'competitor').annotate(score=Min('score')).order_by('score')[:100]
+                'competitor').annotate(score=Min('score')).order_by('score')[:105]
             i = 1
 
             for score in scores:
-                if s.score < score['score']:
-                    return Response({"message": "Score added", "rank": i}, status=status.HTTP_201_CREATED)
+                if s.score <= score['score']:
+                    return Response({"message": "Score added", "rank": i, "score":s.score, "larger":score['score']}, status=status.HTTP_201_CREATED)
                 i += 1
 
-            if i < 100:
-                return Response({"message": "Score added", "rank": i - 1}, status=status.HTTP_201_CREATED)
+            if i <= 100:
+                return Response({"message": "Score added", "rank": i}, status=status.HTTP_201_CREATED)
             else:
-                return Response({"message": "Score added", "is_rank": False}, status=status.HTTP_201_CREATED)
+                return Response({"message": "Score added", "rank": i}, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

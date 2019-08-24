@@ -27,3 +27,4 @@ class Competitor(models.Model):
     city = models.CharField(max_length=255, verbose_name="Şehir",blank=True, null=True)
     notification = models.BooleanField(default=True)
     reference_count = models.IntegerField(default=0, null=True, blank=True)
+    tcno = models.CharField(max_length=15, blank=True, null=True)
