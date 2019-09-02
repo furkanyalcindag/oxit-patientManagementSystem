@@ -196,6 +196,10 @@ class AddScore(APIView):
             user_request = User.objects.get(pk=request.user.id)
             competitor_request = Competitor.objects.get(user=user_request)
 
+            if s.score <= 25000:
+                s.delete()
+                return Response({"message": "Score added", "rank": 110}, status=status.HTTP_201_CREATED)
+
             #score_competitor = Score.objects.filter(competitor=competitor_request).filter(
             #    creationDate__range=(datetime_start, datetime_end)).order_by('score')[:1]
 
@@ -209,6 +213,7 @@ class AddScore(APIView):
                 if s.score <= score['score']:
                     return Response({"message": "Score added", "rank": i, "score":s.score, "larger":score['score']}, status=status.HTTP_201_CREATED)
                 i += 1
+
 
             if i <= 100:
                 return Response({"message": "Score added", "rank": i}, status=status.HTTP_201_CREATED)
@@ -274,7 +279,7 @@ class GetTop100(APIView):
             'request': request,
         }
 
-        scores = Score.objects.filter(creationDate__range=(datetime_start, datetime_end)).values(
+        scores = Score.objects.filter(creationDate__range=(datetime_start, datetime_end)).filter(competitor__user__is_active = True).values(
             'competitor').annotate(score=Min('score')).order_by('score')[:100]
 
         my_objects = []

@@ -47,7 +47,7 @@ class CompetitorSerializer1(serializers.Serializer):
     city = serializers.CharField(required=False)
     mobilePhone = serializers.CharField(required=False)
     country_post = serializers.IntegerField(write_only=True, required=False)
-    reference = serializers.CharField(required=False)
+    reference = serializers.CharField(required=False, allow_blank=True)
 
     def create(self, validated_data):
         # user_data = validated_data.pop('user')
@@ -66,8 +66,10 @@ class CompetitorSerializer1(serializers.Serializer):
         # country = Country.objects.get(pk=validated_data.get('country_post'))
         birthYear = validated_data.get('birthYear')
         city = validated_data.get('city')
+        
+        ref_var =  validated_data.get('reference')
 
-        if validated_data.get('reference') is None:
+        if ref_var is None or ref_var.strip() == '':
             competitor = Competitor.objects.create(user=user, gender=gender, gcm_registerID=gcm,
                                                    city=city, birth_year=birthYear, reference_count=0)
             return competitor
@@ -82,7 +84,7 @@ class CompetitorSerializer1(serializers.Serializer):
                 return competitor
             except:
                 user.delete()
-                raise serializers.ValidationError("reference user not found")
+                raise serializers.ValidationError("reference user not found" + ref_var)
 
 
 class BankInformationSerializer(serializers.Serializer):
