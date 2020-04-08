@@ -44,13 +44,14 @@ urlpatterns = [
     #path('accounts/', include('django.contrib.auth.urls'))
     path('accounts/', include('accounts.urls')),
     path('',views.login, name='index'),
-    path('egitim/', include('education.urls')),
+    #path('egitim/', include('education.urls')),
 
     path('api-auth/', include('rest_framework.urls')),
     path('api/token/', TokenObtainPairView.as_view()),
     path('api/token/refresh', TokenRefreshView.as_view()),
     path('competitor', CreateCompetitor.as_view()),
     path('patlaks/', include('patlaks.urls')),
+    path('booqe/', include('booqe.urls')),
 
 
 
