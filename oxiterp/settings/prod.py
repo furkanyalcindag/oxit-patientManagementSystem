@@ -9,7 +9,7 @@ ALLOWED_HOSTS = ['*']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'oxiterp',
+        'NAME': 'oxit_booqe',
         'USER': 'oxitowner',
         'PASSWORD': 'oxit2016',
         'HOST': 'localhost',
@@ -17,11 +17,11 @@ DATABASES = {
     }
 }
 
-STATIC_ROOT = "/var/www/static/"
+STATIC_ROOT = "/var/www/static/booqe"
 
 STAICFILES_DIR = [
 
-    "/var/www/static/"
+    "/var/www/static/booqe"
 
 ]
 
