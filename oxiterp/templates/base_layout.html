@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>AdminLTE 2 | Fixed Layout</title>
+    <title>Booqe APP</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <!-- Bootstrap 3.3.7 -->
@@ -196,7 +196,7 @@
 
                                 <p>
 
-                                    {{ request.user.first_name }}  {{ request.user.last_name }}
+                                    {{ request.user.first_name }} {{ request.user.last_name }}
 
 
                                 </p>
@@ -222,7 +222,7 @@
                     <img src="{% static 'images/user.png' %}" class="img-circle" alt="User Image">
                 </div>
                 <div class="pull-left info">
-                    <p> {{ request.user.first_name }}  {{ request.user.last_name }}</p>
+                    <p> {{ request.user.first_name }} {{ request.user.last_name }}</p>
                     <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
                 </div>
             </div>
@@ -233,57 +233,107 @@
             <ul class="sidebar-menu" data-widget="tree">
                 <li class="header"></li>
 
-
-
-
-                {% for menu in menus %}
-
-
-                    {% if menu.is_parent %}
-
-                        <li class="treeview">
-                        <a href="#">
-                            <i class="fa {{ menu.fa_icon }}"></i>
-                            <span>{{ menu.name }}</span>
-                            <span class="pull-right-container">
+                <li class="treeview">
+                    <a href="#">
+                        <i class="fa fa-home"></i>
+                        <span>Anasayfa</span>
+                        <span class="pull-right-container">
                                 <i class="fa fa-angle-left pull-right"></i>
                             </span>
-                        </a>
-                    {% endif %}
+                    </a>
+
+                    <ul class="treeview-menu">
+
+                        <li>
+                            <a href="{% url 'booqe:dashboard' %}"><i
+                                    class="fa fa-dashboard"></i> Dashboard</a>
+                        </li>
+                    </ul>
+            </li>
 
 
-                <ul class="treeview-menu">
+                <li class="treeview">
+                    <a href="#">
+                        <i class="fa fa-pencil"></i>
+                        <span>Blog</span>
+                        <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                    </a>
 
-                    {% for menusub in menus %}
+                    <ul class="treeview-menu">
+                         <li>
+                            <a href="{% url 'booqe:get-all' %}"><i
+                                    class="fa fa-file-word-o"></i> Bloglar</a>
+                        </li>
+
+                        <li>
+                            <a href="{% url 'booqe:add-blog' %}"><i
+                                    class="fa fa-plus"></i> Blog Ekle</a>
+                        </li>
+
+                    </ul>
+                </li>
 
 
+             <li class="">
+                    <a href="{% url 'booqe:send' %}">
+                        <i class="fa fa-envelope"></i>
+                        <span>Bildirim Gönder</span>
 
-                        {% if menusub.parent.id is menu.id %}
-
-                            <li>
-                                <a href="{% url menusub.url %}"><i
-                                        class="fa {{ menusub.fa_icon }}"></i> {{ menusub.name }}</a>
-                            </li>
-
+                    </a>
 
 
+                </li>
+
+                    {% for menu in menus %}
+
+
+                        {% if menu.is_parent %}
+
+                            <li class="treeview">
+                            <a href="#">
+                                <i class="fa {{ menu.fa_icon }}"></i>
+                                <span>{{ menu.name }}</span>
+                                <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                            </a>
                         {% endif %}
+
+
+                    <ul class="treeview-menu">
+
+                        {% for menusub in menus %}
+
+
+
+                            {% if menusub.parent.id is menu.id %}
+
+                                <li>
+                                    <a href="{% url menusub.url %}"><i
+                                            class="fa {{ menusub.fa_icon }}"></i> {{ menusub.name }}</a>
+                                </li>
+
+
+
+                            {% endif %}
+
+
+
+
+                        {% endfor %}
+
+                    </ul>
+
+
+                    </li>
+
 
 
 
 
                     {% endfor %}
-
-                </ul>
-
-
-                </li>
-
-
-
-
-
-                {% endfor %}
 
 
             </ul>

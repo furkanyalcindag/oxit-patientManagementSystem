@@ -69,11 +69,13 @@
 
                             <div class="timeline-body">
                                 {% if  blog_images %}
-                                    <div class="row">
+                                    <div class="row" style="margin-top: 20px">
                                         {% for image in blog_images %}
-                                            <div class="col-md-6">
+                                            <div class="col-md-4">
+                                               <a class="button btn btn-danger" style="margin-left: 10px" href="{% url 'booqe:image-delete' image.pk %}"><i class="fa fa-trash"></i> </a>
                                                 <img src="/media/{{ image.blogImage }}" width="100%" height="100%"
                                                      alt="..." class="margin ">
+
                                             </div>
                                         {% endfor %}
 

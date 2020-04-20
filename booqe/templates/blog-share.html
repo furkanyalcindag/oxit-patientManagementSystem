@@ -90,11 +90,16 @@
                                 {% csrf_token %}
 
                                 <div class="form-group">
-                                    <label> başlık</label>
+                                    <label> Başlık</label>
                                     {{ blog_form.title }}
                                 </div>
+
+                             <div class="form-group">
+                                    <label> Özet</label>
+                                    {{ blog_form.description }}
+                                </div>
                                 <div class="form-group">
-                                    <label> blog</label>
+                                    <label> Blog</label>
                                     {{ blog_form.blog }}
                                 </div>
 
@@ -142,59 +147,7 @@
 
                     <hr>
 
-                        <div class="box-body">
 
-                            <h3>Bloglar</h3>
-                            <table id="kategori" class="table table-bordered table-hover">
-                                <thead>
-                                <tr>
-                                    <th>#</th>
-
-                                    <th>Başlık</th>
-                                    <th>Kategori</th>
-                                    <th>Durum</th>
-                                    <th>Yayınlama Zamanı</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-
-                                {% if blogs.all %}
-                                    {% for blog in  blogs %}
-                                        <tr>
-                                            <td>{{ forloop.counter }} </td>
-
-                                            <td>{{ blog.title }}</td>
-
-                                            <td>
-                                                <ul> {% for category in blog.categories.all %}
-
-                                                    <li>{{ category.categoryName }}</li>
-
-                                                {% endfor %}</ul>
-
-                                            </td>
-                                                                                    <td>{{ blog.isPublish }}</td>
-
-                                            <td>{{ blog.creationDate }}</td>
-                                        <td>
-
-                                               <a href="{% url "booqe:blog-images" blog.pk %}" type="button"
-                                                   class="btn btn-warning"><i
-                                                        class="fa fa-edit"></i>Güncelle
-                                                </a>
-
-
-                                        </td>
-
-                                        </tr>
-                                    {% endfor %}
-                                {% endif %}
-
-
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
                     <!-- /.box -->
                 </div>
             </section>

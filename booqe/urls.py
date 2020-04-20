@@ -1,13 +1,17 @@
 from django.conf.urls import url
 
-from booqe.Views import BlogViews, BlogApiViews, UserAPIViews
+from booqe.Views import BlogViews, BlogApiViews, UserAPIViews, DashboardViews, NotificationViews
 
 app_name = 'booqe'
 
 urlpatterns = [
-
+    url(r'dashboard/$', DashboardViews.dashboard, name='dashboard'),
     url(r'blog/$', BlogViews.add_blog, name='add-blog'),
+    url(r'blog-update/(?P<pk>\d+)$', BlogViews.update_blog, name='update-blog'),
     url(r'blog-images/(?P<pk>\d+)$', BlogViews.return_blog_images, name='blog-images'),
+    url(r'blog-delete/(?P<pk>\d+)$', BlogViews.delete_blog, name='blog-delete'),
+    url(r'get-blogs/$', BlogViews.blogs, name='get-all'),
+    url(r'image-delete/(?P<pk>\d+)$', BlogViews.delete_image, name='image-delete'),
 
     # api
     url(r'blogs-api-get/$', BlogApiViews.GetBlogsLatest.as_view(), name='api-get'),
@@ -24,4 +28,6 @@ urlpatterns = [
     url(r'profile-notification-api/$', UserAPIViews.NotificationApi.as_view(), name='notification-api'),
     url(r'change-password/$', UserAPIViews.ChangePassword.as_view(), name='change-password-api'),
     url(r'change-profile-image/$', UserAPIViews.ChangeProfileImage.as_view(), name='change-profile-image-api'),
+
+    url(r'send/$', NotificationViews.send_notify, name='send'),
 ]

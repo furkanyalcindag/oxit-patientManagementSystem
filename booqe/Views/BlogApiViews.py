@@ -113,7 +113,7 @@ class GetBlogsByCategory(APIView):
 
         profile = Profile.objects.get(user=user)
 
-        for blog in category.blog_set.all():
+        for blog in category.blog_set.filter(isPublish=True):
             if BlogImage.objects.filter(blog=blog).count() > 0:
                 image = BlogImage.objects.filter(blog=blog)[0].blogImage
             else:
@@ -289,7 +289,7 @@ class GetBlogsLatest(APIView):
 
         profile = Profile.objects.get(user=user)
 
-        blogs = Blog.objects.filter().order_by('-id')[:20]
+        blogs = Blog.objects.filter(isPublish=True).order_by('-id')[:20]
 
         for blog in blogs:
             if BlogImage.objects.filter(blog=blog).count() > 0:
