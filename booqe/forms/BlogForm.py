@@ -21,7 +21,7 @@ class BlogForm(ModelForm):
                 attrs={'class': 'form-control ',  'placeholder': 'Blog Başlığı'}),
 
             'tags': forms.TextInput(
-                attrs={'class': 'form-control tags', 'id': 'tags', 'placeholder': 'Etiket', 'required': 'required',
+                attrs={'class': 'form-control tags', 'id': 'tags', 'placeholder': 'Etiket',
                        'rows': 3})
 
         }

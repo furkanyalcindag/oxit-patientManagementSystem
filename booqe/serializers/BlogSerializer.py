@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from booqe.models import Blog, Category, Profile
 from booqe.models.PinnedBlog import PinnedBlog
+from booqe.serializers.UserSerializer import ProfileSerializerFlutter
 
 
 class BlogSerializer(serializers.ModelSerializer):
@@ -88,7 +89,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class PinBlogSerializer(serializers.Serializer):
-    blog_id = serializers.IntegerField(required=True,write_only=True)
+    blog_id = serializers.IntegerField(required=True, write_only=True)
 
     def create(self, validated_data):
 
@@ -111,3 +112,11 @@ class PinBlogSerializer(serializers.Serializer):
             pinned = True
 
         return pinned
+
+
+class CekilisSerializer(serializers.Serializer):
+    users = ProfileSerializerFlutter(many=True)
+    blog = serializers.CharField()
+    title = serializers.CharField()
+    pinned_count = serializers.IntegerField()
+    blog_image = serializers.ImageField()

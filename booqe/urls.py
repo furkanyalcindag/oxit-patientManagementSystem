@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from booqe.Views import BlogViews, BlogApiViews, UserAPIViews, DashboardViews, NotificationViews
+from booqe.Views import BlogViews, BlogApiViews, UserAPIViews, DashboardViews, NotificationViews, CekilisViews
 
 app_name = 'booqe'
 
@@ -12,6 +12,8 @@ urlpatterns = [
     url(r'blog-delete/(?P<pk>\d+)$', BlogViews.delete_blog, name='blog-delete'),
     url(r'get-blogs/$', BlogViews.blogs, name='get-all'),
     url(r'image-delete/(?P<pk>\d+)$', BlogViews.delete_image, name='image-delete'),
+    url(r'cekilis/$', CekilisViews.cekilis_ekran, name='cekilis'),
+    url(r'cekilis-hazirla/$', CekilisViews.prepare_cekilis, name="cekilis-hazirla"),
 
     # api
     url(r'blogs-api-get/$', BlogApiViews.GetBlogsLatest.as_view(), name='api-get'),
