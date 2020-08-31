@@ -6,9 +6,9 @@ from oxiterp.settings.base import *
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'oxit_booqe',
+        'NAME': 'car-service',
         'USER': 'postgres',
-        'PASSWORD': 'oxit2016',
+        'PASSWORD': 'Furkan1905.',
         'HOST': 'localhost',
         'PORT': '5432',
     }
