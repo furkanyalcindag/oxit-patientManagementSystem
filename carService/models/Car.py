@@ -1,6 +1,6 @@
 from django.db import models
 
-from carService.models import Profile
+from carService.models.Profile import Profile
 
 
 class Car(models.Model):

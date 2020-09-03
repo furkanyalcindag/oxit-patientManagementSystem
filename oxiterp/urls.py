@@ -27,11 +27,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 import accounts
-import patlaks
+
 from accounts import views
-from patlaks.Views import CompetitorApiViews
-from patlaks.Views.CompetitorApiViews import topic_content_list
-from patlaks.Views.CompetitorViews import CreateCompetitor
 
 
 urlpatterns = [
@@ -49,9 +46,10 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('api/token/', TokenObtainPairView.as_view()),
     path('api/token/refresh', TokenRefreshView.as_view()),
-    path('competitor', CreateCompetitor.as_view()),
-    path('patlaks/', include('patlaks.urls')),
-    path('booqe/', include('booqe.urls')),
+
+
+    path('car-service/', include('carService.urls')),
+
 
 
 

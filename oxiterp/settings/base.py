@@ -48,8 +48,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'accounts',
 
-    'patlaks',
-    'booqe',
+    'carService'
 
 ]
 
