@@ -17,3 +17,6 @@ class UserApi(APIView):
             return Response({"message": "user is created"}, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request, format=None):
+        return Response("ok",status.HTTP_200_OK)

@@ -10,5 +10,5 @@ class Car(models.Model):
     brand = models.CharField(max_length=200, blank=True, null=True)
     model = models.CharField(max_length=200, blank=True, null=True)
     year = models.IntegerField(blank=True, null=True)
-    engine =  models.CharField(max_length=200, blank=True, null=True)
+    engine = models.CharField(max_length=200, blank=True, null=True)
     oilType = models.CharField(max_length=200, blank=True, null=True)

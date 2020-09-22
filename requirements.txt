@@ -4,3 +4,4 @@ djangorestframework
 django-rest-framework
 pillow
 psycopg2
+django-rest-swagger
