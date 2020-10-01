@@ -1,7 +1,8 @@
 django
 dj-database-url
 djangorestframework
-django-rest-framework
 pillow
-psycopg2
+psycopg2-binary
+django-cors-headers
+djangorestframework_simplejwt
 django-rest-swagger
