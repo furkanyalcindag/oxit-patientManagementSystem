@@ -61,8 +61,8 @@ class CustomerAddSerializer(serializers.Serializer):
     uuid = serializers.UUIDField(read_only=True)
     user = UserSerializer(read_only=True)
     gender = serializers.CharField(required=False)
-    first_name = serializers.CharField(required=False)
-    last_name = serializers.CharField(required=False)
+    firstName = serializers.CharField(required=True)
+    lastName = serializers.CharField(required=True)
     username = serializers.CharField(write_only=True, required=False,
                                      validators=[UniqueValidator(queryset=User.objects.all())])
     #password = serializers.CharField(write_only=True)
@@ -70,15 +70,15 @@ class CustomerAddSerializer(serializers.Serializer):
     city = serializers.CharField(required=False)
     mobilePhone = serializers.CharField(required=False)
     isCorporate = serializers.BooleanField(required=True)
-    taxNumber = serializers.CharField(required=False)
-    firmName = serializers.CharField(required=False)
+    taxNumber = serializers.CharField(required=False,allow_blank=True)
+    firmName = serializers.CharField(required=False,allow_blank=True)
 
     def create(self, validated_data):
 
         user = User.objects.create_user(username=validated_data.get('username'),
                                         email=validated_data.get('username'))
-        user.first_name = validated_data.get("first_name")
-        user.last_name = validated_data.get("last_name")
+        user.first_name = validated_data.get("firstName")
+        user.last_name = validated_data.get("lastName")
         user.set_password("Servis123.")
         user.save()
 
@@ -87,7 +87,7 @@ class CustomerAddSerializer(serializers.Serializer):
             user.groups.add(group)
             user.save()
             profile = Profile.objects.create(user=user)
-            profile.mobilePhone = validated_data.get('mobile_phone')
+            profile.mobilePhone = validated_data.get('mobilePhone')
             profile.address = validated_data.get('address')
 
             if validated_data.get('isCorporate'):
