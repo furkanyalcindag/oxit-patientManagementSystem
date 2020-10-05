@@ -61,8 +61,8 @@ class CustomerAddSerializer(serializers.Serializer):
     uuid = serializers.UUIDField(read_only=True)
     user = UserSerializer(read_only=True)
     gender = serializers.CharField(required=False)
-    firstName = serializers.CharField(required=True)
-    lastName = serializers.CharField(required=True)
+    firstName = serializers.CharField(required=True,write_only=True)
+    lastName = serializers.CharField(required=True,write_only=True)
     username = serializers.CharField(write_only=True, required=False,
                                      validators=[UniqueValidator(queryset=User.objects.all())])
     #password = serializers.CharField(write_only=True)
