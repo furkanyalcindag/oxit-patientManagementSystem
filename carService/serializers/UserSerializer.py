@@ -21,8 +21,8 @@ class UserAddSerializer(serializers.Serializer):
     uuid = serializers.UUIDField(read_only=True)
     user = UserSerializer(read_only=True)
     gender = serializers.CharField(required=False)
-    first_name = serializers.CharField(required=False)
-    last_name = serializers.CharField(required=False)
+    firstName = serializers.CharField(required=False)
+    lastName = serializers.CharField(required=False)
     username = serializers.CharField(write_only=True, required=False,
                                      validators=[UniqueValidator(queryset=User.objects.all())])
     password = serializers.CharField(write_only=True)
@@ -61,17 +61,17 @@ class CustomerAddSerializer(serializers.Serializer):
     uuid = serializers.UUIDField(read_only=True)
     user = UserSerializer(read_only=True)
     gender = serializers.CharField(required=False)
-    firstName = serializers.CharField(required=True,write_only=True)
-    lastName = serializers.CharField(required=True,write_only=True)
+    firstName = serializers.CharField(required=True, write_only=True)
+    lastName = serializers.CharField(required=True, write_only=True)
     username = serializers.CharField(write_only=True, required=False,
                                      validators=[UniqueValidator(queryset=User.objects.all())])
-    #password = serializers.CharField(write_only=True)
+    # password = serializers.CharField(write_only=True)
     birthDate = serializers.DateField(required=False)
     city = serializers.CharField(required=False)
     mobilePhone = serializers.CharField(required=False)
     isCorporate = serializers.BooleanField(required=True)
-    taxNumber = serializers.CharField(required=False,allow_blank=True)
-    firmName = serializers.CharField(required=False,allow_blank=True)
+    taxNumber = serializers.CharField(required=False, allow_blank=True)
+    firmName = serializers.CharField(required=False, allow_blank=True)
 
     def create(self, validated_data):
 
@@ -91,12 +91,12 @@ class CustomerAddSerializer(serializers.Serializer):
             profile.address = validated_data.get('address')
 
             if validated_data.get('isCorporate'):
-                profile.taxNumber=validated_data.get('taxNumber')
-                profile.firmName=validated_data.get('firmName')
-                profile.isCorporate=True
+                profile.taxNumber = validated_data.get('taxNumber')
+                profile.firmName = validated_data.get('firmName')
+                profile.isCorporate = True
 
-            else :
-                profile.isCorporate=False
+            else:
+                profile.isCorporate = False
 
             profile.save()
             return profile
@@ -106,3 +106,10 @@ class CustomerAddSerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         pass
+
+
+class CustomerPageSerializer(serializers.Serializer):
+    data = CustomerAddSerializer(many=True)
+    recordsTotal = serializers.IntegerField()
+    recordsFiltered = serializers.IntegerField()
+    pageNumber = serializers.IntegerField()
