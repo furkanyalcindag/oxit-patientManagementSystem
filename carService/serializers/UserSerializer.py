@@ -8,8 +8,7 @@ from carService.models.Profile import Profile
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['first_name','last_name','username','is_active']
-
+        fields = ['first_name', 'last_name', 'username', 'is_active']
 
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
@@ -114,4 +113,3 @@ class CustomerPageSerializer(serializers.Serializer):
     data = CustomerAddSerializer(many=True)
     recordsTotal = serializers.IntegerField()
     recordsFiltered = serializers.IntegerField()
-

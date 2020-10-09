@@ -4,7 +4,7 @@ from carService.models import Profile, Car
 
 
 class CarSerializer(serializers.Serializer):
-    uuid = serializers.UUIDField(read_only=True)
+    uuid = serializers.UUIDField(required=False)
     plate = serializers.CharField(required=True)
     brand = serializers.CharField(required=True)
     model = serializers.CharField(required=True)
@@ -20,8 +20,8 @@ class CarSerializer(serializers.Serializer):
     def create(self, validated_data):
         try:
             profile = Profile.objects.get(uuid=validated_data.get('profileUuid'))
+            car = Car()
             if profile:
-                car = Car()
                 car.brand = validated_data.get('brand')
                 car.color = validated_data.get('color')
                 car.currentKM = validated_data.get('currentKM')
@@ -33,7 +33,29 @@ class CarSerializer(serializers.Serializer):
                 car.oilType = validated_data.get('oilType')
                 car.engineNumber = validated_data.get('engineNumber')
                 car.plate = validated_data.get('plate')
-            return profile
+                car.save()
+
+            return car
+        except Exception:
+
+            raise serializers.ValidationError("lütfen tekrar deneyiniz")
+
+    def update(self, instance, validated_data):
+        try:
+            instance.brand = validated_data.get('brand')
+            instance.color = validated_data.get('color')
+            instance.currentKM = validated_data.get('currentKM')
+            instance.chassisNumber = validated_data.get('chassisNumber')
+            instance.model = validated_data.get('model')
+            instance.year = validated_data.get('year')
+            instance.engine = validated_data.get('engine')
+            instance.oilType = validated_data.get('oilType')
+            instance.engineNumber = validated_data.get('engineNumber')
+            instance.plate = validated_data.get('plate')
+            instance.save()
+            return instance
+
+
         except Exception:
 
             raise serializers.ValidationError("lütfen tekrar deneyiniz")
