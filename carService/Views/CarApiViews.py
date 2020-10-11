@@ -11,8 +11,8 @@ class CarApi(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        cars = Car.objects.filter(profile=request.GET.get('uuid'))
-        serializer = CarSerializer(cars, context={'request': request})
+        cars = Car.objects.filter(profile__uuid=request.GET.get('uuid'))
+        serializer = CarSerializer(cars, many=True, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
 
     def post(self, request, format=None):
