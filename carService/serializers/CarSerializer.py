@@ -55,7 +55,6 @@ class CarSerializer(serializers.Serializer):
             instance.save()
             return instance
 
-
         except Exception:
 
             raise serializers.ValidationError("lütfen tekrar deneyiniz")
