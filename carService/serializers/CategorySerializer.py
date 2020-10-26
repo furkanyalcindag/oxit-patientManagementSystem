@@ -16,6 +16,7 @@ class CategorySerializer(serializers.Serializer):
                 parent_category = Category.objects.get(pk=validated_data.get('parent'))
                 category.parent = parent_category
 
+            category.save()
             return category
 
         except Exception:
