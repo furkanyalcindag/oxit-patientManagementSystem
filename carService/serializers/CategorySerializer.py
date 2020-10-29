@@ -25,3 +25,14 @@ class CategorySerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         pass
+
+
+class CategorySelectSerializer(serializers.Serializer):
+    label = serializers.CharField()
+    value = serializers.CharField()
+
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
