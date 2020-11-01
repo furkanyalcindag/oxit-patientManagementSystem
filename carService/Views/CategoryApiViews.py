@@ -18,6 +18,7 @@ class CategoryApi(APIView):
         for category in categories:
             category_object = CategoryObject()
             category_object.name = category.name
+            category_object.id = category.id
             category_object.parentPath = CategoryServices.get_category_path(category, '')
             category_objects.append(category_object)
 
@@ -35,11 +36,15 @@ class CategoryApi(APIView):
 
 
 class CategorySelectApi(APIView):
-    #permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
         categories = Category.objects.all()
         category_objects = []
+        category_objectRoot = CategorySelectObject()
+        category_objectRoot.label = "Yok"
+        category_objectRoot.value = "0"
+        category_objects.append(category_objectRoot)
         for category in categories:
             category_object = CategorySelectObject()
             category_object.value = category.id
@@ -48,4 +53,3 @@ class CategorySelectApi(APIView):
 
         serializer = CategorySelectSerializer(category_objects, many=True, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
-
