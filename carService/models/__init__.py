@@ -2,7 +2,7 @@ from .Car import Car
 from .Category import Category
 from .Menu import Menu
 from .Product import Product
-from .ProductCategory import Productcategory
+from .ProductCategory import ProductCategory
 from .Profile import Profile
 from .ProfileCar import ProfileCar
 from .Service import Service
