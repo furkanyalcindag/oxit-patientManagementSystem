@@ -39,8 +39,8 @@ class ProductSerializerr(serializers.Serializer):
             for x in validated_data.get('categories'):
                 category = Category.objects.get(pk=x)
                 productCategory = ProductCategory()
-                productCategory.product=product
-                productCategory.category =category
+                productCategory.product = product
+                productCategory.category = category
                 productCategory.save()
 
             return product
