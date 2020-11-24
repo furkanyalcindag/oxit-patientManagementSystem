@@ -3,6 +3,7 @@ from rest_framework import serializers
 from carService.models import Category
 from carService.models.Product import Product
 from carService.models.ProductCategory import ProductCategory
+from carService.models.ProductImage import ProductImage
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -21,6 +22,7 @@ class ProductSerializerr(serializers.Serializer):
     taxRate = serializers.DecimalField(max_digits=5, decimal_places=2)
     totalProduct = serializers.DecimalField(max_digits=5, decimal_places=2)
     categories = serializers.ListField(child=serializers.IntegerField())
+    images = serializers.ListField(child=serializers.CharField())
 
     def update(self, instance, validated_data):
         pass
@@ -42,6 +44,12 @@ class ProductSerializerr(serializers.Serializer):
                 productCategory.product = product
                 productCategory.category = category
                 productCategory.save()
+
+            for x in validated_data.get('images'):
+                productImage = ProductImage()
+                productImage.product = product
+                productImage.image = x
+                productImage.save()
 
             return product
 
