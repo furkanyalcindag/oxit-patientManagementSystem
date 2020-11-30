@@ -7,3 +7,6 @@ from .Profile import Profile
 from .ProfileCar import ProfileCar
 from .Service import Service
 from .ServiceProduct import ServiceProduct
+from .Supplier import Supplier
+from .ServiceSituation import ServiceSituation
+from .Situation import Situation

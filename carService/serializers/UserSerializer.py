@@ -113,3 +113,41 @@ class CustomerPageSerializer(serializers.Serializer):
     data = CustomerAddSerializer(many=True)
     recordsTotal = serializers.IntegerField()
     recordsFiltered = serializers.IntegerField()
+
+
+class RepairmanSerializer(serializers.Serializer):
+    uuid = serializers.UUIDField(read_only=True)
+    user = UserSerializer(read_only=True)
+    gender = serializers.CharField(required=False)
+    firstName = serializers.CharField(required=True, write_only=True)
+    lastName = serializers.CharField(required=True, write_only=True)
+    username = serializers.CharField(write_only=True, required=False,
+                                     validators=[UniqueValidator(queryset=User.objects.all())])
+    # password = serializers.CharField(write_only=True)
+
+    mobilePhone = serializers.CharField(required=False)
+    actions = serializers.CharField(read_only=True)
+
+    def create(self, validated_data):
+
+        user = User.objects.create_user(username=validated_data.get('username'),
+                                        email=validated_data.get('username'))
+        user.first_name = validated_data.get("firstName")
+        user.last_name = validated_data.get("lastName")
+        user.set_password("Servis123.")
+        user.save()
+
+        try:
+            group = Group.objects.get(name='Repairman')
+            user.groups.add(group)
+            user.save()
+            profile = Profile.objects.create(user=user)
+            profile.mobilePhone = validated_data.get('mobilePhone')
+            profile.save()
+            return profile
+        except Exception:
+            user.delete()
+            raise serializers.ValidationError("lütfen tekrar deneyiniz")
+
+    def update(self, instance, validated_data):
+        pass

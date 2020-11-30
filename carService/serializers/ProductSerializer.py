@@ -20,11 +20,12 @@ class ProductSerializerr(serializers.Serializer):
     # productImage = serializers.ImageField()
     isOpen = serializers.BooleanField()
     taxRate = serializers.DecimalField(max_digits=5, decimal_places=2)
-    # totalProduct = serializers.DecimalField(max_digits=5, decimal_places=2)
+    #totalProduct = serializers.DecimalField(max_digits=5, decimal_places=2)
     #categories = serializers.ListField(child=serializers.IntegerField())
     categories = serializers.CharField()
     # images = serializers.ListField(child=serializers.CharField())
     productImage = serializers.CharField()
+    shelf = serializers.CharField()
 
 
     def update(self, instance, validated_data):
@@ -39,14 +40,16 @@ class ProductSerializerr(serializers.Serializer):
             product.quantity = validated_data.get('quantity')
             product.taxRate = validated_data.get('taxRate')
             product.netPrice = validated_data.get('netPrice')
+            product.shelf = validated_data.get('shelf')
             product.totalProduct = validated_data.get('netPrice') + (
                     validated_data.get('netPrice') * validated_data.get('taxRate') / 100)
+            product.productImage =validated_data.get('productImage')
             product.save()
 
-            productImage = ProductImage()
+            '''productImage = ProductImage()
             productImage.product = product
             productImage.image = validated_data.get('productImage')
-            productImage.save()
+            productImage.save()'''
 
             category = Category.objects.get(pk=int(validated_data.get('categories')))
             productCategory = ProductCategory()

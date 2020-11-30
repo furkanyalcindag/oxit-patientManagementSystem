@@ -4,6 +4,7 @@ from carService.Views.CarApiViews import CarApi
 from carService.Views.CategoryApiViews import CategoryApi, CategorySelectApi
 from carService.Views.CustomerApiViews import CustomerApi
 from carService.Views.ProductApiViews import ProductApi
+from carService.Views.RepairmanViews import RepairmanApi
 from carService.Views.UserApiView import UserApi
 
 app_name = 'carService'
@@ -16,6 +17,7 @@ urlpatterns = [
     url(r'car-api/$', CarApi.as_view(), name='car-api'),
     url(r'category-api/$', CategoryApi.as_view(), name='category-api'),
     url(r'category-select-api/$', CategorySelectApi.as_view(), name='category-select-api'),
+    url(r'repairman-api/$', RepairmanApi.as_view(), name='repairman-api'),
 
     # url(r'swagger/$', views.schema_view, name='swagger'),
 

@@ -19,4 +19,4 @@ class UserApi(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request, format=None):
-        return Response("ok",status.HTTP_200_OK)
+        return Response("ok", status.HTTP_200_OK)

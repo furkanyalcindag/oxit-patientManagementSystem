@@ -8,9 +8,8 @@ class Product(models.Model):
     name = models.CharField(max_length=255,null=True)
     quantity = models.IntegerField(default=0)
     netPrice = models.DecimalField(max_digits=8, decimal_places=2,default=0)
-    productImage = models.ImageField(upload_to='product/', null=True, blank=True, verbose_name='Ürün Resmi')
+    productImage = models.TextField(null=True, blank=True)
     isOpen = models.BooleanField(null=True, default=True)
     taxRate = models.DecimalField(max_digits=8, decimal_places=2,default=0)
-    totalProduct =  models.DecimalField(max_digits=8, decimal_places=2,default=0)
-
-
+    totalProduct = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    shelf = models.CharField(max_length=50,null=True, blank=True)

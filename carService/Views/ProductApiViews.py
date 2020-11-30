@@ -11,7 +11,7 @@ class ProductApi(APIView):
     #permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        data = Product.objects.all()
+        data = Product.objects.all().order_by('-id')
         serializer = ProductSerializer(data, many=True, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
 
