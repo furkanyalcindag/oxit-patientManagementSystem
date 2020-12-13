@@ -21,3 +21,4 @@ class Service(models.Model):
     isCameraOpen = models.BooleanField(default=False)
     serviceType = models.ForeignKey(ServiceType, on_delete=models.CASCADE, null=True, blank=True)
     complaint = models.CharField(max_length=500, blank=True, null=True)
+    responsiblePerson = models.CharField(max_length=100,blank=True,null=True)

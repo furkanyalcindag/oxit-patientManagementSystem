@@ -8,7 +8,8 @@ from carService.models.Profile import Profile
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'username', 'is_active']
+        fields = ['first_name', 'last_name', 'username', 'is_active', 'groups']
+        depth = 2
 
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
@@ -115,18 +116,20 @@ class CustomerPageSerializer(serializers.Serializer):
     recordsFiltered = serializers.IntegerField()
 
 
-class RepairmanSerializer(serializers.Serializer):
+class StaffSerializer(serializers.Serializer):
     uuid = serializers.UUIDField(read_only=True)
     user = UserSerializer(read_only=True)
     gender = serializers.CharField(required=False)
-    firstName = serializers.CharField(required=True, write_only=True)
-    lastName = serializers.CharField(required=True, write_only=True)
+    firstName = serializers.CharField(required=True, write_only=True,allow_blank=False)
+    lastName = serializers.CharField(required=True, write_only=True,allow_blank=False)
     username = serializers.CharField(write_only=True, required=False,
                                      validators=[UniqueValidator(queryset=User.objects.all())])
     # password = serializers.CharField(write_only=True)
 
-    mobilePhone = serializers.CharField(required=False)
+    mobilePhone = serializers.CharField(required=False,allow_null=True,allow_blank=True)
     actions = serializers.CharField(read_only=True)
+    group = serializers.CharField(write_only=True,label="grup")
+    address = serializers.CharField(allow_null=True, required=False,allow_blank=True)
 
     def create(self, validated_data):
 
@@ -138,11 +141,12 @@ class RepairmanSerializer(serializers.Serializer):
         user.save()
 
         try:
-            group = Group.objects.get(name='Repairman')
+            group = Group.objects.get(id=int(validated_data.get("group")))
             user.groups.add(group)
             user.save()
             profile = Profile.objects.create(user=user)
             profile.mobilePhone = validated_data.get('mobilePhone')
+            profile.address = validated_data.get('address')
             profile.save()
             return profile
         except Exception:
@@ -151,3 +155,15 @@ class RepairmanSerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         pass
+
+
+class StaffPageSerializer(serializers.Serializer):
+    data = StaffSerializer(many=True)
+    recordsTotal = serializers.IntegerField()
+    recordsFiltered = serializers.IntegerField()
+
+
+class UserGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = ['id', 'name']
