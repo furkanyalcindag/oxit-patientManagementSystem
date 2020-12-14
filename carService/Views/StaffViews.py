@@ -1,4 +1,4 @@
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
 from django.db.models import Q
 from rest_framework import status
 from rest_framework.response import Response
@@ -6,6 +6,8 @@ from rest_framework.views import APIView
 
 from carService.models import Profile
 from carService.models.ApiObject import APIObject
+from carService.models.SelectObject import SelectObject
+from carService.serializers.GeneralSerializer import SelectSerializer
 from carService.serializers.UserSerializer import StaffSerializer, StaffPageSerializer
 
 
@@ -26,7 +28,7 @@ class StaffApi(APIView):
               Q(firmName__icontains=search)).order_by('-id')[start:end]
   '''
 
-        data = Profile.objects.filter(~Q(user__groups__name__iexact='Customer'))
+        data = Profile.objects.filter(~Q(user__groups__name__iexact=request.Get.get('name')))
         apiObject = APIObject()
         apiObject.data = data
         apiObject.recordsFiltered = data.count()
@@ -55,3 +57,25 @@ class StaffApi(APIView):
                     errors_dict['Soyisim'] = value
 
             return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ServicemanSelectApi(APIView):
+
+    # permission_classes = (IsAuthenticated,)
+
+    def get(self, request, format=None):
+        servicemans = Profile.objects.filter(user__groups__name__exact='Tamirci')
+        serviceman_objects = []
+        select_object_root = SelectObject()
+        select_object_root.label = "Seçiniz"
+        select_object_root.value = ""
+        serviceman_objects.append(select_object_root)
+
+        for serviceman in servicemans:
+            select_object = SelectObject()
+            select_object.label = serviceman.user.first_name + ' ' + serviceman.user.last_name
+            select_object.value = serviceman.id
+            serviceman_objects.append(select_object)
+
+        serializer = SelectSerializer(serviceman_objects, many=True, context={'request': request})
+        return Response(serializer.data, status.HTTP_200_OK)

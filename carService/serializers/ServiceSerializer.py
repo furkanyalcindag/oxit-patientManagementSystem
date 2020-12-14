@@ -1,5 +1,9 @@
+import trace
+import traceback
+
 from rest_framework import serializers
 
+from carService.models import Profile, ServiceSituation
 from carService.models.Car import Car
 from carService.models.Service import Service
 from carService.models.Situation import Situation
@@ -35,8 +39,22 @@ class ServiceSerializer(serializers.Serializer):
             service.car = Car.objects.get(uuid=validated_data.get('carUUID'))
             service.serviceType = ServiceType.objects.get(id=int(validated_data.get('serviceType')))
             service.responsiblePerson = validated_data.get('responsiblePerson')
+            service.serviceman = Profile.objects.get(pk=int(validated_data.get('serviceman')))
+            service.price = 0
+            service.totalPrice = 0
+            service.discount = 0
             service.save()
+
+            situation = Situation.objects.get(name__exact='İşlem Bekleniyor')
+            service_situation = ServiceSituation()
+            service_situation.service = service
+            service_situation.situation = situation
+
+            service_situation.save()
+            return service
+
         except:
+            traceback.print_exc()
             raise serializers.ValidationError("lütfen tekrar deneyiniz")
 
     def update(self, instance, validated_data):

@@ -40,6 +40,8 @@ class ServiceApi(APIView):
                     errors_dict['Şikayet'] = value
                 elif key == 'responsiblePerson':
                     errors_dict['Sorumlu Kişi'] = value
+                elif key =='serviceman':
+                    errors_dict['Usta'] = value
 
             return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
 
@@ -50,6 +52,10 @@ class ServiceTypeSelectApi(APIView):
     def get(self, request, format=None):
         service_types = ServiceType.objects.all()
         service_types_objects = []
+        select_object_root = SelectObject()
+        select_object_root.label = "Seçiniz"
+        select_object_root.value = ""
+        service_types_objects.append(select_object_root)
 
         for service_type in service_types:
             select_object = SelectObject()
