@@ -1,8 +1,9 @@
+from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from carService.models import Service, Car, ServiceSituation
+from carService.models import Service, Car, ServiceSituation, Profile
 from carService.models.ApiObject import APIObject
 from carService.models.SelectObject import SelectObject
 from carService.models.ServiceType import ServiceType
@@ -79,11 +80,51 @@ class GetCarServicesApi(APIView):
             data['serviceType'] = service.serviceType.name
             data['carUUID'] = request.GET.get('uuid')
             data['serviceKM'] = service.serviceKM
-            data['complaint'] =service.complaint
-            data['serviceSituation'] = ServiceSituation.objects.filter(service=service).order_by('-id')[:1][0].situation.name
+            data['complaint'] = service.complaint
+            data['serviceSituation'] = ServiceSituation.objects.filter(service=service).order_by('-id')[:1][
+                0].situation.name
             data['creationDate'] = service.creationDate
             data['serviceman'] = service.serviceman.user.first_name + ' ' + service.serviceman.user.last_name
             service_array.append(data)
 
         serializer = ServiceSerializer(service_array, many=True, context={'request': request})
+        return Response(serializer.data, status.HTTP_200_OK)
+
+
+class GetServicesApi(APIView):
+    # permission_classes = (IsAuthenticated,)
+    def get(self, request, format=None):
+        user = User.objects.get(id=request.user.id)
+        group_name = request.user.groups.filter()[0].name
+        services = dict()
+        if group_name == 'Tamirci':
+            services = Service.objects.filter(serviceman__user=user).order_by('-id')
+        elif group_name == 'Admin':
+            services = Service.objects.filter().order_by('-id')
+        elif group_name =='Customer':
+            cars = Car.objects.filter(profile=Profile.objects.get(user=user))
+            services = Service.objects.filter(car__in=cars).order_by('-id')
+
+        service_array = []
+
+        for service in services:
+            data = dict()
+            data['serviceType'] = service.serviceType.name
+            data['carUUID'] = service.car.uuid
+            data['serviceKM'] = service.serviceKM
+            data['complaint'] = service.complaint
+            data['serviceSituation'] = ServiceSituation.objects.filter(service=service).order_by('-id')[:1][
+                0].situation.name
+            data['creationDate'] = service.creationDate
+            data['responsiblePerson']=service.responsiblePerson
+            data['serviceman'] = service.serviceman.user.first_name + ' ' + service.serviceman.user.last_name
+            service_array.append(data)
+
+        api_object = APIObject()
+        api_object.data = service_array
+        api_object.recordsFiltered = services.count()
+        api_object.recordsTotal = services.count()
+        serializer = ServicePageSerializer(api_object, context={'request': request})
+
+        #serializer = ServiceSerializer(service_array, many=True, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
