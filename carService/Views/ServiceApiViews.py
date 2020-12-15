@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from carService.models import Service, Car
+from carService.models import Service, Car, ServiceSituation
 from carService.models.ApiObject import APIObject
 from carService.models.SelectObject import SelectObject
 from carService.models.ServiceType import ServiceType
@@ -40,7 +40,7 @@ class ServiceApi(APIView):
                     errors_dict['Şikayet'] = value
                 elif key == 'responsiblePerson':
                     errors_dict['Sorumlu Kişi'] = value
-                elif key =='serviceman':
+                elif key == 'serviceman':
                     errors_dict['Usta'] = value
 
             return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
@@ -64,4 +64,26 @@ class ServiceTypeSelectApi(APIView):
             service_types_objects.append(select_object)
 
         serializer = SelectSerializer(service_types_objects, many=True, context={'request': request})
+        return Response(serializer.data, status.HTTP_200_OK)
+
+
+class GetCarServicesApi(APIView):
+    # permission_classes = (IsAuthenticated,)
+    def get(self, request, format=None):
+        car = Car.objects.get(uuid=request.GET.get('uuid'))
+        services = Service.objects.filter(car=car).order_by('-id')
+        service_array = []
+
+        for service in services:
+            data = dict()
+            data['serviceType'] = service.serviceType.name
+            data['carUUID'] = request.GET.get('uuid')
+            data['serviceKM'] = service.serviceKM
+            data['complaint'] =service.complaint
+            data['serviceSituation'] = ServiceSituation.objects.filter(service=service).order_by('-id')[:1][0].situation.name
+            data['creationDate'] = service.creationDate
+            data['serviceman'] = service.serviceman.user.first_name + ' ' + service.serviceman.user.last_name
+            service_array.append(data)
+
+        serializer = ServiceSerializer(service_array, many=True, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)

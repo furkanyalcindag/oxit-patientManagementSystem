@@ -35,3 +35,8 @@ class CarApi(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class GetCarApi(APIView):
+    def get(self, request, format=None):
+        cars = Car.objects.get(uuid=request.GET.get('uuid'))
+        serializer = CarSerializer(cars, context={'request': request})
+        return Response(serializer.data, status.HTTP_200_OK)

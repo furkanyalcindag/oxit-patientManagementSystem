@@ -31,6 +31,7 @@ class ServiceSerializer(serializers.Serializer):
     responsiblePerson = serializers.CharField(allow_null=True, allow_blank=True)
     creationDate = serializers.DateTimeField(read_only=True)
     serviceman = serializers.CharField(allow_blank=False)
+    actions = serializers.CharField(read_only=True)
 
     def create(self, validated_data):
         try:
@@ -39,6 +40,7 @@ class ServiceSerializer(serializers.Serializer):
             service.car = Car.objects.get(uuid=validated_data.get('carUUID'))
             service.serviceType = ServiceType.objects.get(id=int(validated_data.get('serviceType')))
             service.responsiblePerson = validated_data.get('responsiblePerson')
+            service.serviceKM = int(validated_data.get('serviceKM'))
             service.serviceman = Profile.objects.get(pk=int(validated_data.get('serviceman')))
             service.price = 0
             service.totalPrice = 0

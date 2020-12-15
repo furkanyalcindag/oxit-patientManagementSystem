@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from carService.models import Profile, Car
+from carService.serializers.UserSerializer import CustomerAddSerializer
 
 
 class CarSerializer(serializers.Serializer):
@@ -16,6 +17,7 @@ class CarSerializer(serializers.Serializer):
     currentKM = serializers.CharField(required=True)
     engineNumber = serializers.CharField(required=True)
     color = serializers.CharField(required=True)
+    profile = CustomerAddSerializer(read_only=True)
 
     def create(self, validated_data):
         try:

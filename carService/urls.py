@@ -1,10 +1,10 @@
 from django.conf.urls import url
 
-from carService.Views.CarApiViews import CarApi
+from carService.Views.CarApiViews import CarApi, GetCarApi
 from carService.Views.CategoryApiViews import CategoryApi, CategorySelectApi
 from carService.Views.CustomerApiViews import CustomerApi
 from carService.Views.ProductApiViews import ProductApi
-from carService.Views.ServiceApiVİews import ServiceTypeSelectApi, ServiceApi
+from carService.Views.ServiceApiViews import ServiceTypeSelectApi, ServiceApi, GetCarServicesApi
 from carService.Views.StaffViews import StaffApi, ServicemanSelectApi
 from carService.Views.UserApiView import UserApi, GroupApi
 
@@ -23,6 +23,8 @@ urlpatterns = [
     url(r'staff-api/$', StaffApi.as_view(), name='staff-api'),
     url(r'service-api/$', ServiceApi.as_view(), name='service-api'),
     url(r'serviceman-select-api/$', ServicemanSelectApi.as_view(), name='serviceman-select-api'),
+    url(r'get-car-by-id-api/$', GetCarApi.as_view(), name='get-car-api'),
+    url(r'get-car-services-api/$', GetCarServicesApi.as_view(), name='get-car-services-api')
 
     # url(r'swagger/$', views.schema_view, name='swagger'),
 

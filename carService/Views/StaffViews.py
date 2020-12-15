@@ -28,7 +28,8 @@ class StaffApi(APIView):
               Q(firmName__icontains=search)).order_by('-id')[start:end]
   '''
 
-        data = Profile.objects.filter(~Q(user__groups__name__iexact=request.Get.get('name')))
+        # data = Profile.objects.filter(~Q(user__groups__name__iexact=request.Get.get('name')))
+        data = Profile.objects.filter(~Q(user__groups__name__iexact='Customer'))
         apiObject = APIObject()
         apiObject.data = data
         apiObject.recordsFiltered = data.count()
