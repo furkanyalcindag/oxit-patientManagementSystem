@@ -83,7 +83,7 @@ class GetCarServicesApi(APIView):
             data['complaint'] = service.complaint
             data['serviceSituation'] = ServiceSituation.objects.filter(service=service).order_by('-id')[:1][
                 0].situation.name
-            data['creationDate'] = service.creationDate
+            data['creationDate'] = service.creationDate.strftime("%d-%m-%Y %H:%M:%S")
             data['serviceman'] = service.serviceman.user.first_name + ' ' + service.serviceman.user.last_name
             service_array.append(data)
 
@@ -109,13 +109,14 @@ class GetServicesApi(APIView):
 
         for service in services:
             data = dict()
+            data['uuid'] = service.uuid
             data['serviceType'] = service.serviceType.name
             data['carUUID'] = service.car.uuid
             data['serviceKM'] = service.serviceKM
             data['complaint'] = service.complaint
             data['serviceSituation'] = ServiceSituation.objects.filter(service=service).order_by('-id')[:1][
                 0].situation.name
-            data['creationDate'] = service.creationDate
+            data['creationDate'] = service.creationDate.strftime("%d-%m-%Y %H:%M:%S")
             data['plate'] = service.car.plate
             data['responsiblePerson'] = service.responsiblePerson
             data['serviceman'] = service.serviceman.user.first_name + ' ' + service.serviceman.user.last_name
@@ -126,6 +127,32 @@ class GetServicesApi(APIView):
         api_object.recordsFiltered = services.count()
         api_object.recordsTotal = services.count()
         serializer = ServicePageSerializer(api_object, context={'request': request})
+
+        # serializer = ServiceSerializer(service_array, many=True, context={'request': request})
+        return Response(serializer.data, status.HTTP_200_OK)
+
+
+class GetServiceDetailApi(APIView):
+    # permission_classes = (IsAuthenticated,)
+    def get(self, request, format=None):
+        services = dict()
+
+        service = Service.objects.get(uuid=request.GET.get('uuid'))
+        service_array = []
+        data = dict()
+        data['uuid'] = service.uuid
+        data['serviceType'] = service.serviceType.name
+        data['carUUID'] = service.car.uuid
+        data['serviceKM'] = service.serviceKM
+        data['complaint'] = service.complaint
+        data['serviceSituation'] = ServiceSituation.objects.filter(service=service).order_by('-id')[:1][
+            0].situation.name
+        data['creationDate'] = service.creationDate.strftime("%d-%m-%Y %H:%M:%S")
+        data['plate'] = service.car.plate
+        data['responsiblePerson'] = service.responsiblePerson
+        data['serviceman'] = service.serviceman.user.first_name + ' ' + service.serviceman.user.last_name
+
+        serializer = ServiceSerializer(data, context={'request': request})
 
         # serializer = ServiceSerializer(service_array, many=True, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)

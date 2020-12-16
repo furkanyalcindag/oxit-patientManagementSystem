@@ -23,6 +23,7 @@ class ServiceTypeSerializer(serializers.ModelSerializer):
 
 
 class ServiceSerializer(serializers.Serializer):
+    uuid = serializers.UUIDField(read_only=True)
     carUUID = serializers.UUIDField()
     serviceType = serializers.CharField()
     serviceKM = serializers.IntegerField()
