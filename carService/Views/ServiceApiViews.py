@@ -101,7 +101,7 @@ class GetServicesApi(APIView):
             services = Service.objects.filter(serviceman__user=user).order_by('-id')
         elif group_name == 'Admin':
             services = Service.objects.filter().order_by('-id')
-        elif group_name =='Customer':
+        elif group_name == 'Customer':
             cars = Car.objects.filter(profile=Profile.objects.get(user=user))
             services = Service.objects.filter(car__in=cars).order_by('-id')
 
@@ -116,7 +116,8 @@ class GetServicesApi(APIView):
             data['serviceSituation'] = ServiceSituation.objects.filter(service=service).order_by('-id')[:1][
                 0].situation.name
             data['creationDate'] = service.creationDate
-            data['responsiblePerson']=service.responsiblePerson
+            data['plate'] = service.car.plate
+            data['responsiblePerson'] = service.responsiblePerson
             data['serviceman'] = service.serviceman.user.first_name + ' ' + service.serviceman.user.last_name
             service_array.append(data)
 
@@ -126,5 +127,5 @@ class GetServicesApi(APIView):
         api_object.recordsTotal = services.count()
         serializer = ServicePageSerializer(api_object, context={'request': request})
 
-        #serializer = ServiceSerializer(service_array, many=True, context={'request': request})
+        # serializer = ServiceSerializer(service_array, many=True, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)

@@ -32,6 +32,7 @@ class ServiceSerializer(serializers.Serializer):
     creationDate = serializers.DateTimeField(read_only=True)
     serviceman = serializers.CharField(allow_blank=False)
     actions = serializers.CharField(read_only=True)
+    plate = serializers.CharField(read_only=True)
 
     def create(self, validated_data):
         try:
