@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -12,7 +13,7 @@ from carService.serializers.ServiceSerializer import ServicePageSerializer, Serv
 
 
 class ServiceApi(APIView):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     def get(self, request, format=None):
         data = Service.objects.filter(car=Car.objects.get(uuid=request.GET.get('carId'))).order_by('-id')
         api_object = APIObject()
@@ -48,7 +49,7 @@ class ServiceApi(APIView):
 
 
 class ServiceTypeSelectApi(APIView):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
         service_types = ServiceType.objects.all()
@@ -69,7 +70,7 @@ class ServiceTypeSelectApi(APIView):
 
 
 class GetCarServicesApi(APIView):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     def get(self, request, format=None):
         car = Car.objects.get(uuid=request.GET.get('uuid'))
         services = Service.objects.filter(car=car).order_by('-id')
@@ -92,7 +93,7 @@ class GetCarServicesApi(APIView):
 
 
 class GetServicesApi(APIView):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     def get(self, request, format=None):
         user = User.objects.get(id=request.user.id)
         group_name = request.user.groups.filter()[0].name

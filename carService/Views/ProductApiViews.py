@@ -8,7 +8,7 @@ from rest_framework.response import Response
 
 
 class ProductApi(APIView):
-    #permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
         data = Product.objects.all().order_by('-id')

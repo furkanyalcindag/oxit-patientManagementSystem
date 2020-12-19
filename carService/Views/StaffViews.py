@@ -1,6 +1,7 @@
 from django.contrib.auth.models import Group, User
 from django.db.models import Q
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -12,7 +13,7 @@ from carService.serializers.UserSerializer import StaffSerializer, StaffPageSeri
 
 
 class StaffApi(APIView):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
         '''  search = request.GET.get('search')
@@ -62,7 +63,7 @@ class StaffApi(APIView):
 
 class ServicemanSelectApi(APIView):
 
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
         servicemans = Profile.objects.filter(user__groups__name__exact='Tamirci')
