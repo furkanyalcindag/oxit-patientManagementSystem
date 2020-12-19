@@ -16,10 +16,10 @@ class ProductSerializerr(serializers.Serializer):
     barcodeNumber = serializers.CharField()
     name = serializers.CharField()
     quantity = serializers.IntegerField()
-    netPrice = serializers.DecimalField(max_digits=5, decimal_places=2)
+    netPrice = serializers.DecimalField(max_digits=10, decimal_places=2)
     # productImage = serializers.ImageField()
     isOpen = serializers.BooleanField()
-    taxRate = serializers.DecimalField(max_digits=5, decimal_places=2)
+    taxRate = serializers.DecimalField(max_digits=10, decimal_places=2)
     #totalProduct = serializers.DecimalField(max_digits=5, decimal_places=2)
     #categories = serializers.ListField(child=serializers.IntegerField())
     categories = serializers.CharField()
@@ -72,4 +72,5 @@ class ProductSerializerr(serializers.Serializer):
             return product
 
         except Exception:
+
             raise serializers.ValidationError("lütfen tekrar deneyiniz")
