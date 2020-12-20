@@ -34,6 +34,10 @@ class GroupApi(APIView):
     def get(self, request, format=None):
         groups = Group.objects.filter(~Q(name='Customer'))
         group_objects = []
+        select_object_root = SelectObject()
+        select_object_root.label = "Seçiniz"
+        select_object_root.value = ""
+        group_objects.append(select_object_root)
 
         for group in groups:
             select_object = SelectObject()

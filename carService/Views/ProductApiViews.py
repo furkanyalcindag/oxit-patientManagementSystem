@@ -24,3 +24,11 @@ class ProductApi(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+class SearchProductApi(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, format=None):
+        data = Product.objects.filter(barcodeNumber__istartswith=request.GET.get('barcode')).order_by('-id')
+        serializer = ProductSerializer(data, many=True, context={'request': request})
+        return Response(serializer.data, status.HTTP_200_OK)
