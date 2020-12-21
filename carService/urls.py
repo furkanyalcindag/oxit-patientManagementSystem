@@ -5,7 +5,7 @@ from carService.Views.CategoryApiViews import CategoryApi, CategorySelectApi
 from carService.Views.CustomerApiViews import CustomerApi
 from carService.Views.ProductApiViews import ProductApi, SearchProductApi
 from carService.Views.ServiceApiViews import ServiceTypeSelectApi, ServiceApi, GetCarServicesApi, GetServicesApi, \
-    GetServiceDetailApi
+    GetServiceDetailApi, DeterminationServiceApi
 from carService.Views.StaffViews import StaffApi, ServicemanSelectApi
 from carService.Views.UserApiView import UserApi, GroupApi
 
@@ -28,7 +28,8 @@ urlpatterns = [
     url(r'get-car-services-api/$', GetCarServicesApi.as_view(), name='get-car-services-api'),
     url(r'get-services-api/$', GetServicesApi.as_view(), name='get-services-api'),
     url(r'get-service-detail-api/$', GetServiceDetailApi.as_view(), name='get-services-detail-api'),
-    url(r'get-product-search-api/$', SearchProductApi.as_view() )
+    url(r'get-product-search-api/$', SearchProductApi.as_view()),
+    url(r'service-determination-api/$', DeterminationServiceApi.as_view())
 
     # url(r'swagger/$', views.schema_view, name='swagger'),
 

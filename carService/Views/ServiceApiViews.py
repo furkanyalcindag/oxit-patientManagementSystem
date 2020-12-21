@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from carService.models import Service, Car, ServiceSituation, Profile
+from carService.models import Service, Car, ServiceSituation, Profile, ServiceProduct, Product, ServiceImage, Situation
 from carService.models.ApiObject import APIObject
 from carService.models.SelectObject import SelectObject
 from carService.models.ServiceType import ServiceType
@@ -14,6 +14,7 @@ from carService.serializers.ServiceSerializer import ServicePageSerializer, Serv
 
 class ServiceApi(APIView):
     permission_classes = (IsAuthenticated,)
+
     def get(self, request, format=None):
         data = Service.objects.filter(car=Car.objects.get(uuid=request.GET.get('carId'))).order_by('-id')
         api_object = APIObject()
@@ -71,6 +72,7 @@ class ServiceTypeSelectApi(APIView):
 
 class GetCarServicesApi(APIView):
     permission_classes = (IsAuthenticated,)
+
     def get(self, request, format=None):
         car = Car.objects.get(uuid=request.GET.get('uuid'))
         services = Service.objects.filter(car=car).order_by('-id')
@@ -94,6 +96,7 @@ class GetCarServicesApi(APIView):
 
 class GetServicesApi(APIView):
     permission_classes = (IsAuthenticated,)
+
     def get(self, request, format=None):
         user = User.objects.get(id=request.user.id)
         group_name = request.user.groups.filter()[0].name
@@ -157,3 +160,44 @@ class GetServiceDetailApi(APIView):
 
         # serializer = ServiceSerializer(service_array, many=True, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
+
+
+class DeterminationServiceApi(APIView):
+    # permission_classes = (IsAuthenticated,)
+    def post(self, request, format=None):
+        try:
+            products = request.data['products']
+            photos = request.data['photos']
+            uuid = request.data['uuid']
+            determination = request.data['determination'] if request.data['determination'] is not None else ''
+            service = Service.objects.get(uuid=uuid)
+            service.description = determination
+            service.save()
+
+            for product in products:
+                productObj = Product.objects.get(uuid=product['uuid'])
+                serviceProduct = ServiceProduct()
+                serviceProduct.product = productObj
+                serviceProduct.service = service
+                serviceProduct.productNetPrice = productObj.netPrice
+                serviceProduct.productTaxRate = productObj.taxRate
+                serviceProduct.quantity = 1
+                serviceProduct.productTotalPrice = productObj.netPrice + (productObj.netPrice * product.taxRate / 100)
+                serviceProduct.save()
+
+            for photo in photos:
+                serviceImage = ServiceImage()
+                serviceImage.service = service
+                serviceImage.image = photo['path']
+                serviceImage.save()
+
+            situation = Situation.objects.get(name__exact='Müşteri Onayı Bekleniyor')
+            service_situation = ServiceSituation()
+            service_situation.service = service
+            service_situation.situation = situation
+            service_situation.save()
+
+            return Response("Başarılı", status.HTTP_200_OK)
+
+        except:
+            return Response("Başarısız", status.HTTP_400_BAD_REQUEST)
