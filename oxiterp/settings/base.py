@@ -31,7 +31,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -97,13 +96,13 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
-'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
 
 }
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=14400),
-    #'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=100),
+    # 'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=100),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
 
@@ -122,9 +121,9 @@ SIMPLE_JWT = {
 
     'JTI_CLAIM': 'jti',
 
-    #'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
-    #'SLIDING_TOKEN_LIFETIME': datetime.timedelta(minutes=5),
-    #'SLIDING_TOKEN_REFRESH_LIFETIME': datetime.timedelta(days=1),
+    # 'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
+    # 'SLIDING_TOKEN_LIFETIME': datetime.timedelta(minutes=5),
+    # 'SLIDING_TOKEN_REFRESH_LIFETIME': datetime.timedelta(days=1),
     'JWT_ALLOW_REFRESH': False,
 }
 
@@ -197,7 +196,6 @@ LOGIN_REDIRECT_URL = '/patlaks'
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
-
 CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ALLOW_CREDENTIALS = True
@@ -215,7 +213,6 @@ CORS_ALLOW_HEADERS = [
 ]
 
 SWAGGER_SETTINGS = {
-
 
     'exclude_url_names': [],
     'exclude_namespaces': [],
@@ -235,7 +232,7 @@ SWAGGER_SETTINGS = {
     'unauthenticated_user': 'django.contrib.auth.models.AnonymousUser',
     'permission_denied_handler': None,
     'resource_access_handler': None,
-    'base_path':'helloreverb.com/docs',
+    'base_path': 'helloreverb.com/docs',
     'info': {
         'contact': 'apiteam@wordnik.com',
         'description': 'This is a sample server Petstore server. '
@@ -252,6 +249,5 @@ SWAGGER_SETTINGS = {
         'title': 'Swagger Sample App',
     },
     'doc_expansion': 'none',
-
 
 }

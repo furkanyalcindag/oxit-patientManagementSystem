@@ -120,16 +120,16 @@ class StaffSerializer(serializers.Serializer):
     uuid = serializers.UUIDField(read_only=True)
     user = UserSerializer(read_only=True)
     gender = serializers.CharField(required=False)
-    firstName = serializers.CharField(required=True, write_only=True,allow_blank=False)
-    lastName = serializers.CharField(required=True, write_only=True,allow_blank=False)
+    firstName = serializers.CharField(required=True, write_only=True, allow_blank=False)
+    lastName = serializers.CharField(required=True, write_only=True, allow_blank=False)
     username = serializers.CharField(write_only=True, required=False,
                                      validators=[UniqueValidator(queryset=User.objects.all())])
     # password = serializers.CharField(write_only=True)
 
-    mobilePhone = serializers.CharField(required=False,allow_null=True,allow_blank=True)
+    mobilePhone = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     actions = serializers.CharField(read_only=True)
-    group = serializers.CharField(write_only=True,label="grup")
-    address = serializers.CharField(allow_null=True, required=False,allow_blank=True)
+    group = serializers.CharField(write_only=True, label="grup")
+    address = serializers.CharField(allow_null=True, required=False, allow_blank=True)
 
     def create(self, validated_data):
 

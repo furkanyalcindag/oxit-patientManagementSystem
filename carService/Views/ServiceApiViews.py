@@ -1,3 +1,5 @@
+import traceback
+
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -109,6 +111,7 @@ class GetServicesApi(APIView):
             cars = Car.objects.filter(profile=Profile.objects.get(user=user))
             services = Service.objects.filter(car__in=cars).order_by('-id')
 
+        services = Service.objects.filter().order_by('-id')
         service_array = []
 
         for service in services:
@@ -182,7 +185,7 @@ class DeterminationServiceApi(APIView):
                 serviceProduct.productNetPrice = productObj.netPrice
                 serviceProduct.productTaxRate = productObj.taxRate
                 serviceProduct.quantity = 1
-                serviceProduct.productTotalPrice = productObj.netPrice + (productObj.netPrice * product.taxRate / 100)
+                serviceProduct.productTotalPrice = productObj.netPrice + (productObj.netPrice * productObj.taxRate / 100)
                 serviceProduct.save()
 
             for photo in photos:
@@ -200,4 +203,5 @@ class DeterminationServiceApi(APIView):
             return Response("Başarılı", status.HTTP_200_OK)
 
         except:
+            traceback.print_exc()
             return Response("Başarısız", status.HTTP_400_BAD_REQUEST)
