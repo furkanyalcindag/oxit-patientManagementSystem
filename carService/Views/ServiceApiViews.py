@@ -11,7 +11,8 @@ from carService.models.ApiObject import APIObject
 from carService.models.SelectObject import SelectObject
 from carService.models.ServiceType import ServiceType
 from carService.serializers.GeneralSerializer import SelectSerializer
-from carService.serializers.ServiceSerializer import ServicePageSerializer, ServiceSerializer
+from carService.serializers.ProductSerializer import ProductSerializer
+from carService.serializers.ServiceSerializer import ServicePageSerializer, ServiceSerializer, ServiceImageSerializer
 
 
 class ServiceApi(APIView):
@@ -158,7 +159,8 @@ class GetServiceDetailApi(APIView):
         data['plate'] = service.car.plate
         data['responsiblePerson'] = service.responsiblePerson
         data['serviceman'] = service.serviceman.user.first_name + ' ' + service.serviceman.user.last_name
-
+        data['price'] = service.price
+        data['totalPrice'] = service.totalPrice
         serializer = ServiceSerializer(data, context={'request': request})
 
         # serializer = ServiceSerializer(service_array, many=True, context={'request': request})
@@ -177,6 +179,8 @@ class DeterminationServiceApi(APIView):
             service.description = determination
             service.save()
 
+            net_price = 0
+            total_price = 0
             for product in products:
                 productObj = Product.objects.get(uuid=product['uuid'])
                 serviceProduct = ServiceProduct()
@@ -185,7 +189,10 @@ class DeterminationServiceApi(APIView):
                 serviceProduct.productNetPrice = productObj.netPrice
                 serviceProduct.productTaxRate = productObj.taxRate
                 serviceProduct.quantity = 1
-                serviceProduct.productTotalPrice = productObj.netPrice + (productObj.netPrice * productObj.taxRate / 100)
+                serviceProduct.productTotalPrice = productObj.netPrice + (
+                        productObj.netPrice * productObj.taxRate / 100)
+                net_price = net_price + serviceProduct.productNetPrice
+                total_price = total_price + serviceProduct.productTotalPrice
                 serviceProduct.save()
 
             for photo in photos:
@@ -199,9 +206,45 @@ class DeterminationServiceApi(APIView):
             service_situation.service = service
             service_situation.situation = situation
             service_situation.save()
+            service.price = net_price
+            service.totalPrice = total_price
+            service.save()
 
             return Response("Başarılı", status.HTTP_200_OK)
 
         except:
             traceback.print_exc()
             return Response("Başarısız", status.HTTP_400_BAD_REQUEST)
+
+
+class GetServiceProductsApi(APIView):
+    # permission_classes = (IsAuthenticated,)
+    def get(self, request, format=None):
+        service = Service.objects.get(uuid=request.GET.get('uuid'))
+        service_products = ServiceProduct.objects.filter(service=service)
+        products = []
+        for serviceProduct in service_products:
+            product = serviceProduct.product
+            product.netPrice = serviceProduct.productNetPrice
+            product.totalProduct = serviceProduct.productTotalPrice
+            product.taxRate = serviceProduct.productTaxRate
+            product.quantity = serviceProduct.quantity
+            products.append(product)
+
+        serializer = ProductSerializer(products, many=True, context={'request': request})
+        return Response(serializer.data, status.HTTP_200_OK)
+
+
+class GetServiceImagesApi(APIView):
+    # permission_classes = (IsAuthenticated,)
+    def get(self, request, format=None):
+        service = Service.objects.get(uuid=request.GET.get('uuid'))
+        service_images = ServiceImage.objects.filter(service=service)
+        images = []
+        for image in service_images:
+            data = dict()
+            data['image'] = image.image
+            images.append(data)
+
+        serializer = ServiceImageSerializer(images, many=True, context={'request': request})
+        return Response(serializer.data, status.HTTP_200_OK)

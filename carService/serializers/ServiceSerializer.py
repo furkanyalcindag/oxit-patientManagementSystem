@@ -34,6 +34,8 @@ class ServiceSerializer(serializers.Serializer):
     serviceman = serializers.CharField(allow_blank=False)
     actions = serializers.CharField(read_only=True)
     plate = serializers.CharField(read_only=True)
+    price = serializers.DecimalField(read_only=True, max_digits=10, decimal_places=2)
+    totalPrice = serializers.DecimalField(read_only=True, max_digits=10, decimal_places=2)
 
     def create(self, validated_data):
         try:
@@ -69,6 +71,16 @@ class ServicePageSerializer(serializers.Serializer):
     data = ServiceSerializer(many=True)
     recordsTotal = serializers.IntegerField()
     recordsFiltered = serializers.IntegerField()
+
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
+
+
+class ServiceImageSerializer(serializers.Serializer):
+    image = serializers.CharField()
 
     def update(self, instance, validated_data):
         pass
