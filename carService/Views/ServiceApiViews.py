@@ -248,3 +248,29 @@ class GetServiceImagesApi(APIView):
 
         serializer = ServiceImageSerializer(images, many=True, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
+
+
+class ServiceCustomerAcceptApi(APIView):
+
+    # permission_classes = (IsAuthenticated,)
+    def post(self, request, format=None):
+
+        try:
+            service = Service.objects.get(uuid=request.data['uuid'])
+            is_accept = request.data['isAccept']
+
+            if is_accept:
+                service_situation = ServiceSituation()
+                service_situation.service = service
+                service_situation.situation = Situation.objects.get(name='Müşteri Onayı Alındı')
+                service_situation.save()
+                return Response("Servis Onaylandı", status.HTTP_200_OK)
+            else:
+                service_situation = ServiceSituation()
+                service_situation.service = service
+                service_situation.situation = Situation.objects.get(name='İptal Edildi')
+                service_situation.save()
+                return Response("Servis İptal Edildi", status.HTTP_200_OK)
+        except:
+            traceback.print_exc()
+            return Response("Servis ", status.HTTP_400_BAD_REQUEST)
