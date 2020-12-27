@@ -11,3 +11,4 @@ from .Supplier import Supplier
 from .ServiceSituation import ServiceSituation
 from .Situation import Situation
 from .ServiceImage import ServiceImage
+from .Brand import Brand

@@ -1,6 +1,8 @@
 import uuid as uuid
 from django.db import models
 
+from carService.models.Brand import Brand
+
 
 class Product(models.Model):
     barcodeNumber = models.CharField(max_length=255)
@@ -13,3 +15,5 @@ class Product(models.Model):
     taxRate = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     totalProduct = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     shelf = models.CharField(max_length=50, null=True, blank=True)
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, null=True, blank=True)
+    purchasePrice = models.DecimalField(max_digits=10, decimal_places=2, default=0)

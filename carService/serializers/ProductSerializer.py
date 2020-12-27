@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from carService.models import Category
+from carService.models import Category, Brand
 from carService.models.Product import Product
 from carService.models.ProductCategory import ProductCategory
 from carService.models.ProductImage import ProductImage
@@ -10,6 +10,36 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'
+        depth =2
+
+
+class BrandSerializer(serializers.Serializer):
+    name = serializers.CharField(allow_blank=False, allow_null=False, required=True)
+
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        try:
+            brand = Brand()
+            brand.name = validated_data.get('name')
+            brand.save()
+            return brand
+        except Exception:
+
+            raise serializers.ValidationError("lütfen tekrar deneyiniz")
+
+
+class BrandPageSerializer(serializers.Serializer):
+    data = BrandSerializer(many=True)
+    recordsTotal = serializers.IntegerField()
+    recordsFiltered = serializers.IntegerField()
+
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
 
 
 class ProductSerializerr(serializers.Serializer):
@@ -20,13 +50,14 @@ class ProductSerializerr(serializers.Serializer):
     # productImage = serializers.ImageField()
     isOpen = serializers.BooleanField()
     taxRate = serializers.DecimalField(max_digits=10, decimal_places=2)
-    #totalProduct = serializers.DecimalField(max_digits=5, decimal_places=2)
-    #categories = serializers.ListField(child=serializers.IntegerField())
+    # totalProduct = serializers.DecimalField(max_digits=5, decimal_places=2)
+    # categories = serializers.ListField(child=serializers.IntegerField())
     categories = serializers.CharField()
     # images = serializers.ListField(child=serializers.CharField())
     productImage = serializers.CharField()
     shelf = serializers.CharField()
-
+    brand = serializers.CharField()
+    purchasePrice = serializers.DecimalField(max_digits=10, decimal_places=2)
 
     def update(self, instance, validated_data):
         pass
@@ -41,9 +72,11 @@ class ProductSerializerr(serializers.Serializer):
             product.taxRate = validated_data.get('taxRate')
             product.netPrice = validated_data.get('netPrice')
             product.shelf = validated_data.get('shelf')
+            product.purchasePrice = validated_data.get('purchasePrice')
             product.totalProduct = validated_data.get('netPrice') + (
                     validated_data.get('netPrice') * validated_data.get('taxRate') / 100)
-            product.productImage =validated_data.get('productImage')
+            product.productImage = validated_data.get('productImage')
+            product.brand = Brand.objects.get(pk=int(validated_data.get('brand')))
             product.save()
 
             '''productImage = ProductImage()

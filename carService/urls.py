@@ -3,7 +3,7 @@ from django.conf.urls import url
 from carService.Views.CarApiViews import CarApi, GetCarApi
 from carService.Views.CategoryApiViews import CategoryApi, CategorySelectApi
 from carService.Views.CustomerApiViews import CustomerApi
-from carService.Views.ProductApiViews import ProductApi, SearchProductApi
+from carService.Views.ProductApiViews import ProductApi, SearchProductApi, BrandApi, BrandSelectApi
 from carService.Views.ServiceApiViews import ServiceTypeSelectApi, ServiceApi, GetCarServicesApi, GetServicesApi, \
     GetServiceDetailApi, DeterminationServiceApi, GetServiceProductsApi, GetServiceImagesApi, ServiceCustomerAcceptApi
 from carService.Views.StaffViews import StaffApi, ServicemanSelectApi
@@ -32,7 +32,11 @@ urlpatterns = [
     url(r'service-determination-api/$', DeterminationServiceApi.as_view()),
     url(r'get-service-products-api/$', GetServiceProductsApi.as_view()),
     url(r'get-service-images-api/$', GetServiceImagesApi.as_view()),
-    url(r'service-approve-api/$', ServiceCustomerAcceptApi.as_view())
+    url(r'service-approve-api/$', ServiceCustomerAcceptApi.as_view()),
+    url(r'brand-api/$', BrandApi.as_view()),
+    url(r'brand-select-api', BrandSelectApi.as_view())
+
+
 
     # url(r'swagger/$', views.schema_view, name='swagger'),
 
