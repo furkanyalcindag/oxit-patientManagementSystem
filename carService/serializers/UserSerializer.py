@@ -73,6 +73,7 @@ class CustomerAddSerializer(serializers.Serializer):
     isCorporate = serializers.BooleanField(required=True)
     taxNumber = serializers.CharField(required=False, allow_blank=True)
     firmName = serializers.CharField(required=False, allow_blank=True)
+    taxOffice = serializers.CharField(required=False, allow_blank=False)
     actions = serializers.CharField(read_only=True)
 
     def create(self, validated_data):
@@ -95,6 +96,7 @@ class CustomerAddSerializer(serializers.Serializer):
             if validated_data.get('isCorporate'):
                 profile.taxNumber = validated_data.get('taxNumber')
                 profile.firmName = validated_data.get('firmName')
+                profile.taxOffice = validated_data.get('taxOffice')
                 profile.isCorporate = True
 
             else:

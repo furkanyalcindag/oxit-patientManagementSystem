@@ -30,3 +30,4 @@ class Profile(models.Model):
     taxNumber = models.CharField(max_length=128, null=True, blank=True)
     isCorporate = models.BooleanField(null=True, blank=True)
     firmName = models.CharField(max_length=255, null=True, blank=True)
+    taxOffice = models.CharField(max_length=255, null=True, blank=True)
