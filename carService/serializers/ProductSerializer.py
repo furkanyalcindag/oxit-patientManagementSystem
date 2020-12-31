@@ -10,7 +10,7 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'
-        depth =2
+        depth = 2
 
 
 class BrandSerializer(serializers.Serializer):
@@ -54,8 +54,8 @@ class ProductSerializerr(serializers.Serializer):
     # categories = serializers.ListField(child=serializers.IntegerField())
     categories = serializers.CharField()
     # images = serializers.ListField(child=serializers.CharField())
-    productImage = serializers.CharField()
-    shelf = serializers.CharField()
+    productImage = serializers.CharField(allow_blank=True, allow_null=True)
+    shelf = serializers.CharField(allow_null=True, allow_blank=True)
     brand = serializers.CharField()
     purchasePrice = serializers.DecimalField(max_digits=10, decimal_places=2)
 
@@ -75,7 +75,9 @@ class ProductSerializerr(serializers.Serializer):
             product.purchasePrice = validated_data.get('purchasePrice')
             product.totalProduct = validated_data.get('netPrice') + (
                     validated_data.get('netPrice') * validated_data.get('taxRate') / 100)
-            product.productImage = validated_data.get('productImage')
+
+            if validated_data.get('productImage') is not None or validated_data.get('productImage') != '':
+                product.productImage = validated_data.get('productImage')
             product.brand = Brand.objects.get(pk=int(validated_data.get('brand')))
             product.save()
 

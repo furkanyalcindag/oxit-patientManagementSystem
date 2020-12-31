@@ -69,6 +69,7 @@ class CustomerAddSerializer(serializers.Serializer):
     # password = serializers.CharField(write_only=True)
     birthDate = serializers.DateField(required=False)
     city = serializers.CharField(required=False)
+    address = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     mobilePhone = serializers.CharField(required=False)
     isCorporate = serializers.BooleanField(required=True)
     taxNumber = serializers.CharField(required=False, allow_blank=True)

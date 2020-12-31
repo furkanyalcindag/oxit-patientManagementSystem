@@ -51,7 +51,7 @@ class ServiceSerializer(serializers.Serializer):
             service.discount = 0
             service.save()
 
-            situation = Situation.objects.get(name__exact='İşlem Bekleniyor')
+            situation = Situation.objects.get(name__exact='Arıza Tespiti Bekleniyor')
             service_situation = ServiceSituation()
             service_situation.service = service
             service_situation.situation = situation
