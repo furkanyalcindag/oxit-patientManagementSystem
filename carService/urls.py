@@ -2,12 +2,15 @@ from django.conf.urls import url
 
 from carService.Views.CarApiViews import CarApi, GetCarApi
 from carService.Views.CategoryApiViews import CategoryApi, CategorySelectApi
+from carService.Views.CheckingAccountViews import CheckingAccountApi
 from carService.Views.CustomerApiViews import CustomerApi
 from carService.Views.ProductApiViews import ProductApi, SearchProductApi, BrandApi, BrandSelectApi
 from carService.Views.ServiceApiViews import ServiceTypeSelectApi, ServiceApi, GetCarServicesApi, GetServicesApi, \
-    GetServiceDetailApi, DeterminationServiceApi, GetServiceProductsApi, GetServiceImagesApi, ServiceCustomerAcceptApi
+    GetServiceDetailApi, DeterminationServiceApi, GetServiceProductsApi, GetServiceImagesApi, ServiceCustomerAcceptApi, \
+    ServiceProcessingApi
 from carService.Views.StaffViews import StaffApi, ServicemanSelectApi
 from carService.Views.UserApiView import UserApi, GroupApi
+
 
 app_name = 'carService'
 
@@ -34,7 +37,9 @@ urlpatterns = [
     url(r'get-service-images-api/$', GetServiceImagesApi.as_view()),
     url(r'service-approve-api/$', ServiceCustomerAcceptApi.as_view()),
     url(r'brand-api/$', BrandApi.as_view()),
-    url(r'brand-select-api', BrandSelectApi.as_view())
+    url(r'brand-select-api/$', BrandSelectApi.as_view()),
+    url(r'service-processing-api/$', ServiceProcessingApi.as_view()),
+    url(r'checking-account-api/$', CheckingAccountApi.as_view())
 
 
 

@@ -72,9 +72,9 @@ class CustomerAddSerializer(serializers.Serializer):
     address = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     mobilePhone = serializers.CharField(required=False)
     isCorporate = serializers.BooleanField(required=True)
-    taxNumber = serializers.CharField(required=False, allow_blank=True)
-    firmName = serializers.CharField(required=False, allow_blank=True)
-    taxOffice = serializers.CharField(required=False, allow_blank=False)
+    taxNumber = serializers.CharField(required=True, allow_blank=False)
+    firmName = serializers.CharField(required=True, allow_blank=False)
+    taxOffice = serializers.CharField(required=True, allow_blank=False)
     actions = serializers.CharField(read_only=True)
 
     def create(self, validated_data):

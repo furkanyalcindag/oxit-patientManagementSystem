@@ -12,3 +12,7 @@ from .ServiceSituation import ServiceSituation
 from .Situation import Situation
 from .ServiceImage import ServiceImage
 from .Brand import Brand
+from .PaymentType import PaymentType
+from .PaymentSituation import PaymentSituation
+from .PaymentMovement import PaymentMovement
+from .CheckingAccount import CheckingAccount

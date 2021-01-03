@@ -22,6 +22,17 @@ class ServiceTypeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ButtonSerializer(serializers.Serializer):
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
+
+    buttonName = serializers.CharField(read_only=True)
+    buttonFunction = serializers.CharField(read_only=True)
+
+
 class ServiceSerializer(serializers.Serializer):
     uuid = serializers.UUIDField(read_only=True)
     carUUID = serializers.UUIDField()
@@ -33,9 +44,13 @@ class ServiceSerializer(serializers.Serializer):
     creationDate = serializers.DateTimeField(read_only=True)
     serviceman = serializers.CharField(allow_blank=False)
     actions = serializers.CharField(read_only=True)
+    buttons = ButtonSerializer(many=True, read_only=True)
     plate = serializers.CharField(read_only=True)
     price = serializers.DecimalField(read_only=True, max_digits=10, decimal_places=2)
     totalPrice = serializers.DecimalField(read_only=True, max_digits=10, decimal_places=2)
+    laborPrice = serializers.DecimalField(read_only=True, max_digits=10, decimal_places=2)
+    laborTaxRate = serializers.DecimalField(read_only=True, max_digits=10, decimal_places=2)
+    laborName =serializers.CharField(read_only=True)
 
     def create(self, validated_data):
         try:
@@ -49,6 +64,8 @@ class ServiceSerializer(serializers.Serializer):
             service.price = 0
             service.totalPrice = 0
             service.discount = 0
+            service.laborPrice =0
+            service.laborTaxRate=0
             service.save()
 
             situation = Situation.objects.get(name__exact='Arıza Tespiti Bekleniyor')

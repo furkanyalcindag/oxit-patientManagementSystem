@@ -10,7 +10,7 @@ from carService.serializers.UserSerializer import CustomerAddSerializer, Custome
 
 
 class CustomerApi(APIView):
-    #permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
 
@@ -41,4 +41,22 @@ class CustomerApi(APIView):
             serializer.save()
             return Response({"message": "user is created"}, status=status.HTTP_200_OK)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            errors_dict = dict()
+            for key, value in serializer.errors.items():
+                if key == 'group':
+                    errors_dict['Grup'] = value
+                elif key == 'username':
+                    errors_dict['Email'] = value
+                elif key == 'firstName':
+                    errors_dict['İsim'] = value
+                elif key == 'lastName':
+                    errors_dict['Soyisim'] = value
+                elif key == 'firmName':
+                    errors_dict['Firma Adı'] = value
+                elif key == 'taxNumber':
+                    errors_dict['Vergi Numarası'] = value
+                elif key == 'taxOffice':
+                    errors_dict['Vergi Dairesi'] = value
+
+            return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)

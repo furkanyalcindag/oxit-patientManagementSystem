@@ -1,4 +1,5 @@
 import traceback
+from decimal import Decimal
 
 from django.contrib.auth.models import User
 from rest_framework import status
@@ -6,13 +7,15 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from carService.models import Service, Car, ServiceSituation, Profile, ServiceProduct, Product, ServiceImage, Situation
+from carService.models import Service, Car, ServiceSituation, Profile, ServiceProduct, Product, ServiceImage, Situation, \
+    CheckingAccount, PaymentSituation
 from carService.models.ApiObject import APIObject
 from carService.models.SelectObject import SelectObject
 from carService.models.ServiceType import ServiceType
 from carService.serializers.GeneralSerializer import SelectSerializer
 from carService.serializers.ProductSerializer import ProductSerializer
 from carService.serializers.ServiceSerializer import ServicePageSerializer, ServiceSerializer, ServiceImageSerializer
+from carService.services import ButtonServices
 
 
 class ServiceApi(APIView):
@@ -117,17 +120,21 @@ class GetServicesApi(APIView):
 
         for service in services:
             data = dict()
+            situation_name = ServiceSituation.objects.filter(service=service).order_by('-id')[:1][
+                0].situation.name
             data['uuid'] = service.uuid
             data['serviceType'] = service.serviceType.name
             data['carUUID'] = service.car.uuid
             data['serviceKM'] = service.serviceKM
             data['complaint'] = service.complaint
-            data['serviceSituation'] = ServiceSituation.objects.filter(service=service).order_by('-id')[:1][
-                0].situation.name
+            data['serviceSituation'] = situation_name
             data['creationDate'] = service.creationDate.strftime("%d-%m-%Y %H:%M:%S")
             data['plate'] = service.car.plate
             data['responsiblePerson'] = service.responsiblePerson
             data['serviceman'] = service.serviceman.user.first_name + ' ' + service.serviceman.user.last_name
+
+            data['buttons'] = ButtonServices.get_buttons(group_name, situation_name)
+
             service_array.append(data)
 
         api_object = APIObject()
@@ -161,6 +168,9 @@ class GetServiceDetailApi(APIView):
         data['serviceman'] = service.serviceman.user.first_name + ' ' + service.serviceman.user.last_name
         data['price'] = service.price
         data['totalPrice'] = service.totalPrice
+        data['laborPrice'] = service.laborPrice
+        data['laborTaxRate'] = service.laborTaxRate
+        data['laborName'] = service.laborName
         serializer = ServiceSerializer(data, context={'request': request})
 
         # serializer = ServiceSerializer(service_array, many=True, context={'request': request})
@@ -175,6 +185,9 @@ class DeterminationServiceApi(APIView):
             photos = request.data['photos']
             uuid = request.data['uuid']
             determination = request.data['determination'] if request.data['determination'] is not None else ''
+            labor_price = Decimal(request.data['laborPrice'])
+            labor_tax_rate = Decimal(request.data['laborTaxRate'])
+            labor_name = request.data['laborName']
             service = Service.objects.get(uuid=uuid)
             service.description = determination
             service.save()
@@ -206,8 +219,12 @@ class DeterminationServiceApi(APIView):
             service_situation.service = service
             service_situation.situation = situation
             service_situation.save()
-            service.price = net_price
+            service.price = net_price + labor_price
             service.totalPrice = total_price
+            service.laborPrice = labor_price
+            service.laborTaxRate = labor_tax_rate
+            service.laborName = labor_name
+            service.totalPrice = service.totalPrice + labor_price + (labor_price * labor_tax_rate / 100)
             service.save()
 
             return Response("Başarılı", status.HTTP_200_OK)
@@ -262,7 +279,7 @@ class ServiceCustomerAcceptApi(APIView):
             if is_accept:
                 service_situation = ServiceSituation()
                 service_situation.service = service
-                service_situation.situation = Situation.objects.get(name='Müşteri Onayı Alındı')
+                service_situation.situation = Situation.objects.get(name='İşlem Bekleniyor')
                 service_situation.save()
                 return Response("Servis Onaylandı", status.HTTP_200_OK)
             else:
@@ -271,6 +288,47 @@ class ServiceCustomerAcceptApi(APIView):
                 service_situation.situation = Situation.objects.get(name='İptal Edildi')
                 service_situation.save()
                 return Response("Servis İptal Edildi", status.HTTP_200_OK)
+        except:
+            traceback.print_exc()
+            return Response("Servis ", status.HTTP_400_BAD_REQUEST)
+
+
+class ServiceProcessingApi(APIView):
+    # permission_classes = (IsAuthenticated,)
+    def post(self, request, format=None):
+        try:
+            service = Service.objects.get(uuid=request.data['uuid'])
+            situation_no = request.data['situationNo']
+            service_situation = ServiceSituation()
+            service_situation.service = service
+
+            '''
+                     situation_no
+                     1=>İşleme Al
+                     2=>İşlem Tamamla
+                     3=>Teslim Et
+                     '''
+            if situation_no == 1:
+                situation = Situation.objects.get(name__exact='İşlemde')
+                service_situation.situation = situation
+                service_situation.save()
+            elif situation_no == 2:
+                situation = Situation.objects.get(name__exact='Tamamlandı')
+                service_situation.situation = situation
+                service_situation.save()
+                checking_account = CheckingAccount()
+                checking_account.service = service
+                checking_account.remainingDebt = service.totalPrice
+                checking_account.paymentSituation = PaymentSituation.objects.get(name__exact='Ödenmedi')
+                checking_account.save()
+
+            elif situation_no == 3:
+                situation = Situation.objects.get(name__exact='Teslim Edildi')
+                service_situation.situation = situation
+                service_situation.save()
+
+            return Response("Servis ", status.HTTP_200_OK)
+
         except:
             traceback.print_exc()
             return Response("Servis ", status.HTTP_400_BAD_REQUEST)
