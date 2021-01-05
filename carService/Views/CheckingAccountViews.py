@@ -16,7 +16,7 @@ class CheckingAccountApi(APIView):
         for checking_account in checking_accounts:
             data = dict()
             data['plate'] = checking_account.service.car.plate
-            data['serviceDate'] = checking_account.service.creationDate
+            data['serviceDate'] = checking_account.service.creationDate.strftime("%d-%m-%Y %H:%M:%S")
             data['customerName'] = checking_account.service.car.profile.firmName \
                 if checking_account.service.car.profile.isCorporate \
                 else checking_account.service.car.profile.user.first_name + ' ' + checking_account.service.car.profile \
@@ -24,6 +24,7 @@ class CheckingAccountApi(APIView):
             data['totalPrice'] = checking_account.service.totalPrice
             data['remainingPrice'] = checking_account.remainingDebt
             data['paymentSituation'] = checking_account.paymentSituation.name
+            checking_account_array.append(data)
 
         api_object = APIObject()
         api_object.data = checking_account_array
