@@ -2,9 +2,9 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from carService.models import CheckingAccount
+from carService.models import CheckingAccount, PaymentMovement
 from carService.models.ApiObject import APIObject
-from carService.serializers.CheckingAccountSerializer import CheckingAccountPageSerializer
+from carService.serializers.CheckingAccountSerializer import CheckingAccountPageSerializer, PaymentSerializer
 
 
 class CheckingAccountApi(APIView):
@@ -33,3 +33,40 @@ class CheckingAccountApi(APIView):
 
         serializer = CheckingAccountPageSerializer(api_object, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
+
+
+class PaymentAccountApi(APIView):
+    # permission_classes = (IsAuthenticated,)
+
+    def get(self, request, format=None):
+        checking_account = CheckingAccount.objects.get(uuid=request.GET.get('uuid'))
+        payment_movements = PaymentMovement.objects.filter(checkingAccount=checking_account).order_by('-id')
+        payment_movement_array = []
+        for payment_movement in payment_movements:
+            data = dict()
+            data['paymentAmount'] = payment_movement.paymentAmount
+            data['paymentDate'] = payment_movement.creationDate.strftime("%d-%m-%Y %H:%M:%S")
+            data['paymentTypeDesc'] = payment_movement.paymentType.name
+            data['checkingAccountUUID'] = payment_movement.uuid
+
+            payment_movement_array.append(data)
+
+        serializer = PaymentSerializer(payment_movement_array, context={'request': request})
+        return Response(serializer.data, status.HTTP_200_OK)
+
+    def post(self, request, format=None):
+        serializer = PaymentSerializer(data=request.data, context={'request': request})
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "payment is created"}, status=status.HTTP_200_OK)
+        else:
+
+            errors_dict = dict()
+            for key, value in serializer.errors.items():
+                if key == 'paymentAmount':
+                    errors_dict['Ödeme Miktarı'] = value
+                elif key == 'paymentType':
+                    errors_dict['Ödeme Tipi'] = value
+
+            return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
