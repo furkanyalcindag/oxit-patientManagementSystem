@@ -2,7 +2,7 @@ from django.conf.urls import url
 
 from carService.Views.CarApiViews import CarApi, GetCarApi
 from carService.Views.CategoryApiViews import CategoryApi, CategorySelectApi
-from carService.Views.CheckingAccountViews import CheckingAccountApi
+from carService.Views.CheckingAccountViews import CheckingAccountApi, PaymentAccountApi, PaymentTypeSelectApi
 from carService.Views.CustomerApiViews import CustomerApi
 from carService.Views.ProductApiViews import ProductApi, SearchProductApi, BrandApi, BrandSelectApi
 from carService.Views.ServiceApiViews import ServiceTypeSelectApi, ServiceApi, GetCarServicesApi, GetServicesApi, \
@@ -10,7 +10,6 @@ from carService.Views.ServiceApiViews import ServiceTypeSelectApi, ServiceApi, G
     ServiceProcessingApi
 from carService.Views.StaffViews import StaffApi, ServicemanSelectApi
 from carService.Views.UserApiView import UserApi, GroupApi
-
 
 app_name = 'carService'
 
@@ -39,9 +38,9 @@ urlpatterns = [
     url(r'brand-api/$', BrandApi.as_view()),
     url(r'brand-select-api/$', BrandSelectApi.as_view()),
     url(r'service-processing-api/$', ServiceProcessingApi.as_view()),
-    url(r'checking-account-api/$', CheckingAccountApi.as_view())
-
-
+    url(r'checking-account-api/$', CheckingAccountApi.as_view()),
+    url(r'payment-account-api/$', PaymentAccountApi.as_view()),
+    url(r'payment-type-select-api/$', PaymentTypeSelectApi.as_view())
 
     # url(r'swagger/$', views.schema_view, name='swagger'),
 

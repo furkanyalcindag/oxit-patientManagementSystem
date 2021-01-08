@@ -1,10 +1,13 @@
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from carService.models import CheckingAccount, PaymentMovement
+from carService.models import CheckingAccount, PaymentMovement, PaymentType
 from carService.models.ApiObject import APIObject
+from carService.models.SelectObject import SelectObject
 from carService.serializers.CheckingAccountSerializer import CheckingAccountPageSerializer, PaymentSerializer
+from carService.serializers.GeneralSerializer import SelectSerializer
 
 
 class CheckingAccountApi(APIView):
@@ -70,3 +73,24 @@ class PaymentAccountApi(APIView):
                     errors_dict['Ödeme Tipi'] = value
 
             return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PaymentTypeSelectApi(APIView):
+    #permission_classes = (IsAuthenticated,)
+
+    def get(self, request, format=None):
+        types = PaymentType.objects.all()
+        types_objects = []
+        select_object_root = SelectObject()
+        select_object_root.label = "Seçiniz"
+        select_object_root.value = ""
+        types_objects.append(select_object_root)
+
+        for type in types:
+            select_object = SelectObject()
+            select_object.label = type.name
+            select_object.value = type.id
+            types_objects.append(select_object)
+
+        serializer = SelectSerializer(types_objects, many=True, context={'request': request})
+        return Response(serializer.data, status.HTTP_200_OK)
