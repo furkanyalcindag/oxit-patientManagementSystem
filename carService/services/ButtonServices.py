@@ -87,3 +87,23 @@ def get_buttons(group_name: str, service_situation: str):
         buttons.append(button_object_info)
 
     return buttons
+
+
+def get_buttons_payment(payment_situation: str):
+    buttons = []
+
+    button_object_info = ServiceButtonObject()
+    button_object_info.buttonName = 'İşlem Bilgi'
+    button_object_info.buttonFunction = 'getPaymentMovementsList'
+
+    button_object_payment = ServiceButtonObject()
+    button_object_payment.buttonName = 'Ödeme Yap'
+    button_object_payment.buttonFunction = 'makePayment'
+    if payment_situation == 'Ödendi':
+        buttons.append(button_object_info)
+
+    else:
+        buttons.append(button_object_info)
+        buttons.append(button_object_payment)
+
+    return buttons

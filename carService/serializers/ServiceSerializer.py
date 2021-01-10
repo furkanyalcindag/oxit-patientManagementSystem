@@ -8,6 +8,7 @@ from carService.models.Car import Car
 from carService.models.Service import Service
 from carService.models.Situation import Situation
 from carService.models.ServiceType import ServiceType
+from carService.serializers.GeneralSerializer import ButtonSerializer
 
 
 class SituationSerializer(serializers.ModelSerializer):
@@ -21,16 +22,6 @@ class ServiceTypeSerializer(serializers.ModelSerializer):
         model = ServiceType
         fields = '__all__'
 
-
-class ButtonSerializer(serializers.Serializer):
-    def update(self, instance, validated_data):
-        pass
-
-    def create(self, validated_data):
-        pass
-
-    buttonName = serializers.CharField(read_only=True)
-    buttonFunction = serializers.CharField(read_only=True)
 
 
 class ServiceSerializer(serializers.Serializer):

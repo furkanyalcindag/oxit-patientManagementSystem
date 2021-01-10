@@ -1,3 +1,5 @@
+import traceback
+
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -8,6 +10,7 @@ from carService.models.ApiObject import APIObject
 from carService.models.SelectObject import SelectObject
 from carService.serializers.CheckingAccountSerializer import CheckingAccountPageSerializer, PaymentSerializer
 from carService.serializers.GeneralSerializer import SelectSerializer
+from carService.services import ButtonServices
 
 
 class CheckingAccountApi(APIView):
@@ -18,6 +21,7 @@ class CheckingAccountApi(APIView):
         checking_account_array = []
         for checking_account in checking_accounts:
             data = dict()
+            data['checkingAccountId'] = checking_account.uuid
             data['plate'] = checking_account.service.car.plate
             data['serviceDate'] = checking_account.service.creationDate.strftime("%d-%m-%Y %H:%M:%S")
             data['customerName'] = checking_account.service.car.profile.firmName \
@@ -27,6 +31,7 @@ class CheckingAccountApi(APIView):
             data['totalPrice'] = checking_account.service.totalPrice
             data['remainingPrice'] = checking_account.remainingDebt
             data['paymentSituation'] = checking_account.paymentSituation.name
+            data['buttons'] = ButtonServices.get_buttons_payment(checking_account.paymentSituation.name)
             checking_account_array.append(data)
 
         api_object = APIObject()
@@ -42,20 +47,25 @@ class PaymentAccountApi(APIView):
     # permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        checking_account = CheckingAccount.objects.get(uuid=request.GET.get('uuid'))
-        payment_movements = PaymentMovement.objects.filter(checkingAccount=checking_account).order_by('-id')
-        payment_movement_array = []
-        for payment_movement in payment_movements:
-            data = dict()
-            data['paymentAmount'] = payment_movement.paymentAmount
-            data['paymentDate'] = payment_movement.creationDate.strftime("%d-%m-%Y %H:%M:%S")
-            data['paymentTypeDesc'] = payment_movement.paymentType.name
-            data['checkingAccountUUID'] = payment_movement.uuid
+        try:
+            checking_account = CheckingAccount.objects.get(uuid=request.GET.get('uuid'))
+            payment_movements = PaymentMovement.objects.filter(checkingAccount=checking_account).order_by('-id')
+            payment_movement_array = []
+            for payment_movement in payment_movements:
+                data = dict()
+                data['paymentAmount'] = payment_movement.paymentAmount
+                data['paymentDate'] = payment_movement.creationDate.strftime("%d-%m-%Y %H:%M:%S")
+                data['paymentTypeDesc'] = payment_movement.paymentType.name
 
-            payment_movement_array.append(data)
 
-        serializer = PaymentSerializer(payment_movement_array, context={'request': request})
-        return Response(serializer.data, status.HTTP_200_OK)
+                payment_movement_array.append(data)
+
+            serializer = PaymentSerializer(payment_movement_array,many=True, context={'request': request})
+            return Response(serializer.data, status.HTTP_200_OK)
+        except:
+            traceback.print_exc()
+            return Response("Başarısız", status.HTTP_400_BAD_REQUEST)
+
 
     def post(self, request, format=None):
         serializer = PaymentSerializer(data=request.data, context={'request': request})
