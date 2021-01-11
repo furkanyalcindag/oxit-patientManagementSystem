@@ -55,7 +55,8 @@ class SearchProductApi(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        data = Product.objects.filter(barcodeNumber__istartswith=request.GET.get('barcode')).order_by('-id')
+        #data = Product.objects.filter(barcodeNumber__istartswith=request.GET.get('barcode')).order_by('-id')
+        data = Product.objects.filter(name__icontains=request.GET.get('barcode')).order_by('-id')
         serializer = ProductSerializer(data, many=True, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
 

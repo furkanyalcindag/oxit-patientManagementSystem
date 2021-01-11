@@ -55,9 +55,9 @@ class PaymentSerializer(serializers.Serializer):
                 payment_movement.paymentType = payment_type
                 payment_movement.save()
 
-                checking_account.remainingDebt = checking_account.remainingDebt-validated_data.get('paymentAmount')
+                checking_account.remainingDebt = checking_account.remainingDebt - validated_data.get('paymentAmount')
 
-                if checking_account.remainingDebt == validated_data.get('paymentAmount'):
+                if checking_account.remainingDebt == 0:
                     checking_account.paymentSituation = PaymentSituation.objects.get(name__exact='Ödendi')
                 else:
                     checking_account.paymentSituation = PaymentSituation.objects.get(name__exact='Kısmi Ödendi')
@@ -65,9 +65,6 @@ class PaymentSerializer(serializers.Serializer):
                 checking_account.save()
 
             return checking_account
-
-
-
 
 
         except:

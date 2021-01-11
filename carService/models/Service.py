@@ -7,7 +7,7 @@ from carService.models.ServiceType import ServiceType
 
 
 class Service(models.Model):
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     car = models.ForeignKey(Car, on_delete=models.CASCADE, null=True, blank=True)
     description = models.CharField(max_length=500, blank=True, null=True)
     serviceKM = models.IntegerField(null=True, blank=True)

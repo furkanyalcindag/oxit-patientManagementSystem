@@ -26,7 +26,7 @@ class Profile(models.Model):
     district = models.CharField(max_length=100, blank=True, null=True)
     notification = models.BooleanField(default=True)
     address = models.CharField(max_length=255, verbose_name='Adres', null=True, blank=True)
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False,unique=True)
     taxNumber = models.CharField(max_length=128, null=True, blank=True)
     isCorporate = models.BooleanField(null=True, blank=True)
     firmName = models.CharField(max_length=255, null=True, blank=True)

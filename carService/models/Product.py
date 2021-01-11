@@ -6,7 +6,7 @@ from carService.models.Brand import Brand
 
 class Product(models.Model):
     barcodeNumber = models.CharField(max_length=255)
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     name = models.CharField(max_length=255, null=True)
     quantity = models.IntegerField(default=0)
     netPrice = models.DecimalField(max_digits=10, decimal_places=2, default=0)
