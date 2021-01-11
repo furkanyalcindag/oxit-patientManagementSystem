@@ -9,6 +9,7 @@ from carService.serializers.GeneralSerializer import ButtonSerializer
 class CheckingAccountSerializer(serializers.Serializer):
     checkingAccountId = serializers.UUIDField(read_only=True)
     serviceDate = serializers.DateTimeField()
+    serviceNo = serializers.CharField(read_only=True)
     plate = serializers.CharField()
     customerName = serializers.CharField()
     remainingPrice = serializers.DecimalField(max_digits=10, decimal_places=2)
@@ -42,6 +43,7 @@ class PaymentSerializer(serializers.Serializer):
     paymentType = serializers.IntegerField(write_only=True)
     paymentTypeDesc = serializers.CharField(read_only=True)
     paymentDate = serializers.DateTimeField(read_only=True)
+
 
     def create(self, validated_data):
         payment_movement = PaymentMovement()

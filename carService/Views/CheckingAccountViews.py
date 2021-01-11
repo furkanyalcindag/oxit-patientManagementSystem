@@ -32,6 +32,7 @@ class CheckingAccountApi(APIView):
             data['remainingPrice'] = checking_account.remainingDebt
             data['paymentSituation'] = checking_account.paymentSituation.name
             data['buttons'] = ButtonServices.get_buttons_payment(checking_account.paymentSituation.name)
+            data['serviceNo'] = '#' + str(checking_account.service.pk)
             checking_account_array.append(data)
 
         api_object = APIObject()
@@ -57,15 +58,13 @@ class PaymentAccountApi(APIView):
                 data['paymentDate'] = payment_movement.creationDate.strftime("%d-%m-%Y %H:%M:%S")
                 data['paymentTypeDesc'] = payment_movement.paymentType.name
 
-
                 payment_movement_array.append(data)
 
-            serializer = PaymentSerializer(payment_movement_array,many=True, context={'request': request})
+            serializer = PaymentSerializer(payment_movement_array, many=True, context={'request': request})
             return Response(serializer.data, status.HTTP_200_OK)
         except:
             traceback.print_exc()
             return Response("Başarısız", status.HTTP_400_BAD_REQUEST)
-
 
     def post(self, request, format=None):
         serializer = PaymentSerializer(data=request.data, context={'request': request})
@@ -86,7 +85,7 @@ class PaymentAccountApi(APIView):
 
 
 class PaymentTypeSelectApi(APIView):
-    #permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
         types = PaymentType.objects.all()

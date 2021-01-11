@@ -86,6 +86,7 @@ class GetCarServicesApi(APIView):
 
         for service in services:
             data = dict()
+            data['id'] = service.pk
             data['serviceType'] = service.serviceType.name
             data['carUUID'] = request.GET.get('uuid')
             data['serviceKM'] = service.serviceKM
@@ -120,6 +121,7 @@ class GetServicesApi(APIView):
 
         for service in services:
             data = dict()
+            data['id'] = "#" + str(service.pk)
             situation_name = ServiceSituation.objects.filter(service=service).order_by('-id')[:1][
                 0].situation.name
             data['uuid'] = service.uuid
@@ -171,6 +173,7 @@ class GetServiceDetailApi(APIView):
         data['laborPrice'] = service.laborPrice
         data['laborTaxRate'] = service.laborTaxRate
         data['laborName'] = service.laborName
+        data['description'] = service.description
         serializer = ServiceSerializer(data, context={'request': request})
 
         # serializer = ServiceSerializer(service_array, many=True, context={'request': request})
