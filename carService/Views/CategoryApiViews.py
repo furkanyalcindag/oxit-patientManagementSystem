@@ -47,9 +47,10 @@ class CategorySelectApi(APIView):
         category_objectRoot.value = "0"
         category_objects.append(category_objectRoot)
         for category in categories:
+            path = CategoryServices.get_category_arr(category,[])
             category_object = CategorySelectObject()
             category_object.value = category.id
-            category_object.label = category.name
+            category_object.label = CategoryServices.get_path_from_arr(path)
             category_objects.append(category_object)
 
         serializer = CategorySelectSerializer(category_objects, many=True, context={'request': request})

@@ -14,6 +14,8 @@ class CheckingAccountSerializer(serializers.Serializer):
     customerName = serializers.CharField()
     remainingPrice = serializers.DecimalField(max_digits=10, decimal_places=2)
     totalPrice = serializers.DecimalField(max_digits=10, decimal_places=2)
+    netPrice = serializers.DecimalField(max_digits=10, decimal_places=2)
+    taxPrice = serializers.DecimalField(max_digits=10, decimal_places=2)
     buttons = ButtonSerializer(many=True, read_only=True)
 
     paymentSituation = serializers.CharField()
@@ -43,7 +45,6 @@ class PaymentSerializer(serializers.Serializer):
     paymentType = serializers.IntegerField(write_only=True)
     paymentTypeDesc = serializers.CharField(read_only=True)
     paymentDate = serializers.DateTimeField(read_only=True)
-
 
     def create(self, validated_data):
         payment_movement = PaymentMovement()

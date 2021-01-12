@@ -30,6 +30,8 @@ class CheckingAccountApi(APIView):
                 .user.last_name
             data['totalPrice'] = checking_account.service.totalPrice
             data['remainingPrice'] = checking_account.remainingDebt
+            data['netPrice'] = checking_account.service.price
+            data['taxPrice'] = checking_account.service.totalPrice-checking_account.service.price
             data['paymentSituation'] = checking_account.paymentSituation.name
             data['buttons'] = ButtonServices.get_buttons_payment(checking_account.paymentSituation.name)
             data['serviceNo'] = '#' + str(checking_account.service.pk)
