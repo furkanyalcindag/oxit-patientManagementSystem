@@ -22,7 +22,7 @@ class Service(models.Model):
     isOrder = models.BooleanField(default=False)
     creationDate = models.DateTimeField(auto_now_add=True, verbose_name='Kayıt Tarihi')
     modificationDate = models.DateTimeField(auto_now=True, verbose_name='Güncelleme Tarihi')
-    camera = models.ForeignKey(Camera, on_delete=models.CASCADE)
+    camera = models.ForeignKey(Camera, on_delete=models.CASCADE, null=True, blank=True)
     isCameraOpen = models.BooleanField(default=False)
     serviceType = models.ForeignKey(ServiceType, on_delete=models.CASCADE, null=True, blank=True)
     complaint = models.CharField(max_length=500, blank=True, null=True)

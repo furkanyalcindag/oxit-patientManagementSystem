@@ -12,11 +12,11 @@ class CarSerializer(serializers.Serializer):
     year = serializers.IntegerField(required=True)
     engine = serializers.CharField(required=True)
     profileUuid = serializers.UUIDField(write_only=True)
-    oilType = serializers.CharField(required=True)
+    oilType = serializers.CharField(required=False)
     chassisNumber = serializers.CharField(required=True)
     currentKM = serializers.CharField(required=True)
-    engineNumber = serializers.CharField(required=True)
-    color = serializers.CharField(required=True)
+    engineNumber = serializers.CharField(required=False)
+    color = serializers.CharField(required=False)
     profile = CustomerAddSerializer(read_only=True)
 
     def create(self, validated_data):
