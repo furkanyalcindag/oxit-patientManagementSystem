@@ -12,13 +12,14 @@ def get_category_path(category: Category, path: str):
 
 
 def get_category_arr(category: Category, path: []):
+    if category.name not in path:
+        path.append(category.name)
     category_parent = category.parent
     if category_parent:
         path.append(category_parent.name)
         if category_parent.parent:
             return get_category_arr(category_parent, path)
-    else:
-        path.append(category.name)
+
 
     return path
 
