@@ -14,6 +14,7 @@ class CheckingAccountSerializer(serializers.Serializer):
     customerName = serializers.CharField()
     remainingPrice = serializers.DecimalField(max_digits=10, decimal_places=2)
     totalPrice = serializers.DecimalField(max_digits=10, decimal_places=2)
+    discount = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     netPrice = serializers.DecimalField(max_digits=10, decimal_places=2)
     taxPrice = serializers.DecimalField(max_digits=10, decimal_places=2)
     buttons = ButtonSerializer(many=True, read_only=True)
@@ -36,6 +37,36 @@ class CheckingAccountPageSerializer(serializers.Serializer):
         pass
 
     def create(self, validated_data):
+        pass
+
+
+class PaymentDiscountSerializer(serializers.Serializer):
+    checkingAccountUUID = serializers.UUIDField(write_only=True)
+    paymentAmount = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+    def create(self, validated_data):
+        payment_movement = PaymentMovement()
+        try:
+            checking_account = CheckingAccount.objects.get(uuid=validated_data.get('checkingAccountUUID'))
+            if checking_account.paymentSituation.name == 'Ödenmedi' and validated_data.get(
+                    'paymentAmount') <= checking_account.remainingDebt:
+                payment_type = PaymentType.objects.get(name='İndirim')
+                payment_movement.checkingAccount = checking_account
+                payment_movement.paymentAmount = validated_data.get('paymentAmount')
+                payment_movement.paymentType = payment_type
+                payment_movement.save()
+                service = checking_account.service
+                service.discount = service.discount + validated_data.get('paymentAmount')
+                service.save()
+                checking_account.remainingDebt = checking_account.remainingDebt - validated_data.get('paymentAmount')
+                checking_account.save()
+
+            return checking_account
+        except:
+            traceback.print_exc()
+            raise serializers.ValidationError("lütfen tekrar deneyiniz")
+
+    def update(self, instance, validated_data):
         pass
 
 

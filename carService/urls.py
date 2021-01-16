@@ -2,7 +2,8 @@ from django.conf.urls import url
 
 from carService.Views.CarApiViews import CarApi, GetCarApi
 from carService.Views.CategoryApiViews import CategoryApi, CategorySelectApi
-from carService.Views.CheckingAccountViews import CheckingAccountApi, PaymentAccountApi, PaymentTypeSelectApi
+from carService.Views.CheckingAccountViews import CheckingAccountApi, PaymentAccountApi, PaymentTypeSelectApi, \
+    PaymentAccountDiscountApi, CheckingAccountByCustomerApi
 from carService.Views.CustomerApiViews import CustomerApi
 from carService.Views.ProductApiViews import ProductApi, SearchProductApi, BrandApi, BrandSelectApi
 from carService.Views.ServiceApiViews import ServiceTypeSelectApi, ServiceApi, GetCarServicesApi, GetServicesApi, \
@@ -40,7 +41,9 @@ urlpatterns = [
     url(r'service-processing-api/$', ServiceProcessingApi.as_view()),
     url(r'checking-account-api/$', CheckingAccountApi.as_view()),
     url(r'payment-account-api/$', PaymentAccountApi.as_view()),
-    url(r'payment-type-select-api/$', PaymentTypeSelectApi.as_view())
+    url(r'payment-type-select-api/$', PaymentTypeSelectApi.as_view()),
+    url(r'payment-discount-api/$', PaymentAccountDiscountApi.as_view()),
+    url(r'customer-checking-account-api/$', CheckingAccountByCustomerApi.as_view()),
 
     # url(r'swagger/$', views.schema_view, name='swagger'),
 

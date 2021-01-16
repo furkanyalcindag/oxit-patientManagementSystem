@@ -99,11 +99,21 @@ def get_buttons_payment(payment_situation: str):
     button_object_payment = ServiceButtonObject()
     button_object_payment.buttonName = 'Ödeme Yap'
     button_object_payment.buttonFunction = 'makePayment'
+
+    button_object_discount = ServiceButtonObject()
+    button_object_discount.buttonName = 'İndirim Yap'
+    button_object_discount.buttonFunction = 'makeDiscount'
+
     if payment_situation == 'Ödendi':
         buttons.append(button_object_info)
 
+    elif payment_situation == 'Kısmi Ödendi':
+        buttons.append(button_object_info)
+        buttons.append(button_object_payment)
     else:
         buttons.append(button_object_info)
         buttons.append(button_object_payment)
+        buttons.append(button_object_discount)
+
 
     return buttons

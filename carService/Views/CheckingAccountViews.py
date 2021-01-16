@@ -1,14 +1,16 @@
 import traceback
 
+from django.db.models import Q
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from carService.models import CheckingAccount, PaymentMovement, PaymentType
+from carService.models import CheckingAccount, PaymentMovement, PaymentType, Profile
 from carService.models.ApiObject import APIObject
 from carService.models.SelectObject import SelectObject
-from carService.serializers.CheckingAccountSerializer import CheckingAccountPageSerializer, PaymentSerializer
+from carService.serializers.CheckingAccountSerializer import CheckingAccountPageSerializer, PaymentSerializer, \
+    PaymentDiscountSerializer
 from carService.serializers.GeneralSerializer import SelectSerializer
 from carService.services import ButtonServices
 
@@ -29,9 +31,10 @@ class CheckingAccountApi(APIView):
                 else checking_account.service.car.profile.user.first_name + ' ' + checking_account.service.car.profile \
                 .user.last_name
             data['totalPrice'] = checking_account.service.totalPrice
+            data['discount'] = checking_account.service.discount
             data['remainingPrice'] = checking_account.remainingDebt
             data['netPrice'] = checking_account.service.price
-            data['taxPrice'] = checking_account.service.totalPrice-checking_account.service.price
+            data['taxPrice'] = checking_account.service.totalPrice - checking_account.service.price
             data['paymentSituation'] = checking_account.paymentSituation.name
             data['buttons'] = ButtonServices.get_buttons_payment(checking_account.paymentSituation.name)
             data['serviceNo'] = '#' + str(checking_account.service.pk)
@@ -44,6 +47,62 @@ class CheckingAccountApi(APIView):
 
         serializer = CheckingAccountPageSerializer(api_object, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
+
+
+class CheckingAccountByCustomerApi(APIView):
+    # permission_classes = (IsAuthenticated,)
+
+    def get(self, request, format=None):
+        profile = Profile.objects.get(uuid=request.GET.get('uuid'))
+        checking_accounts = CheckingAccount.objects.filter(service__car__profile=profile).order_by('-id')
+        checking_account_array = []
+        for checking_account in checking_accounts:
+            data = dict()
+            data['checkingAccountId'] = checking_account.uuid
+            data['plate'] = checking_account.service.car.plate
+            data['serviceDate'] = checking_account.service.creationDate.strftime("%d-%m-%Y %H:%M:%S")
+            data['customerName'] = checking_account.service.car.profile.firmName \
+                if checking_account.service.car.profile.isCorporate \
+                else checking_account.service.car.profile.user.first_name + ' ' + checking_account.service.car.profile \
+                .user.last_name
+            data['totalPrice'] = checking_account.service.totalPrice
+            data['discount'] = checking_account.service.discount
+            data['remainingPrice'] = checking_account.remainingDebt
+            data['netPrice'] = checking_account.service.price
+            data['taxPrice'] = checking_account.service.totalPrice - checking_account.service.price
+            data['paymentSituation'] = checking_account.paymentSituation.name
+            data['buttons'] = ButtonServices.get_buttons_payment(checking_account.paymentSituation.name)
+            data['serviceNo'] = '#' + str(checking_account.service.pk)
+            checking_account_array.append(data)
+
+        api_object = APIObject()
+        api_object.data = checking_account_array
+        api_object.recordsFiltered = checking_accounts.count()
+        api_object.recordsTotal = checking_accounts.count()
+
+        serializer = CheckingAccountPageSerializer(api_object, context={'request': request})
+        return Response(serializer.data, status.HTTP_200_OK)
+
+
+class PaymentAccountDiscountApi(APIView):
+    # permission_classes = (IsAuthenticated,)
+
+    def post(self, request, format=None):
+        serializer = PaymentDiscountSerializer(data=request.data, context={'request': request})
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "payment is created"}, status=status.HTTP_200_OK)
+        else:
+
+            errors_dict = dict()
+            for key, value in serializer.errors.items():
+                if key == 'paymentAmount':
+                    errors_dict['Ödeme Miktarı'] = value
+                elif key == 'paymentType':
+                    errors_dict['Ödeme Tipi'] = value
+
+            return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PaymentAccountApi(APIView):
@@ -90,7 +149,7 @@ class PaymentTypeSelectApi(APIView):
     # permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        types = PaymentType.objects.all()
+        types = PaymentType.objects.filter(~Q(name='İndirim'))
         types_objects = []
         select_object_root = SelectObject()
         select_object_root.label = "Seçiniz"
