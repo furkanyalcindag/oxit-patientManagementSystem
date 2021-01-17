@@ -117,7 +117,7 @@ class GetServicesApi(APIView):
             cars = Car.objects.filter(profile=Profile.objects.get(user=user))
             services = Service.objects.filter(car__in=cars).order_by('-id')
 
-        services = Service.objects.filter().order_by('-id')
+        #services = Service.objects.filter().order_by('-id')
         service_array = []
 
         for service in services:
