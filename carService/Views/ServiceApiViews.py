@@ -109,7 +109,8 @@ class GetServicesApi(APIView):
         group_name = request.user.groups.filter()[0].name
         services = dict()
         if group_name == 'Tamirci':
-            services = Service.objects.filter(serviceman__user=user).order_by('-id')
+            profile = Profile.objects.get(user=user)
+            services = Service.objects.filter(serviceman=profile).order_by('-id')
         elif group_name == 'Admin':
             services = Service.objects.filter().order_by('-id')
         elif group_name == 'Customer':
