@@ -43,7 +43,7 @@ urlpatterns = [
     url(r'payment-account-api/$', PaymentAccountApi.as_view()),
     url(r'payment-type-select-api/$', PaymentTypeSelectApi.as_view()),
     url(r'payment-discount-api/$', PaymentAccountDiscountApi.as_view()),
-    url(r'customer-checking-account-api/$', CheckingAccountByCustomerApi.as_view()),
+    url(r'checking-customer-account-api/$', CheckingAccountByCustomerApi.as_view()),
 
     # url(r'swagger/$', views.schema_view, name='swagger'),
 
