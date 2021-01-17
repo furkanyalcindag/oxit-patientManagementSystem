@@ -117,7 +117,7 @@ class GetServicesApi(APIView):
             cars = Car.objects.filter(profile=Profile.objects.get(user=user))
             services = Service.objects.filter(car__in=cars).order_by('-id')
 
-        #services = Service.objects.filter().order_by('-id')
+        # services = Service.objects.filter().order_by('-id')
         service_array = []
 
         for service in services:
@@ -174,7 +174,10 @@ class GetServiceDetailApi(APIView):
         data['laborPrice'] = service.laborPrice
         data['laborTaxRate'] = service.laborTaxRate
         data['laborName'] = service.laborName
-        data['description'] = service.description
+        if service.description is None:
+            data['description'] = '-'
+        else:
+            data['description'] = service.description
         serializer = ServiceSerializer(data, context={'request': request})
 
         # serializer = ServiceSerializer(service_array, many=True, context={'request': request})
