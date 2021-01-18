@@ -333,6 +333,9 @@ class ServiceProcessingApi(APIView):
                 situation = Situation.objects.get(name__exact='Teslim Edildi')
                 service_situation.situation = situation
                 service_situation.save()
+                receiver_person = request.data['receiverPerson']
+                service.receiverPerson = receiver_person
+                service.save()
 
             return Response("Servis ", status.HTTP_200_OK)
 
