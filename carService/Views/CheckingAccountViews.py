@@ -16,7 +16,7 @@ from carService.services import ButtonServices
 
 
 class CheckingAccountApi(APIView):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
         checking_accounts = CheckingAccount.objects.all().order_by('-id')
@@ -50,7 +50,7 @@ class CheckingAccountApi(APIView):
 
 
 class CheckingAccountByCustomerApi(APIView):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
         profile = Profile.objects.get(uuid=request.GET.get('uuid'))
@@ -85,7 +85,7 @@ class CheckingAccountByCustomerApi(APIView):
 
 
 class PaymentAccountDiscountApi(APIView):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request, format=None):
         serializer = PaymentDiscountSerializer(data=request.data, context={'request': request})
@@ -106,7 +106,7 @@ class PaymentAccountDiscountApi(APIView):
 
 
 class PaymentAccountApi(APIView):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
         try:
@@ -146,7 +146,7 @@ class PaymentAccountApi(APIView):
 
 
 class PaymentTypeSelectApi(APIView):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
         types = PaymentType.objects.filter(~Q(name='İndirim'))
@@ -164,3 +164,4 @@ class PaymentTypeSelectApi(APIView):
 
         serializer = SelectSerializer(types_objects, many=True, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
+
