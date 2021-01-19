@@ -1,12 +1,12 @@
 import traceback
 
-from django.db.models import Q
+from django.db.models import Q, Sum
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from carService.models import CheckingAccount, PaymentMovement, PaymentType, Profile
+from carService.models import CheckingAccount, PaymentMovement, PaymentType, Profile, ServiceSituation
 from carService.models.ApiObject import APIObject
 from carService.models.SelectObject import SelectObject
 from carService.serializers.CheckingAccountSerializer import CheckingAccountPageSerializer, PaymentSerializer, \
@@ -47,6 +47,15 @@ class CheckingAccountApi(APIView):
 
         serializer = CheckingAccountPageSerializer(api_object, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
+
+
+class CheckingAccountStatisticApi(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, format=None):
+        total_receivable = CheckingAccount.objects.filter(~Q(paymentSituation__name='Ödendi')).aggregate(
+            Sum('remainingDebt'))
+        total_price = CheckingAccount.objects.all().aggregate(Sum('service__totalPrice'))
 
 
 class CheckingAccountByCustomerApi(APIView):
@@ -164,4 +173,3 @@ class PaymentTypeSelectApi(APIView):
 
         serializer = SelectSerializer(types_objects, many=True, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
-

@@ -1,4 +1,3 @@
-import trace
 import traceback
 
 from rest_framework import serializers
@@ -43,6 +42,7 @@ class ServiceSerializer(serializers.Serializer):
     laborTaxRate = serializers.DecimalField(read_only=True, max_digits=10, decimal_places=2)
     laborName = serializers.CharField(read_only=True)
     description = serializers.CharField(read_only=True)
+    receiverPerson = serializers.CharField(read_only=True)
 
     def create(self, validated_data):
         try:
