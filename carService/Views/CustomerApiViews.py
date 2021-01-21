@@ -41,7 +41,6 @@ class CustomerApi(APIView):
             serializer.save()
             return Response({"message": "user is created"}, status=status.HTTP_200_OK)
         else:
-
             errors_dict = dict()
             for key, value in serializer.errors.items():
                 if key == 'group':

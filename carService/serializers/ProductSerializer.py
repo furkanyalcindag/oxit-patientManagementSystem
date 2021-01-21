@@ -59,8 +59,39 @@ class ProductSerializerr(serializers.Serializer):
     brand = serializers.CharField()
     purchasePrice = serializers.DecimalField(max_digits=10, decimal_places=2)
 
+
+
     def update(self, instance, validated_data):
-        pass
+        try:
+            instance.name = validated_data.get('name')
+            instance.barcodeNumber = validated_data.get('barcodeNumber')
+            instance.isOpen = validated_data.get('isOpen')
+            instance.quantity = validated_data.get('quantity')
+            instance.taxRate = validated_data.get('model')
+            instance.netPrice = validated_data.get('year')
+            instance.shelf = validated_data.get('engine')
+            instance.purchasePrice = validated_data.get('oilType')
+            instance.totalProduct = validated_data.get('engineNumber')
+            instance.productImage = validated_data.get('plate')
+            instance.brand = validated_data.get('plate')
+            instance.save()
+
+            category = Category.objects.get(pk=int(validated_data.get('categories')))
+            product_categories = ProductCategory.objects.filter(product=instance)
+
+            for product_category in product_categories:
+                product_category.delete()
+
+            product_category = ProductCategory()
+            product_category.product = instance
+            product_category.category = category
+            product_category.save()
+
+            return instance
+
+        except Exception:
+
+            raise serializers.ValidationError("lütfen tekrar deneyiniz")
 
     def create(self, validated_data):
         try:

@@ -12,7 +12,7 @@ from rest_framework.response import Response
 
 
 class ProductApi(APIView):
-    permission_classes = (IsAuthenticated,)
+    #permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
         data = Product.objects.all().order_by('-id')
@@ -49,6 +49,11 @@ class ProductApi(APIView):
                     errors_dict['Alış Fiyatı'] = value
 
             return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, pk, format=None):
+        print(pk)
+
+
 
 
 class SearchProductApi(APIView):
