@@ -57,6 +57,11 @@ class CheckingAccountStatisticApi(APIView):
             Sum('remainingDebt'))
         total_price = CheckingAccount.objects.all().aggregate(Sum('service__totalPrice'))
 
+        data = dict()
+        data['totalReceivable'] = total_receivable
+        data['total_price'] = total_price
+        return Response(data, status.HTTP_200_OK)
+
 
 class CheckingAccountByCustomerApi(APIView):
     permission_classes = (IsAuthenticated,)

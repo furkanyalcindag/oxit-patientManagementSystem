@@ -58,6 +58,7 @@ class ProductSerializerr(serializers.Serializer):
     shelf = serializers.CharField(allow_null=True, allow_blank=True)
     brand = serializers.CharField()
     purchasePrice = serializers.DecimalField(max_digits=10, decimal_places=2)
+    uuid = serializers.UUIDField(allow_null=True, allow_blank=True,required=False)
 
 
 

@@ -21,7 +21,6 @@ urlpatterns = [
     url(r'group-api/$', GroupApi.as_view(), name='group-api'),
     url(r'customer-api/', CustomerApi.as_view(), name='customer-api'),
     url(r'product-api/$', ProductApi.as_view(), name='product-api'),
-    path(r'^product-api/(?P<pk>\d+)/$', ProductApi.as_view()),
     url(r'car-api/$', CarApi.as_view(), name='car-api'),
     url(r'category-api/$', CategoryApi.as_view(), name='category-api'),
     url(r'category-select-api/$', CategorySelectApi.as_view(), name='category-select-api'),
