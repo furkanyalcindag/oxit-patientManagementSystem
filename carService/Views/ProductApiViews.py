@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, BasePermissionMetaclass
 from rest_framework.views import APIView
 
-from carService.models import Product, Brand
+from carService.models import Product, Brand, ProductCategory
 from carService.models.ApiObject import APIObject
 from carService.models.SelectObject import SelectObject
 from carService.serializers.GeneralSerializer import SelectSerializer
@@ -12,7 +12,7 @@ from rest_framework.response import Response
 
 
 class ProductApi(APIView):
-    #permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
         data = Product.objects.all().order_by('-id')
@@ -50,17 +50,45 @@ class ProductApi(APIView):
 
             return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request, pk, format=None):
-        print(pk)
+    def put(self, request, format=None):
+        instance = Product.objects.get(uuid=request.data['uuid'])
+        serializer = ProductSerializerr(data=request.data, instance=instance, context={'request': request})
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "product is updated"}, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class SingleProductApi(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, format=None):
+        product = Product.objects.get(uuid=request.GET.get('id'))
+        category = ProductCategory.objects.filter(product=product)[0]
+        data = dict()
+        data['name'] = product.name
+        data['brand']=product.brand.id
+        data['taxRate']= product.taxRate
+        data['netPrice']= product.netPrice
+        data['purchasePrice'] = product.purchasePrice
+        data['barcodeNumber'] = product.barcodeNumber
+        data['quantity'] = product.quantity
+        data['shelf'] = product.shelf
+        data['productImage'] = product.productImage
+        data['categories'] = str(category.category.pk)
+        data['isOpen'] = product.isOpen
+        data['uuid'] = product.uuid
+        serializer = ProductSerializerr(data, context={'request': request})
+        return Response(serializer.data, status.HTTP_200_OK)
 
 
 class SearchProductApi(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        #data = Product.objects.filter(barcodeNumber__istartswith=request.GET.get('barcode')).order_by('-id')
+        # data = Product.objects.filter(barcodeNumber__istartswith=request.GET.get('barcode')).order_by('-id')
         data = Product.objects.filter(name__icontains=request.GET.get('barcode')).order_by('-id')
         serializer = ProductSerializer(data, many=True, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)

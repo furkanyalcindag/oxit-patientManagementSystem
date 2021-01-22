@@ -54,13 +54,11 @@ class ProductSerializerr(serializers.Serializer):
     # categories = serializers.ListField(child=serializers.IntegerField())
     categories = serializers.CharField()
     # images = serializers.ListField(child=serializers.CharField())
-    productImage = serializers.CharField(allow_blank=True, allow_null=True)
+    productImage = serializers.CharField(allow_blank=True, allow_null=True,required=False)
     shelf = serializers.CharField(allow_null=True, allow_blank=True)
     brand = serializers.CharField()
     purchasePrice = serializers.DecimalField(max_digits=10, decimal_places=2)
-    uuid = serializers.UUIDField(allow_null=True, allow_blank=True,required=False)
-
-
+    uuid = serializers.UUIDField(allow_null=True, required=False)
 
     def update(self, instance, validated_data):
         try:
@@ -68,13 +66,17 @@ class ProductSerializerr(serializers.Serializer):
             instance.barcodeNumber = validated_data.get('barcodeNumber')
             instance.isOpen = validated_data.get('isOpen')
             instance.quantity = validated_data.get('quantity')
-            instance.taxRate = validated_data.get('model')
-            instance.netPrice = validated_data.get('year')
-            instance.shelf = validated_data.get('engine')
-            instance.purchasePrice = validated_data.get('oilType')
-            instance.totalProduct = validated_data.get('engineNumber')
-            instance.productImage = validated_data.get('plate')
-            instance.brand = validated_data.get('plate')
+            instance.taxRate = validated_data.get('taxRate')
+            instance.netPrice = validated_data.get('netPrice')
+            instance.shelf = validated_data.get('shelf')
+            instance.purchasePrice = validated_data.get('purchasePrice')
+
+            if validated_data.get('productImage') is not None or validated_data.get('productImage') != '':
+                instance.productImage = validated_data.get('productImage')
+            instance.totalProduct = validated_data.get('netPrice') + (
+                    validated_data.get('netPrice') * validated_data.get('taxRate') / 100)
+
+            instance.brand = Brand.objects.get(pk=int(validated_data.get('brand')))
             instance.save()
 
             category = Category.objects.get(pk=int(validated_data.get('categories')))
