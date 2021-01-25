@@ -51,9 +51,9 @@ class ServiceSerializer(serializers.Serializer):
             service.complaint = validated_data.get('complaint')
             service.car = Car.objects.get(uuid=validated_data.get('carUUID'))
             service.serviceType = ServiceType.objects.get(id=int(validated_data.get('serviceType')))
-            if int(validated_data.get('serviceman')) > 0:
+            if int(validated_data.get('camera')) > 0:
                 service.isCameraOpen = True
-                service.camera = Camera.objects.get(pk=int(validated_data.get('serviceman')))
+                service.camera = Camera.objects.get(pk=int(validated_data.get('camera')))
             service.responsiblePerson = validated_data.get('responsiblePerson')
             service.serviceKM = int(validated_data.get('serviceKM'))
             service.serviceman = Profile.objects.get(pk=int(validated_data.get('serviceman')))

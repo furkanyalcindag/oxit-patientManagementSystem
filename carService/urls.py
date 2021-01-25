@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from django.urls import path
 
-from carService.Views.CameraApiViews import CameraSelectApi
+from carService.Views.CameraApiViews import CameraSelectApi, CameraApiView
 from carService.Views.CarApiViews import CarApi, GetCarApi
 from carService.Views.CategoryApiViews import CategoryApi, CategorySelectApi
 from carService.Views.CheckingAccountViews import CheckingAccountApi, PaymentAccountApi, PaymentTypeSelectApi, \
@@ -48,7 +48,7 @@ urlpatterns = [
     url(r'payment-discount-api/$', PaymentAccountDiscountApi.as_view()),
     url(r'checking-customer-account-api/$', CheckingAccountByCustomerApi.as_view()),
     url(r'camera-select-api/$', CameraSelectApi.as_view()),
-    url(r'get-camera-api/$', C.as_view()),
+    url(r'get-camera-api/$', CameraApiView.as_view()),
 
     # url(r'swagger/$', views.schema_view, name='swagger'),
 

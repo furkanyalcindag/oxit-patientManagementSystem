@@ -176,6 +176,7 @@ class GetServiceDetailApi(APIView):
         data['laborPrice'] = service.laborPrice
         data['laborTaxRate'] = service.laborTaxRate
         data['laborName'] = service.laborName
+        data['camera'] =None
         if service.receiverPerson is None:
             data['receiverPerson'] = '-'
         else:

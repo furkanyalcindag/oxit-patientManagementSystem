@@ -37,21 +37,25 @@ def get_buttons(group_name: str, service_situation: str, service : Service):
 
         if service_situation == 'Arıza Tespiti Bekleniyor':
             buttons.append(button_object_info)
-            buttons.append(button_object_camera)
+            if service.isCameraOpen:
+                buttons.append(button_object_camera)
 
         elif service_situation == 'Müşteri Onayı Bekleniyor':
             buttons.append(button_object_info)
             buttons.append(button_object_confirm)
-            buttons.append(button_object_camera)
+            if service.isCameraOpen:
+                buttons.append(button_object_camera)
 
 
         elif service_situation == 'İşlem Bekleniyor':
             buttons.append(button_object_info)
-            buttons.append(button_object_camera)
+            if service.isCameraOpen:
+                buttons.append(button_object_camera)
 
         elif service_situation == 'İşlemde':
             buttons.append(button_object_info)
-            buttons.append(button_object_camera)
+            if service.isCameraOpen:
+                buttons.append(button_object_camera)
 
         elif service_situation == 'Tamamlandı':
             buttons.append(button_object_info)

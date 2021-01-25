@@ -35,7 +35,7 @@ class CameraSelectApi(APIView):
 
 
 class CameraApiView(APIView):
-    permission_classes = (IsAuthenticated,)
+    #permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
         service = Service.objects.get(uuid=request.GET.get('uuid'))
