@@ -95,6 +95,7 @@ class GetCarServicesApi(APIView):
                 0].situation.name
             data['creationDate'] = service.creationDate.strftime("%d-%m-%Y %H:%M:%S")
             data['serviceman'] = service.serviceman.user.first_name + ' ' + service.serviceman.user.last_name
+            data['camera'] = None
             service_array.append(data)
 
         serializer = ServiceSerializer(service_array, many=True, context={'request': request})
@@ -135,8 +136,9 @@ class GetServicesApi(APIView):
             data['plate'] = service.car.plate
             data['responsiblePerson'] = service.responsiblePerson
             data['serviceman'] = service.serviceman.user.first_name + ' ' + service.serviceman.user.last_name
+            data['camera']=None
 
-            data['buttons'] = ButtonServices.get_buttons(group_name, situation_name)
+            data['buttons'] = ButtonServices.get_buttons(group_name, situation_name, service)
 
             service_array.append(data)
 

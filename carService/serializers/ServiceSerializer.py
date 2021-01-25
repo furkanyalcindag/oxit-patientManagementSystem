@@ -2,7 +2,7 @@ import traceback
 
 from rest_framework import serializers
 
-from carService.models import Profile, ServiceSituation
+from carService.models import Profile, ServiceSituation, Camera
 from carService.models.Car import Car
 from carService.models.Service import Service
 from carService.models.Situation import Situation
@@ -43,6 +43,7 @@ class ServiceSerializer(serializers.Serializer):
     laborName = serializers.CharField(read_only=True)
     description = serializers.CharField(read_only=True)
     receiverPerson = serializers.CharField(read_only=True)
+    camera = serializers.CharField(allow_blank=False)
 
     def create(self, validated_data):
         try:
@@ -50,6 +51,9 @@ class ServiceSerializer(serializers.Serializer):
             service.complaint = validated_data.get('complaint')
             service.car = Car.objects.get(uuid=validated_data.get('carUUID'))
             service.serviceType = ServiceType.objects.get(id=int(validated_data.get('serviceType')))
+            if int(validated_data.get('serviceman')) > 0:
+                service.isCameraOpen = True
+                service.camera = Camera.objects.get(pk=int(validated_data.get('serviceman')))
             service.responsiblePerson = validated_data.get('responsiblePerson')
             service.serviceKM = int(validated_data.get('serviceKM'))
             service.serviceman = Profile.objects.get(pk=int(validated_data.get('serviceman')))

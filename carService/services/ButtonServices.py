@@ -1,7 +1,8 @@
+from carService.models import Service
 from carService.models.ServiceButtonObject import ServiceButtonObject
 
 
-def get_buttons(group_name: str, service_situation: str):
+def get_buttons(group_name: str, service_situation: str, service : Service):
     buttons = []
 
     button_object_info = ServiceButtonObject()
@@ -15,6 +16,10 @@ def get_buttons(group_name: str, service_situation: str):
     button_object_make_determination = ServiceButtonObject()
     button_object_make_determination.buttonName = 'Arıza Tespiti Yap'
     button_object_make_determination.buttonFunction = 'goServiceDetermination'
+
+    button_object_camera = ServiceButtonObject()
+    button_object_camera.buttonName = 'İzle'
+    button_object_camera.buttonFunction = 'goWatchCamera'
 
     button_object_get_process = ServiceButtonObject()
     button_object_get_process.buttonName = 'İşleme Al'
@@ -32,16 +37,21 @@ def get_buttons(group_name: str, service_situation: str):
 
         if service_situation == 'Arıza Tespiti Bekleniyor':
             buttons.append(button_object_info)
+            buttons.append(button_object_camera)
 
         elif service_situation == 'Müşteri Onayı Bekleniyor':
             buttons.append(button_object_info)
             buttons.append(button_object_confirm)
+            buttons.append(button_object_camera)
+
 
         elif service_situation == 'İşlem Bekleniyor':
             buttons.append(button_object_info)
+            buttons.append(button_object_camera)
 
         elif service_situation == 'İşlemde':
             buttons.append(button_object_info)
+            buttons.append(button_object_camera)
 
         elif service_situation == 'Tamamlandı':
             buttons.append(button_object_info)
@@ -82,6 +92,8 @@ def get_buttons(group_name: str, service_situation: str):
 
         else:
             buttons.append(button_object_info)
+            if service.isCameraOpen:
+                buttons.append(button_object_camera)
 
     else:
         buttons.append(button_object_info)
