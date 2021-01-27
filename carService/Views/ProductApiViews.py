@@ -69,9 +69,9 @@ class SingleProductApi(APIView):
         category = ProductCategory.objects.filter(product=product)[0]
         data = dict()
         data['name'] = product.name
-        data['brand']=product.brand.id
-        data['taxRate']= product.taxRate
-        data['netPrice']= product.netPrice
+        data['brand'] = product.brand.id
+        data['taxRate'] = product.taxRate
+        data['netPrice'] = product.netPrice
         data['purchasePrice'] = product.purchasePrice
         data['barcodeNumber'] = product.barcodeNumber
         data['quantity'] = product.quantity
@@ -121,6 +121,16 @@ class BrandApi(APIView):
                     errors_dict['Marka'] = value
 
             return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, format=None):
+        instance = Brand.objects.get(uuid=request.data['id'])
+        serializer = BrandSerializer(data=request.data, instance=instance, context={'request': request})
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "brand is updated"}, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class BrandSelectApi(APIView):
