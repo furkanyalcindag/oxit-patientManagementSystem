@@ -14,10 +14,17 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class BrandSerializer(serializers.Serializer):
+    id = serializers.IntegerField(allow_null=False, required=False)
     name = serializers.CharField(allow_blank=False, allow_null=False, required=True)
 
     def update(self, instance, validated_data):
-        pass
+        try:
+            instance.name = validated_data.get('name')
+            instance.save()
+            return instance
+
+        except Exception:
+            raise serializers.ValidationError("lütfen tekrar deneyiniz")
 
     def create(self, validated_data):
         try:
@@ -54,7 +61,7 @@ class ProductSerializerr(serializers.Serializer):
     # categories = serializers.ListField(child=serializers.IntegerField())
     categories = serializers.CharField()
     # images = serializers.ListField(child=serializers.CharField())
-    productImage = serializers.CharField(allow_blank=True, allow_null=True,required=False)
+    productImage = serializers.CharField(allow_blank=True, allow_null=True, required=False)
     shelf = serializers.CharField(allow_null=True, allow_blank=True)
     brand = serializers.CharField()
     purchasePrice = serializers.DecimalField(max_digits=10, decimal_places=2)

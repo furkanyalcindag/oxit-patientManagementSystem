@@ -95,16 +95,22 @@ class SearchProductApi(APIView):
 
 
 class BrandApi(APIView):
-    permission_classes = (IsAuthenticated,)
+    #permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        data = Brand.objects.all().order_by('-id')
-        api_object = APIObject()
-        api_object.data = data
-        api_object.recordsFiltered = data.count()
-        api_object.recordsTotal = data.count()
-        serializer = BrandPageSerializer(api_object, context={'request': request})
-        return Response(serializer.data, status.HTTP_200_OK)
+        if request.GET.get('id') is None:
+            data = Brand.objects.all().order_by('-id')
+            api_object = APIObject()
+            api_object.data = data
+            api_object.recordsFiltered = data.count()
+            api_object.recordsTotal = data.count()
+            serializer = BrandPageSerializer(api_object, context={'request': request})
+            return Response(serializer.data, status.HTTP_200_OK)
+        else:
+            data = Brand.objects.get(id=int(request.GET.get('id')))
+            serializer = BrandSerializer(data, context={'request': request})
+            return Response(serializer.data, status.HTTP_200_OK)
+
 
     def post(self, request, format=None):
 
@@ -123,7 +129,7 @@ class BrandApi(APIView):
             return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, format=None):
-        instance = Brand.objects.get(uuid=request.data['id'])
+        instance = Brand.objects.get(id=request.GET.get('id'))
         serializer = BrandSerializer(data=request.data, instance=instance, context={'request': request})
 
         if serializer.is_valid():
