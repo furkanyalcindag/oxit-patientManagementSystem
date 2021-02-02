@@ -4,7 +4,7 @@ from carService.models import Car, Category
 
 
 class CategorySerializer(serializers.Serializer):
-    id = serializers.CharField(allow_null=True,required=False)
+    id = serializers.CharField(allow_null=True, required=False)
     name = serializers.CharField(required=True)
     parent = serializers.IntegerField(required=True, write_only=True, allow_null=True)
     parentPath = serializers.CharField(read_only=True)
@@ -25,7 +25,16 @@ class CategorySerializer(serializers.Serializer):
             raise serializers.ValidationError("lütfen tekrar deneyiniz")
 
     def update(self, instance, validated_data):
-        pass
+        try:
+            instance.name = validated_data.get('name')
+            if validated_data.get('parent') != 0:
+                parent_category = Category.objects.get(pk=validated_data.get('parent'))
+                instance.parent = parent_category
+            instance.save()
+            return instance
+
+        except Exception:
+            raise serializers.ValidationError("lütfen tekrar deneyiniz")
 
 
 class CategorySelectSerializer(serializers.Serializer):
