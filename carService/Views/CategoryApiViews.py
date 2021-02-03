@@ -27,11 +27,16 @@ class CategoryApi(APIView):
             serializer = CategorySerializer(category_objects, many=True, context={'request': request})
             return Response(serializer.data, status.HTTP_200_OK)
         else:
+            category_object = CategoryObject()
             category = Category.objects.get(id=int(request.GET.get('id')))
-            category.name = category.name
-            category.id = category.id
-            category.parentPath = CategoryServices.get_category_path(category, '')
-            serializer = CategorySerializer(category, context={'request': request})
+            category_object.name = category.name
+            category_object.id = category.id
+            if category.parent:
+                category_object.parent = category.parent.id
+            else:
+                category_object.parent=0
+            category_object.parentPath = CategoryServices.get_category_path(category, '')
+            serializer = CategorySerializer(category_object, context={'request': request})
             return Response(serializer.data, status.HTTP_200_OK)
 
     def post(self, request, format=None):

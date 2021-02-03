@@ -6,7 +6,7 @@ from carService.models import Car, Category
 class CategorySerializer(serializers.Serializer):
     id = serializers.CharField(allow_null=True, required=False)
     name = serializers.CharField(required=True)
-    parent = serializers.IntegerField(required=True, write_only=True, allow_null=True)
+    parent = serializers.IntegerField(required=True, allow_null=True)
     parentPath = serializers.CharField(read_only=True)
 
     def create(self, validated_data):
