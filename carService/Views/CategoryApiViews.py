@@ -3,10 +3,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from carService.models import Category
+from carService.models import Category, Product, ProductCategory
 from carService.models.CategoryObject import CategoryObject
 from carService.models.CategorySelectObject import CategorySelectObject
 from carService.serializers.CategorySerializer import CategorySerializer, CategorySelectSerializer
+from carService.serializers.GeneralSerializer import ErrorSerializer
 from carService.services import CategoryServices
 
 
@@ -15,7 +16,7 @@ class CategoryApi(APIView):
 
     def get(self, request, format=None):
         if request.GET.get('id') is None:
-            categories = Category.objects.all()
+            categories = Category.objects.filter(isDeleted=False).order_by("-id")
             category_objects = []
             for category in categories:
                 category_object = CategoryObject()
@@ -34,8 +35,8 @@ class CategoryApi(APIView):
             if category.parent:
                 category_object.parent = category.parent.id
             else:
-                category_object.parent=0
-            category_object.parentPath = CategoryServices.get_category_path(category, '')
+                category_object.parent = 0
+            # category_object.parentPath = CategoryServices.get_category_path(category, '')
             serializer = CategorySerializer(category_object, context={'request': request})
             return Response(serializer.data, status.HTTP_200_OK)
 
@@ -59,12 +60,36 @@ class CategoryApi(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request, format=None):
+        category = Category.objects.get(pk=request.GET.get('id'))
+        data = dict()
+        err = []
+
+        if Category.objects.filter(parent=category).filter(isDeleted=False):
+
+            data['value'] = 'Bu kategori, kaydedilen bir kategoriyle ilişkili olduğu için silinemez'
+            err.append(data)
+            serializer = ErrorSerializer(err, many=True, context={'request': request})
+            return Response(serializer.data, status=status.HTTP_300_MULTIPLE_CHOICES)
+        elif ProductCategory.objects.filter(category=category).filter(
+                product__in=Product.objects.filter(isDeleted=False)):
+
+            data['value'] = 'Bu kategori, kaydedilen bir ürünle ilişkili olduğu için silinemez'
+            err.append(data)
+            serializer = ErrorSerializer(err, many=True, context={'request': request})
+            return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
+
+        else:
+            category.isDeleted = True
+            category.save()
+            return Response(status=status.HTTP_200_OK)
+
 
 class CategorySelectApi(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        categories = Category.objects.all()
+        categories = Category.objects.filter(isDeleted=False).order_by("-id")
         category_objects = []
         category_objectRoot = CategorySelectObject()
         category_objectRoot.label = "Yok"

@@ -10,7 +10,7 @@ from carService.serializers.UserSerializer import CustomerAddSerializer, Custome
 
 
 class CustomerApi(APIView):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
 

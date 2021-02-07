@@ -19,3 +19,4 @@ class Car(models.Model):
     color = models.CharField(max_length=255, null=True, blank=True)
     creationDate = models.DateTimeField(auto_now_add=True, verbose_name='Kayıt Tarihi')
     modificationDate = models.DateTimeField(auto_now=True, verbose_name='Güncelleme Tarihi')
+    isDeleted = models.BooleanField(default=False)

@@ -31,3 +31,4 @@ class Profile(models.Model):
     isCorporate = models.BooleanField(null=True, blank=True)
     firmName = models.CharField(max_length=255, null=True, blank=True)
     taxOffice = models.CharField(max_length=255, null=True, blank=True)
+    isDeleted = models.BooleanField(default=False)

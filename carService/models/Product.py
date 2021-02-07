@@ -17,3 +17,4 @@ class Product(models.Model):
     shelf = models.CharField(max_length=50, null=True, blank=True)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, null=True, blank=True)
     purchasePrice = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    isDeleted = models.BooleanField(default=False)

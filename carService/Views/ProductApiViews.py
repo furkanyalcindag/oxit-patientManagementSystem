@@ -5,17 +5,17 @@ from rest_framework.views import APIView
 from carService.models import Product, Brand, ProductCategory
 from carService.models.ApiObject import APIObject
 from carService.models.SelectObject import SelectObject
-from carService.serializers.GeneralSerializer import SelectSerializer
+from carService.serializers.GeneralSerializer import SelectSerializer, ErrorSerializer
 from carService.serializers.ProductSerializer import ProductSerializer, ProductSerializerr, BrandSerializer, \
     BrandPageSerializer
 from rest_framework.response import Response
 
 
 class ProductApi(APIView):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        data = Product.objects.all().order_by('-id')
+        data = Product.objects.filter(isDeleted=False).order_by('-id')
         serializer = ProductSerializer(data, many=True, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
 
@@ -60,6 +60,13 @@ class ProductApi(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request, format=None):
+        product = Product.objects.get(uuid=request.GET.get('id'))
+        data = dict()
+        product.isDeleted = True
+        product.save()
+        return Response(status=status.HTTP_200_OK)
+
 
 class SingleProductApi(APIView):
     permission_classes = (IsAuthenticated,)
@@ -89,17 +96,18 @@ class SearchProductApi(APIView):
 
     def get(self, request, format=None):
         # data = Product.objects.filter(barcodeNumber__istartswith=request.GET.get('barcode')).order_by('-id')
-        data = Product.objects.filter(name__icontains=request.GET.get('barcode')).order_by('-id')
+        data = Product.objects.filter(name__icontains=request.GET.get('barcode')).filter(isDeleted=False).order_by(
+            '-id')
         serializer = ProductSerializer(data, many=True, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
 
 
 class BrandApi(APIView):
-    #permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
         if request.GET.get('id') is None:
-            data = Brand.objects.all().order_by('-id')
+            data = Brand.objects.filter(isDeleted=False).order_by('-id')
             api_object = APIObject()
             api_object.data = data
             api_object.recordsFiltered = data.count()
@@ -110,7 +118,6 @@ class BrandApi(APIView):
             data = Brand.objects.get(id=int(request.GET.get('id')))
             serializer = BrandSerializer(data, context={'request': request})
             return Response(serializer.data, status.HTTP_200_OK)
-
 
     def post(self, request, format=None):
 
@@ -138,12 +145,26 @@ class BrandApi(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request, format=None):
+        brand = Brand.objects.get(pk=request.GET.get('id'))
+        data = dict()
+
+        if Product.objects.filter(brand=brand):
+            data['key'] = '1'
+            data['value'] = 'Bu marka, kaydediler bir ürünle ilişkili olduğu için silinemez'
+            serializer = ErrorSerializer(data, context={'request': request})
+            return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
+        else:
+            brand.isDeleted = True
+            brand.save()
+            return Response(status=status.HTTP_200_OK)
+
 
 class BrandSelectApi(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        brands = Brand.objects.all()
+        brands = Brand.objects.filter(isDeleted=False)
         brands_objects = []
         select_object_root = SelectObject()
         select_object_root.label = "Seçiniz"

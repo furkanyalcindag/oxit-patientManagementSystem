@@ -6,7 +6,7 @@ from carService.models import Car, Category
 class CategorySerializer(serializers.Serializer):
     id = serializers.CharField(allow_null=True, required=False)
     name = serializers.CharField(required=True)
-    parent = serializers.IntegerField(required=True, allow_null=True)
+    parent = serializers.CharField(required=True, allow_null=True)
     parentPath = serializers.CharField(read_only=True)
 
     def create(self, validated_data):
@@ -14,7 +14,7 @@ class CategorySerializer(serializers.Serializer):
             category = Category()
             category.name = validated_data.get('name')
             if validated_data.get('parent') != 0:
-                parent_category = Category.objects.get(pk=validated_data.get('parent'))
+                parent_category = Category.objects.get(pk=int(validated_data.get('parent')))
                 category.parent = parent_category
 
             category.save()
@@ -28,7 +28,7 @@ class CategorySerializer(serializers.Serializer):
         try:
             instance.name = validated_data.get('name')
             if validated_data.get('parent') != 0:
-                parent_category = Category.objects.get(pk=validated_data.get('parent'))
+                parent_category = Category.objects.get(pk=int(validated_data.get('parent')))
                 instance.parent = parent_category
             instance.save()
             return instance

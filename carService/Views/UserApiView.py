@@ -12,7 +12,7 @@ from carService.serializers.UserSerializer import UserAddSerializer, UserGroupSe
 
 
 class UserApi(APIView):
-    #permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request, format=None):
         serializer = UserAddSerializer(data=request.data, context={'request': request})
@@ -25,12 +25,12 @@ class UserApi(APIView):
 
     def get(self, request, format=None):
         users = User.objects.all()
-        serialzier = UserSerializer(users, context={'request': request},many=True)
+        serialzier = UserSerializer(users, context={'request': request}, many=True)
         return Response(serialzier.data, status.HTTP_200_OK)
 
 
 class GroupApi(APIView):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
         groups = Group.objects.filter(~Q(name='Customer'))

@@ -153,7 +153,7 @@ class GetServicesApi(APIView):
 
 
 class GetServiceDetailApi(APIView):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     def get(self, request, format=None):
         services = dict()
 

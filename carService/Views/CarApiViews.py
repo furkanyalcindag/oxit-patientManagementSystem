@@ -11,7 +11,7 @@ class CarApi(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        cars = Car.objects.filter(profile__uuid=request.GET.get('uuid'))
+        cars = Car.objects.filter(profile__uuid=request.GET.get('uuid')).filter(isDeleted=False)
         serializer = CarSerializer(cars, many=True, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
 
@@ -40,9 +40,7 @@ class CarApi(APIView):
                 elif key == 'engine':
                     errors_dict['Motor'] = value
 
-
             return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
-
 
     def put(self, request):
         instance = Car.objects.get(uuid=request.data['uuid'])
@@ -54,8 +52,17 @@ class CarApi(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request, format=None):
+        car = Car.objects.get(uuid=request.GET.get('id'))
+        data = dict()
+        car.isDeleted = True
+        car.save()
+
+        return Response(status=status.HTTP_200_OK)
+
 
 class GetCarApi(APIView):
+    permission_classes = (IsAuthenticated,)
     def get(self, request, format=None):
         cars = Car.objects.get(uuid=request.GET.get('uuid'))
         serializer = CarSerializer(cars, context={'request': request})

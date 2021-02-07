@@ -37,6 +37,8 @@ class BrandSerializer(serializers.Serializer):
             raise serializers.ValidationError("lütfen tekrar deneyiniz")
 
 
+
+
 class BrandPageSerializer(serializers.Serializer):
     data = BrandSerializer(many=True)
     recordsTotal = serializers.IntegerField()
