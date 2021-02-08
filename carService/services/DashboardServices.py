@@ -22,14 +22,11 @@ def get_customer_count():
     return Profile.objects.filter(user__groups__name__exact='Customer').count()
 
 
-def get_process_work_count():
-    return Service.objects.filter()
-
-
 def get_uncompleted_services_count():
     # x = ServiceSituation.objects.all().order_by('service', '-id').distinct('service').values()
     x = ServiceSituation.objects.order_by('service', '-id').distinct('service')
-    return ServiceSituation.objects.filter(id__in=x).filter(situation=Situation.objects.get(name__exact='İşlemde'))
+    return ServiceSituation.objects.filter(id__in=x).filter(
+        situation=Situation.objects.get(name__exact='İşlemde')).count()
 
 
 def get_waiting_approve_services_count():
@@ -43,11 +40,12 @@ def get_completed_services_count():
     # x = ServiceSituation.objects.all().order_by('service', '-id').distinct('service').values()
     x = ServiceSituation.objects.order_by('service', '-id').distinct('service')
     return ServiceSituation.objects.filter(id__in=x).filter(
-        situation=Situation.objects.get(Q(name__exact='Tamamlandı')) | Q(name__exact='TeslimEdildi')).count()
-
+        situation=Situation.objects.filter(Q(name__exact='Tamamlandı') | Q(name__exact='TeslimEdildi'))).count()
 
 def get_total_checking_account(type):
+
     today = datetime.date.today()
+
     today_min = datetime.datetime.combine(datetime.date.today(), datetime.time.min)
     today_max = datetime.datetime.combine(datetime.date.today(), datetime.time.max)
     given_date = datetime.datetime.today().date()
@@ -57,13 +55,25 @@ def get_total_checking_account(type):
         first_day_of_month = given_date - datetime.timedelta(days=int(given_date.strftime("%d")) - 1)
         last_day_of_month = calendar.monthrange(given_date.year, given_date.month)[1]
         print(1)
-        first= datetime.datetime(int(given_date.year), int(given_date.month), int(first_day_of_month.day))
+        first = datetime.datetime(int(given_date.year), int(given_date.month), int(first_day_of_month.day))
         last = datetime.datetime(int(given_date.year), int(given_date.month), int(last_day_of_month))
-        return PaymentMovement.objects.filter(creationDate__range=(first, last)).aggregate(
-            Sum('paymentAmount'))
+
+        if PaymentMovement.objects.filter(creationDate__range=(first, last)).aggregate(
+                Sum('paymentAmount'))['paymentAmount__sum'] is None:
+            return 0
+        else:
+            return PaymentMovement.objects.filter(creationDate__range=(first, last)).aggregate(
+                Sum('paymentAmount'))['paymentAmount__sum']
     elif type == 'daily':
-        return PaymentMovement.objects.filter(creationDate__range=(today_min, today_max)).aggregate(
-            Sum('paymentAmount'))
+
+        if PaymentMovement.objects.filter(creationDate__range=(today_min, today_max)).aggregate(
+                Sum('paymentAmount'))['paymentAmount__sum'] is None:
+            return 0
+        else:
+            return PaymentMovement.objects.filter(creationDate__range=(today_min, today_max)).aggregate(
+                Sum('paymentAmount'))['paymentAmount__sum']
+
+
 
     elif type == 'yearly':
 
@@ -73,8 +83,14 @@ def get_total_checking_account(type):
         first = datetime.datetime(int(given_date.year), int(1), int(1))
         last = datetime.datetime(int(given_date.year), int(12), int(last_day_of_mount))
 
-        return PaymentMovement.objects.filter(creationDate__range=(first, last)).aggregate(
-            Sum('paymentAmount'))
+        if PaymentMovement.objects.filter(creationDate__range=(first, last)).aggregate(
+                Sum('paymentAmount'))['paymentAmount__sum'] is None:
+            return 0
+        else:
+            return PaymentMovement.objects.filter(creationDate__range=(first, last)).aggregate(
+                Sum('paymentAmount'))['paymentAmount__sum']
+
+
 
     else:
         return 0
