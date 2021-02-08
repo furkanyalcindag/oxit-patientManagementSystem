@@ -1,12 +1,14 @@
 from django.conf.urls import url
 from django.urls import path
 
+from carService.Views import DashboardViews
 from carService.Views.CameraApiViews import CameraSelectApi, CameraApiView
 from carService.Views.CarApiViews import CarApi, GetCarApi
 from carService.Views.CategoryApiViews import CategoryApi, CategorySelectApi
 from carService.Views.CheckingAccountViews import CheckingAccountApi, PaymentAccountApi, PaymentTypeSelectApi, \
     PaymentAccountDiscountApi, CheckingAccountByCustomerApi
 from carService.Views.CustomerApiViews import CustomerApi
+from carService.Views.DashboardViews import AdminDashboardViews
 from carService.Views.ProductApiViews import ProductApi, SearchProductApi, BrandApi, BrandSelectApi, SingleProductApi
 from carService.Views.ServiceApiViews import ServiceTypeSelectApi, ServiceApi, GetCarServicesApi, GetServicesApi, \
     GetServiceDetailApi, DeterminationServiceApi, GetServiceProductsApi, GetServiceImagesApi, ServiceCustomerAcceptApi, \
@@ -49,6 +51,7 @@ urlpatterns = [
     url(r'checking-customer-account-api/$', CheckingAccountByCustomerApi.as_view()),
     url(r'camera-select-api/$', CameraSelectApi.as_view()),
     url(r'get-camera-api/$', CameraApiView.as_view()),
+    url(r'get-admin-dashboard-api/$', AdminDashboardViews.as_view()),
 
     # url(r'swagger/$', views.schema_view, name='swagger'),
 
