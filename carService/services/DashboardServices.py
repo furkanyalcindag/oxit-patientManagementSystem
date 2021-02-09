@@ -3,7 +3,8 @@ import calendar
 
 from django.db.models import Q, Sum
 
-from carService.models import Product, Car, Profile, Service, ServiceSituation, Situation, PaymentMovement
+from carService.models import Product, Car, Profile, Service, ServiceSituation, Situation, PaymentMovement, \
+    CheckingAccount
 
 
 def get_product_count():
@@ -40,17 +41,24 @@ def get_completed_services_count():
     # x = ServiceSituation.objects.all().order_by('service', '-id').distinct('service').values()
     x = ServiceSituation.objects.order_by('service', '-id').distinct('service')
     return ServiceSituation.objects.filter(id__in=x).filter(
-        situation=Situation.objects.filter(Q(name__exact='Tamamlandı') | Q(name__exact='TeslimEdildi'))).count()
+        situation__in=Situation.objects.filter(Q(name__exact='Tamamlandı') | Q(name__exact='Teslim Edildi'))).count()
 
-def get_total_checking_account(type):
 
+def get_remain():
+    # x = ServiceSituation.objects.all().order_by('service', '-id').distinct('service').values()
+
+    return CheckingAccount.objects.filter(~Q(paymentSituation__name='Ödendi')).aggregate(
+        Sum('remainingDebt'))['remainingDebt__sum']
+
+
+def get_total_checking_account(time_type):
     today = datetime.date.today()
 
     today_min = datetime.datetime.combine(datetime.date.today(), datetime.time.min)
     today_max = datetime.datetime.combine(datetime.date.today(), datetime.time.max)
     given_date = datetime.datetime.today().date()
 
-    if type == 'monthly':
+    if time_type == 'monthly':
 
         first_day_of_month = given_date - datetime.timedelta(days=int(given_date.strftime("%d")) - 1)
         last_day_of_month = calendar.monthrange(given_date.year, given_date.month)[1]
@@ -58,24 +66,28 @@ def get_total_checking_account(type):
         first = datetime.datetime(int(given_date.year), int(given_date.month), int(first_day_of_month.day))
         last = datetime.datetime(int(given_date.year), int(given_date.month), int(last_day_of_month))
 
-        if PaymentMovement.objects.filter(creationDate__range=(first, last)).aggregate(
-                Sum('paymentAmount'))['paymentAmount__sum'] is None:
+        if PaymentMovement.objects.filter(~Q(paymentType__name='İndirim')).filter(
+                creationDate__range=(first, last)).aggregate(
+            Sum('paymentAmount'))['paymentAmount__sum'] is None:
             return 0
         else:
-            return PaymentMovement.objects.filter(creationDate__range=(first, last)).aggregate(
+            return PaymentMovement.objects.filter(~Q(paymentType__name='İndirim')).filter(
+                creationDate__range=(first, last)).aggregate(
                 Sum('paymentAmount'))['paymentAmount__sum']
-    elif type == 'daily':
+    elif time_type == 'daily':
 
-        if PaymentMovement.objects.filter(creationDate__range=(today_min, today_max)).aggregate(
-                Sum('paymentAmount'))['paymentAmount__sum'] is None:
+        if PaymentMovement.objects.filter(~Q(paymentType__name='İndirim')).filter(
+                creationDate__range=(today_min, today_max)).aggregate(
+            Sum('paymentAmount'))['paymentAmount__sum'] is None:
             return 0
         else:
-            return PaymentMovement.objects.filter(creationDate__range=(today_min, today_max)).aggregate(
+            return PaymentMovement.objects.filter(~Q(paymentType__name='İndirim')).filter(
+                creationDate__range=(today_min, today_max)).aggregate(
                 Sum('paymentAmount'))['paymentAmount__sum']
 
 
 
-    elif type == 'yearly':
+    elif time_type == 'yearly':
 
         first_day_of_month = given_date - datetime.timedelta(days=int(given_date.strftime("%d")) - 1)
         last_day_of_mount = calendar.monthrange(given_date.year, 12)[1]
@@ -83,14 +95,13 @@ def get_total_checking_account(type):
         first = datetime.datetime(int(given_date.year), int(1), int(1))
         last = datetime.datetime(int(given_date.year), int(12), int(last_day_of_mount))
 
-        if PaymentMovement.objects.filter(creationDate__range=(first, last)).aggregate(
+        if PaymentMovement.objects.filter(~Q(paymentType__name='İndirim')).filter(
+                creationDate__range=(first, last)).aggregate(
                 Sum('paymentAmount'))['paymentAmount__sum'] is None:
             return 0
         else:
-            return PaymentMovement.objects.filter(creationDate__range=(first, last)).aggregate(
+            return PaymentMovement.objects.filter(~Q(paymentType__name='İndirim')).filter(
+                creationDate__range=(first, last)).aggregate(
                 Sum('paymentAmount'))['paymentAmount__sum']
-
-
-
     else:
         return 0

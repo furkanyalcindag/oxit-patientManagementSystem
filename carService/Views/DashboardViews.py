@@ -18,7 +18,7 @@ class AdminDashboardViews(APIView):
         data['outOfStockCount'] = DashboardServices.get_product_out_of_stock_count()
         data['carCount'] = DashboardServices.get_car_count()
         data['customerCount'] = DashboardServices.get_customer_count()
-        #data['processWorkCount'] = DashboardServices.get_process_work_count()
+        data['remainingDebt'] = DashboardServices.get_remain()
         data['uncompletedServiceCount'] = DashboardServices.get_uncompleted_services_count()
         data['waitingApproveServiceCount'] = DashboardServices.get_waiting_approve_services_count()
         data['completedServiceCount'] = DashboardServices.get_completed_services_count()
