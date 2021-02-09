@@ -25,5 +25,6 @@ class AdminDashboardViews(APIView):
         data['totalCheckingAccountDaily'] = DashboardServices.get_total_checking_account('daily')
         data['totalCheckingAccountMonthly'] = DashboardServices.get_total_checking_account('monthly')
         data['totalCheckingAccountYearly'] = DashboardServices.get_total_checking_account('yearly')
+        data['canceledServiceCount'] = DashboardServices.get_canceled_services_count()
         serializer = AdminDashboardSerializer(data, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)

@@ -44,6 +44,13 @@ def get_completed_services_count():
         situation__in=Situation.objects.filter(Q(name__exact='Tamamlandı') | Q(name__exact='Teslim Edildi'))).count()
 
 
+def get_canceled_services_count():
+    # x = ServiceSituation.objects.all().order_by('service', '-id').distinct('service').values()
+    x = ServiceSituation.objects.order_by('service', '-id').distinct('service')
+    return ServiceSituation.objects.filter(id__in=x).filter(
+        situation__in=Situation.objects.filter(name__exact='İptal Edildi')).count()
+
+
 def get_remain():
     # x = ServiceSituation.objects.all().order_by('service', '-id').distinct('service').values()
 
@@ -97,7 +104,7 @@ def get_total_checking_account(time_type):
 
         if PaymentMovement.objects.filter(~Q(paymentType__name='İndirim')).filter(
                 creationDate__range=(first, last)).aggregate(
-                Sum('paymentAmount'))['paymentAmount__sum'] is None:
+            Sum('paymentAmount'))['paymentAmount__sum'] is None:
             return 0
         else:
             return PaymentMovement.objects.filter(~Q(paymentType__name='İndirim')).filter(
