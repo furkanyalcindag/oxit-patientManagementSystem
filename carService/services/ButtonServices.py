@@ -126,6 +126,7 @@ def get_buttons_payment(payment_situation: str):
     elif payment_situation == 'Kısmi Ödendi':
         buttons.append(button_object_info)
         buttons.append(button_object_payment)
+        buttons.append(button_object_discount)
     else:
         buttons.append(button_object_info)
         buttons.append(button_object_payment)

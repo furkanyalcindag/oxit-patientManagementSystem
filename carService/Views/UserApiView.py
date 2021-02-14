@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from carService.models import Profile
 from carService.models.SelectObject import SelectObject
 from carService.serializers.GeneralSerializer import SelectSerializer
 from carService.serializers.UserSerializer import UserAddSerializer, UserGroupSerializer, UserSerializer
@@ -48,3 +49,12 @@ class GroupApi(APIView):
 
         serializer = SelectSerializer(group_objects, many=True, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
+
+
+class UserPayload(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, format=None):
+        user_id = request.user.id
+        user = User.objects.get(pk=user_id)
+        return Response(user.first_name + ' ' + user.last_name, status.HTTP_200_OK)
