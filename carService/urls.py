@@ -12,15 +12,16 @@ from carService.Views.DashboardViews import AdminDashboardViews
 from carService.Views.ProductApiViews import ProductApi, SearchProductApi, BrandApi, BrandSelectApi, SingleProductApi
 from carService.Views.ServiceApiViews import ServiceTypeSelectApi, ServiceApi, GetCarServicesApi, GetServicesApi, \
     GetServiceDetailApi, DeterminationServiceApi, GetServiceProductsApi, GetServiceImagesApi, ServiceCustomerAcceptApi, \
-    ServiceProcessingApi
+    ServiceProcessingApi,GetServicePdfApi
 from carService.Views.StaffViews import StaffApi, ServicemanSelectApi
-from carService.Views.UserApiView import UserApi, GroupApi
+from carService.Views.UserApiView import UserApi, GroupApi, UserPayload
 
 app_name = 'carService'
 
 urlpatterns = [
 
     url(r'user-api/$', UserApi.as_view(), name='user-api'),
+    url(r'user-payload-api/$', UserPayload.as_view()),
     url(r'group-api/$', GroupApi.as_view(), name='group-api'),
     url(r'customer-api/', CustomerApi.as_view(), name='customer-api'),
     url(r'product-api/$', ProductApi.as_view(), name='product-api'),
@@ -36,6 +37,7 @@ urlpatterns = [
     url(r'get-car-services-api/$', GetCarServicesApi.as_view(), name='get-car-services-api'),
     url(r'get-services-api/$', GetServicesApi.as_view(), name='get-services-api'),
     url(r'get-service-detail-api/$', GetServiceDetailApi.as_view(), name='get-services-detail-api'),
+    url(r'get-service-pdf-api/$', GetServicePdfApi.as_view(), name='get-services-pdf-api'),
     url(r'get-product-search-api/$', SearchProductApi.as_view()),
     url(r'service-determination-api/$', DeterminationServiceApi.as_view()),
     url(r'get-service-products-api/$', GetServiceProductsApi.as_view()),
