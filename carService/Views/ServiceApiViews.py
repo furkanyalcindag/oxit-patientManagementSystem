@@ -4,11 +4,17 @@ import traceback
 from decimal import Decimal
 
 from django.contrib.auth.models import User
+from django.db import transaction
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+
+from carService.exceptions import OutOfStockException
+
 from django.http import FileResponse
+
 from carService.models import Service, Car, ServiceSituation, Profile, ServiceProduct, Product, ServiceImage, Situation, \
     CheckingAccount, PaymentSituation
 from carService.models.ApiObject import APIObject
@@ -146,8 +152,10 @@ class GetServicesApi(APIView):
                 "%d-%m-%Y %H:%M:%S")
             data['plate'] = service.car.plate
             data['responsiblePerson'] = service.responsiblePerson
-            data['serviceman'] = service.serviceman.user.first_name + \
-                ' ' + service.serviceman.user.last_name
+
+            data['serviceman'] = service.serviceman.user.first_name + ' ' + service.serviceman.user.last_name
+
+
             data['camera'] = None
 
             data['buttons'] = ButtonServices.get_buttons(
@@ -209,7 +217,8 @@ class GetServiceDetailApi(APIView):
 
 
 class DeterminationServiceApi(APIView):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
+
     def post(self, request, format=None):
         try:
             products = request.data['products']
@@ -268,12 +277,14 @@ class DeterminationServiceApi(APIView):
 
 
 class GetServiceProductsApi(APIView):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
+
     def get(self, request, format=None):
         service = Service.objects.get(uuid=request.GET.get('uuid'))
         service_products = ServiceProduct.objects.filter(service=service)
         products = []
         for serviceProduct in service_products:
+
             product = serviceProduct.product
             product.netPrice = serviceProduct.productNetPrice
             product.totalProduct = serviceProduct.productTotalPrice
@@ -287,7 +298,8 @@ class GetServiceProductsApi(APIView):
 
 
 class GetServiceImagesApi(APIView):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
+
     def get(self, request, format=None):
         service = Service.objects.get(uuid=request.GET.get('uuid'))
         service_images = ServiceImage.objects.filter(service=service)
@@ -513,13 +525,46 @@ class GetServicePdfApi(APIView):
         else: 
             return Response("Teslim edilmeden rapor alınamaz",status= status.HTTP_403_FORBIDDEN)
 class ServiceCustomerAcceptApi(APIView):
+    permission_classes = (IsAuthenticated,)
 
-    # permission_classes = (IsAuthenticated,)
     def post(self, request, format=None):
 
         try:
-            service = Service.objects.get(uuid=request.data['uuid'])
-            is_accept = request.data['isAccept']
+            with transaction.atomic():
+                service = Service.objects.get(uuid=request.data['uuid'])
+                is_accept = request.data['isAccept']
+
+                if is_accept:
+                    service_situation = ServiceSituation()
+                    service_products = ServiceProduct.objects.filter(service=service)
+
+                    for service_product in service_products:
+                        product = service_product.product
+                        if product.quantity > service_product.quantity:
+                            product.quantity = product.quantity - service_product.quantity
+                            product.save()
+                        else:
+                            raise OutOfStockException("Sorry, no numbers below zero")
+
+                    service_situation.service = service
+                    service_situation.situation = Situation.objects.get(name='İşlem Bekleniyor')
+                    service_situation.save()
+
+                    return Response("Servis Onaylandı", status.HTTP_200_OK)
+                else:
+                    service_situation = ServiceSituation()
+                    service_situation.service = service
+                    service_situation.situation = Situation.objects.get(name='İptal Edildi')
+                    service_situation.save()
+                    return Response("Servis İptal Edildi", status.HTTP_200_OK)
+
+        except OutOfStockException as e:
+            traceback.print_exc()
+            return Response("Ürünler Stokta Bulunmamaktadır ", status.HTTP_404_NOT_FOUND)
+
+
+
+        except Exception as e:
 
             if is_accept:
                 service_situation = ServiceSituation()
@@ -536,12 +581,14 @@ class ServiceCustomerAcceptApi(APIView):
                 service_situation.save()
                 return Response("Servis İptal Edildi", status.HTTP_200_OK)
         except:
+
             traceback.print_exc()
             return Response("Servis ", status.HTTP_400_BAD_REQUEST)
 
 
 class ServiceProcessingApi(APIView):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
+
     def post(self, request, format=None):
         try:
             service = Service.objects.get(uuid=request.data['uuid'])
