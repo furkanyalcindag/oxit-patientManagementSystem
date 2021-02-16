@@ -3,7 +3,7 @@
         "model": "carService.Situation",
         "pk": 1,
         "fields": {
-            "name": "İşlem Bekliyor"
+            "name": "İşlem Bekleniyor"
         }
     },
     {
