@@ -9,11 +9,12 @@ from carService.models.CategorySelectObject import CategorySelectObject
 from carService.serializers.CategorySerializer import CategorySerializer, CategorySelectSerializer
 from carService.serializers.GeneralSerializer import ErrorSerializer
 from carService.services import CategoryServices
+from carService.permissions import IsAccountant,IsAccountantOrAdmin,IsAdmin,IsCustomer,IsCustomerOrAdmin,IsServiceman,IsServicemanOrAdmin,method_permission_classes
 
-#admin usta
 class CategoryApi(APIView):
     permission_classes = (IsAuthenticated,)
 
+    @method_permission_classes((IsServicemanOrAdmin,))
     def get(self, request, format=None):
         if request.GET.get('id') is None:
             categories = Category.objects.filter(isDeleted=False).order_by("-id")
@@ -39,7 +40,8 @@ class CategoryApi(APIView):
             # category_object.parentPath = CategoryServices.get_category_path(category, '')
             serializer = CategorySerializer(category_object, context={'request': request})
             return Response(serializer.data, status.HTTP_200_OK)
-
+    
+    @method_permission_classes((IsServicemanOrAdmin,))
     def post(self, request, format=None):
         serializer = CategorySerializer(data=request.data, context={'request': request})
 
@@ -49,6 +51,7 @@ class CategoryApi(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @method_permission_classes((IsServicemanOrAdmin,))
     def put(self, request, format=None):
         instance = Category.objects.get(id=request.GET.get('id'))
         serializer = CategorySerializer(data=request.data
@@ -59,7 +62,7 @@ class CategoryApi(APIView):
             return Response({"message": "brand is updated"}, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    #sadece admin
+    @method_permission_classes((IsAdmin,))
     def delete(self, request, format=None):
         category = Category.objects.get(pk=request.GET.get('id'))
         data = dict()
@@ -84,9 +87,9 @@ class CategoryApi(APIView):
             category.save()
             return Response(status=status.HTTP_200_OK)
 
-#admin usta
+
 class CategorySelectApi(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,IsServicemanOrAdmin,)
 
     def get(self, request, format=None):
         categories = Category.objects.filter(isDeleted=False).order_by("-id")

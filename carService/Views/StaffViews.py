@@ -10,10 +10,10 @@ from carService.models.ApiObject import APIObject
 from carService.models.SelectObject import SelectObject
 from carService.serializers.GeneralSerializer import SelectSerializer
 from carService.serializers.UserSerializer import StaffSerializer, StaffPageSerializer
+from carService.permissions import IsAccountant,IsAccountantOrAdmin,IsAdmin,IsCustomer,IsCustomerOrAdmin,IsServiceman,IsServicemanOrAdmin
 
-# admin
 class StaffApi(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,IsAdmin,)
 
     def get(self, request, format=None):
         '''  search = request.GET.get('search')
@@ -60,10 +60,9 @@ class StaffApi(APIView):
 
             return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
 
-#admin
 class ServicemanSelectApi(APIView):
 
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,IsAdmin,)
 
     def get(self, request, format=None):
         servicemans = Profile.objects.filter(user__groups__name__exact='Tamirci')

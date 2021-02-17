@@ -6,10 +6,10 @@ from rest_framework.views import APIView
 from carService.models import Camera, Service
 from carService.models.SelectObject import SelectObject
 from carService.serializers.GeneralSerializer import SelectSerializer
+from carService.permissions import IsAccountant,IsAccountantOrAdmin,IsAdmin,IsCustomer,IsCustomerOrAdmin,IsServiceman,IsServicemanOrAdmin
 
-#admin
 class CameraSelectApi(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,IsAdmin,)
 
     def get(self, request, format=None):
         cameras = Camera.objects.all()
@@ -33,9 +33,8 @@ class CameraSelectApi(APIView):
         serializer = SelectSerializer(cameras_objects, many=True, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
 
-#müşteri admin
 class CameraApiView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,IsCustomerOrAdmin,)
 
     def get(self, request, format=None):
         service = Service.objects.get(uuid=request.GET.get('uuid'))

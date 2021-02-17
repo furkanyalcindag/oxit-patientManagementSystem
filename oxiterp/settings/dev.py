@@ -8,7 +8,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'carservice',
         'USER': 'postgres',
-        'PASSWORD': '1234',
+        'PASSWORD': 'oxit2016',
         'HOST': 'localhost',
         'PORT': '5432',
     }

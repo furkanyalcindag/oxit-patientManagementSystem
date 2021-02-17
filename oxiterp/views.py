@@ -8,7 +8,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         refresh = self.get_token(self.user)
         data['refresh'] = str(refresh)
         data['access'] = str(refresh.access_token)
-        data['groups'] = self.user.groups.values_list('name', flat=True)
+        data['group'] = self.user.groups.values_list('name', flat=True)[0]
         return data
 
 

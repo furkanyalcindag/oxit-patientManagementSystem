@@ -7,12 +7,11 @@ from rest_framework.views import APIView
 from carService.models import Profile
 from carService.models.ApiObject import APIObject
 from carService.serializers.UserSerializer import CustomerAddSerializer, CustomerPageSerializer
+from carService.permissions import IsAccountant,IsAccountantOrAdmin,IsAdmin,IsCustomer,IsCustomerOrAdmin,IsServiceman,IsServicemanOrAdmin,method_permission_classes
 
-
-#muhasebe,admin
 class CustomerApi(APIView):
     permission_classes = (IsAuthenticated,)
-
+    @method_permission_classes((IsAccountantOrAdmin,))
     def get(self, request, format=None):
 
         search = request.GET.get('search')
@@ -34,7 +33,7 @@ class CustomerApi(APIView):
 
         serializer = CustomerPageSerializer(apiObject, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
-    #admin
+    @method_permission_classes((IsAdmin,))
     def post(self, request, format=None):
         serializer = CustomerAddSerializer(data=request.data, context={'request': request})
 
