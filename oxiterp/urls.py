@@ -21,7 +21,8 @@ from django.conf.urls import url, include
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework import routers
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from oxiterp.views import CustomTokenObtainPairView
+from rest_framework_simplejwt.views import TokenRefreshView
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
@@ -36,7 +37,7 @@ urlpatterns = [
     path('', views.login, name='index'),
 
     path('api-auth/', include('rest_framework.urls')),
-    path('api/token/', TokenObtainPairView.as_view()),
+    path('api/token/', CustomTokenObtainPairView.as_view()),
     path('api/token/refresh', TokenRefreshView.as_view()),
 
     path('car-service/', include('carService.urls')),
