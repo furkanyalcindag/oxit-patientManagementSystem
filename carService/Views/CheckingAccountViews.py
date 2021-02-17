@@ -14,7 +14,7 @@ from carService.serializers.CheckingAccountSerializer import CheckingAccountPage
 from carService.serializers.GeneralSerializer import SelectSerializer
 from carService.services import ButtonServices
 
-
+#admin müşteri
 class CheckingAccountApi(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -62,7 +62,7 @@ class CheckingAccountStatisticApi(APIView):
         data['total_price'] = total_price
         return Response(data, status.HTTP_200_OK)
 
-
+#admin
 class CheckingAccountByCustomerApi(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -97,7 +97,7 @@ class CheckingAccountByCustomerApi(APIView):
         serializer = CheckingAccountPageSerializer(api_object, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
 
-
+#admin
 class PaymentAccountDiscountApi(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -118,7 +118,7 @@ class PaymentAccountDiscountApi(APIView):
 
             return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
 
-
+#admin
 class PaymentAccountApi(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -158,7 +158,7 @@ class PaymentAccountApi(APIView):
 
             return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
 
-
+#admin
 class PaymentTypeSelectApi(APIView):
     permission_classes = (IsAuthenticated,)
 

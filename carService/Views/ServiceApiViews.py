@@ -28,7 +28,7 @@ from weasyprint import HTML, CSS
 import datetime
 class ServiceApi(APIView):
     permission_classes = (IsAuthenticated,)
-
+    #admin müşteri tamirci
     def get(self, request, format=None):
         data = Service.objects.filter(car=Car.objects.get(
             uuid=request.GET.get('carId'))).order_by('-id')
@@ -39,7 +39,7 @@ class ServiceApi(APIView):
         serializer = ServicePageSerializer(
             api_object, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
-
+    #admin
     def post(self, request, format=None):
 
         serializer = ServiceSerializer(
@@ -65,7 +65,7 @@ class ServiceApi(APIView):
 
             return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
 
-
+# admin
 class ServiceTypeSelectApi(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -87,7 +87,7 @@ class ServiceTypeSelectApi(APIView):
             service_types_objects, many=True, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
 
-
+#admin customer usta
 class GetCarServicesApi(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -173,7 +173,7 @@ class GetServicesApi(APIView):
         # serializer = ServiceSerializer(service_array, many=True, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
 
-
+# usta admin müşteri
 class GetServiceDetailApi(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -215,7 +215,7 @@ class GetServiceDetailApi(APIView):
         # serializer = ServiceSerializer(service_array, many=True, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
 
-
+#admin usta
 class DeterminationServiceApi(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -275,7 +275,7 @@ class DeterminationServiceApi(APIView):
             traceback.print_exc()
             return Response("Başarısız", status.HTTP_400_BAD_REQUEST)
 
-
+#admin usta müşteri
 class GetServiceProductsApi(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -296,7 +296,7 @@ class GetServiceProductsApi(APIView):
             products, many=True, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
 
-
+#admin usta müşteri
 class GetServiceImagesApi(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -314,7 +314,7 @@ class GetServiceImagesApi(APIView):
         return Response(serializer.data, status.HTTP_200_OK)
 
 
-
+#admin
 class GetServicePdfApi(APIView):
     # permission_classes = (IsAuthenticated,)
     def get(self, request, format=None):
@@ -524,6 +524,9 @@ class GetServicePdfApi(APIView):
                 raise Exception("Error While creating service detail pdf")
         else: 
             return Response("Teslim edilmeden rapor alınamaz",status= status.HTTP_403_FORBIDDEN)
+
+
+#admin müşteri
 class ServiceCustomerAcceptApi(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -585,7 +588,7 @@ class ServiceCustomerAcceptApi(APIView):
             traceback.print_exc()
             return Response("Servis ", status.HTTP_400_BAD_REQUEST)
 
-
+# usta admin
 class ServiceProcessingApi(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -616,7 +619,7 @@ class ServiceProcessingApi(APIView):
                 checking_account.paymentSituation = PaymentSituation.objects.get(
                     name__exact='Ödenmedi')
                 checking_account.save()
-
+            #admin
             elif situation_no == 3:
                 situation = Situation.objects.get(name__exact='Teslim Edildi')
                 service_situation.situation = situation

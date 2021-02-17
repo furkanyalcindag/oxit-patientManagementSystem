@@ -10,7 +10,7 @@ from carService.serializers.ProductSerializer import ProductSerializer, ProductS
     BrandPageSerializer
 from rest_framework.response import Response
 
-
+#usta admin 
 class ProductApi(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -49,7 +49,6 @@ class ProductApi(APIView):
                     errors_dict['Alış Fiyatı'] = value
 
             return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
-
     def put(self, request, format=None):
         instance = Product.objects.get(uuid=request.data['uuid'])
         serializer = ProductSerializerr(data=request.data, instance=instance, context={'request': request})
@@ -59,7 +58,7 @@ class ProductApi(APIView):
             return Response({"message": "product is updated"}, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    #admin
     def delete(self, request, format=None):
         product = Product.objects.get(uuid=request.GET.get('id'))
         data = dict()
@@ -67,7 +66,7 @@ class ProductApi(APIView):
         product.save()
         return Response(status=status.HTTP_200_OK)
 
-
+#admin usta
 class SingleProductApi(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -90,7 +89,7 @@ class SingleProductApi(APIView):
         serializer = ProductSerializerr(data, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
 
-
+#admin usta
 class SearchProductApi(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -101,7 +100,7 @@ class SearchProductApi(APIView):
         serializer = ProductSerializer(data, many=True, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
 
-
+#admin usta 
 class BrandApi(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -144,7 +143,7 @@ class BrandApi(APIView):
             return Response({"message": "brand is updated"}, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    #admin
     def delete(self, request, format=None):
         brand = Brand.objects.get(pk=request.GET.get('id'))
         data = dict()
@@ -159,7 +158,7 @@ class BrandApi(APIView):
             brand.save()
             return Response(status=status.HTTP_200_OK)
 
-
+#admin usta
 class BrandSelectApi(APIView):
     permission_classes = (IsAuthenticated,)
 

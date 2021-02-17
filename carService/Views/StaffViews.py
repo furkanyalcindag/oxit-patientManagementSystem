@@ -11,7 +11,7 @@ from carService.models.SelectObject import SelectObject
 from carService.serializers.GeneralSerializer import SelectSerializer
 from carService.serializers.UserSerializer import StaffSerializer, StaffPageSerializer
 
-
+# admin
 class StaffApi(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -60,7 +60,7 @@ class StaffApi(APIView):
 
             return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
 
-
+#admin
 class ServicemanSelectApi(APIView):
 
     permission_classes = (IsAuthenticated,)

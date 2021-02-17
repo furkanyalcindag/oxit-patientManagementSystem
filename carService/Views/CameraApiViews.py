@@ -7,7 +7,7 @@ from carService.models import Camera, Service
 from carService.models.SelectObject import SelectObject
 from carService.serializers.GeneralSerializer import SelectSerializer
 
-
+#admin
 class CameraSelectApi(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -33,7 +33,7 @@ class CameraSelectApi(APIView):
         serializer = SelectSerializer(cameras_objects, many=True, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
 
-
+#müşteri admin
 class CameraApiView(APIView):
     permission_classes = (IsAuthenticated,)
 

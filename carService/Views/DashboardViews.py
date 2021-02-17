@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 from carService.serializers.DashboardSerializer import AdminDashboardSerializer
 from carService.services import DashboardServices
 
-
+#admin
 class AdminDashboardViews(APIView):
     permission_classes = (IsAuthenticated,)
 

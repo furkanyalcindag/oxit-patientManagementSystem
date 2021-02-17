@@ -9,6 +9,7 @@ from carService.models.ApiObject import APIObject
 from carService.serializers.UserSerializer import CustomerAddSerializer, CustomerPageSerializer
 
 
+#muhasebe,admin
 class CustomerApi(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -33,7 +34,7 @@ class CustomerApi(APIView):
 
         serializer = CustomerPageSerializer(apiObject, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
-
+    #admin
     def post(self, request, format=None):
         serializer = CustomerAddSerializer(data=request.data, context={'request': request})
 

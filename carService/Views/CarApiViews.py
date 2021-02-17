@@ -9,12 +9,12 @@ from carService.serializers.CarSerializer import CarSerializer
 
 class CarApi(APIView):
     permission_classes = (IsAuthenticated,)
-
+    #admin customer
     def get(self, request, format=None):
         cars = Car.objects.filter(profile__uuid=request.GET.get('uuid')).filter(isDeleted=False)
         serializer = CarSerializer(cars, many=True, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
-
+    #admin
     def post(self, request, format=None):
         serializer = CarSerializer(data=request.data, context={'request': request})
 
@@ -41,7 +41,7 @@ class CarApi(APIView):
                     errors_dict['Motor'] = value
 
             return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
-
+    #admin 
     def put(self, request):
         instance = Car.objects.get(uuid=request.data['uuid'])
         serializer = CarSerializer(data=request.data, instance=instance, context={'request': request})
@@ -51,7 +51,7 @@ class CarApi(APIView):
             return Response({"message": "car is updated"}, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    #admin
     def delete(self, request, format=None):
         car = Car.objects.get(uuid=request.GET.get('id'))
         data = dict()
@@ -60,7 +60,7 @@ class CarApi(APIView):
 
         return Response(status=status.HTTP_200_OK)
 
-
+#single admin customer ?
 class GetCarApi(APIView):
     permission_classes = (IsAuthenticated,)
     def get(self, request, format=None):

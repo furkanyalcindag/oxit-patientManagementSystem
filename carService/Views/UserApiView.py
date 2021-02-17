@@ -11,7 +11,7 @@ from carService.models.SelectObject import SelectObject
 from carService.serializers.GeneralSerializer import SelectSerializer
 from carService.serializers.UserSerializer import UserAddSerializer, UserGroupSerializer, UserSerializer
 
-
+#admin
 class UserApi(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -29,7 +29,7 @@ class UserApi(APIView):
         serialzier = UserSerializer(users, context={'request': request}, many=True)
         return Response(serialzier.data, status.HTTP_200_OK)
 
-
+#admin
 class GroupApi(APIView):
     permission_classes = (IsAuthenticated,)
 

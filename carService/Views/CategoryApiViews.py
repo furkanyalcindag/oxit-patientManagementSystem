@@ -10,7 +10,7 @@ from carService.serializers.CategorySerializer import CategorySerializer, Catego
 from carService.serializers.GeneralSerializer import ErrorSerializer
 from carService.services import CategoryServices
 
-
+#admin usta
 class CategoryApi(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -59,7 +59,7 @@ class CategoryApi(APIView):
             return Response({"message": "brand is updated"}, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    #sadece admin
     def delete(self, request, format=None):
         category = Category.objects.get(pk=request.GET.get('id'))
         data = dict()
@@ -84,7 +84,7 @@ class CategoryApi(APIView):
             category.save()
             return Response(status=status.HTTP_200_OK)
 
-
+#admin usta
 class CategorySelectApi(APIView):
     permission_classes = (IsAuthenticated,)
 
