@@ -7,10 +7,10 @@ from rest_framework.views import APIView
 
 from carService.serializers.DashboardSerializer import AdminDashboardSerializer
 from carService.services import DashboardServices
-
+from carService.permissions import IsAccountant,IsAccountantOrAdmin,IsAdmin,IsCustomer,IsCustomerOrAdmin,IsServiceman,IsServicemanOrAdmin
 
 class AdminDashboardViews(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,IsAdmin,)
 
     def get(self, request, format=None):
         data = dict()
