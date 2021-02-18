@@ -64,7 +64,7 @@ class CheckingAccountStatisticApi(APIView):
 
 
 class CheckingAccountByCustomerApi(APIView):
-    permission_classes = (IsAuthenticated,IsAdmin,)
+    permission_classes = (IsAuthenticated,IsCustomerOrAdmin)
 
     def get(self, request, format=None):
         profile = Profile.objects.get(uuid=request.GET.get('uuid'))

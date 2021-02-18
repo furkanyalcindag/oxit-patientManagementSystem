@@ -49,6 +49,7 @@ class CategoryApi(APIView):
             serializer.save()
             return Response({"message": "category is created"}, status=status.HTTP_200_OK)
         else:
+            print(serializer.errors())
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @method_permission_classes((IsServicemanOrAdmin,))

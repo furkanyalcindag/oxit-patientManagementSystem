@@ -8,7 +8,7 @@ from carService.Views.CategoryApiViews import CategoryApi, CategorySelectApi
 from carService.Views.CheckingAccountViews import CheckingAccountApi, PaymentAccountApi, PaymentTypeSelectApi, \
     PaymentAccountDiscountApi, CheckingAccountByCustomerApi
 from carService.Views.CustomerApiViews import CustomerApi
-from carService.Views.DashboardViews import AdminDashboardViews
+from carService.Views.DashboardViews import AdminDashboardViews,ServicemanDashboardViews,CustomerDashboardViews
 from carService.Views.ProductApiViews import ProductApi, SearchProductApi, BrandApi, BrandSelectApi, SingleProductApi
 from carService.Views.ServiceApiViews import ServiceTypeSelectApi, ServiceApi, GetCarServicesApi, GetServicesApi, \
     GetServiceDetailApi, DeterminationServiceApi, GetServiceProductsApi, GetServiceImagesApi, ServiceCustomerAcceptApi, \
@@ -54,6 +54,9 @@ urlpatterns = [
     url(r'camera-select-api/$', CameraSelectApi.as_view()),
     url(r'get-camera-api/$', CameraApiView.as_view()),
     url(r'get-admin-dashboard-api/$', AdminDashboardViews.as_view()),
+    url(r'get-serviceman-dashboard-api/$', ServicemanDashboardViews.as_view()),
+    url(r'get-customer-dashboard-api/$', CustomerDashboardViews.as_view()),
+
 
     # url(r'swagger/$', views.schema_view, name='swagger'),
 

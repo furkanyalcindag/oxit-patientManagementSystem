@@ -11,7 +11,7 @@ from carService.permissions import IsAccountant,IsAccountantOrAdmin,IsAdmin,IsCu
 
 class CustomerApi(APIView):
     permission_classes = (IsAuthenticated,)
-    @method_permission_classes((IsAccountantOrAdmin,))
+    @method_permission_classes((IsAccountantOrAdmin|IsCustomer,))
     def get(self, request, format=None):
 
         search = request.GET.get('search')
