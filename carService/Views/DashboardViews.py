@@ -5,12 +5,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from carService.serializers.DashboardSerializer import AdminDashboardSerializer
+from carService.serializers.DashboardSerializer import AdminDashboardSerializer,ServicemanDashboardSerializer,CustomerDashboardSerializer
 from carService.services import DashboardServices
-
+from carService.permissions import IsAccountant,IsAccountantOrAdmin,IsAdmin,IsCustomer,IsCustomerOrAdmin,IsServiceman,IsServicemanOrAdmin
 
 class AdminDashboardViews(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,IsAdmin,)
 
     def get(self, request, format=None):
         data = dict()
@@ -28,3 +28,31 @@ class AdminDashboardViews(APIView):
         data['canceledServiceCount'] = DashboardServices.get_canceled_services_count()
         serializer = AdminDashboardSerializer(data, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
+class ServicemanDashboardViews(APIView):
+    permission_classes = (IsAuthenticated,IsServiceman,)
+
+    def get(self, request, format=None):
+        data = dict()
+        data['uncompletedServiceCount'] = DashboardServices.serviceman_get_uncompleted_services_count(request.user)
+        data['waitingCustomerApproveServiceCount'] = DashboardServices.serviceman_get_waiting_customer_approve_services_count(request.user)
+        data['waitingApproveServiceCount'] = DashboardServices.serviceman_get_waiting_approve_services_count(request.user)
+        data['completedServiceCount'] = DashboardServices.serviceman_get_completed_services_count(request.user)
+        data['canceledServiceCount'] = DashboardServices.serviceman_get_canceled_services_count(request.user)
+        serializer = ServicemanDashboardSerializer(data, context={'request': request})
+        return Response(serializer.data, status.HTTP_200_OK)
+class CustomerDashboardViews(APIView):
+    permission_classes = (IsAuthenticated,IsCustomer,)
+
+    def get(self, request, format=None):
+        data = dict()
+        data['carCount'] = DashboardServices.customer_get_car_count(request.user)
+        data['uncompletedServiceCount'] = DashboardServices.customer_get_uncompleted_services_count(request.user)
+        data['waitingApproveServiceCount'] = DashboardServices.customer_get_waiting_approve_services_count(request.user)
+        data['completedServiceCount'] = DashboardServices.customer_get_completed_services_count(request.user)
+        data['canceledServiceCount'] = DashboardServices.customer_get_canceled_services_count(request.user)
+        data['remainingDebt'] = DashboardServices.customer_get_remain(request.user)
+        data['totalCheckingAccount'] = DashboardServices.customer_get_total_checking_account(request.user)
+        serializer = CustomerDashboardSerializer(data, context={'request': request})
+        return Response(serializer.data, status.HTTP_200_OK)
+
+

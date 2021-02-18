@@ -9,16 +9,18 @@ from carService.serializers.GeneralSerializer import SelectSerializer, ErrorSeri
 from carService.serializers.ProductSerializer import ProductSerializer, ProductSerializerr, BrandSerializer, \
     BrandPageSerializer
 from rest_framework.response import Response
-
+from carService.permissions import IsAccountant,IsAccountantOrAdmin,IsAdmin,IsCustomer,IsCustomerOrAdmin,IsServiceman,IsServicemanOrAdmin,method_permission_classes
 
 class ProductApi(APIView):
     permission_classes = (IsAuthenticated,)
 
+    @method_permission_classes((IsServicemanOrAdmin,))
     def get(self, request, format=None):
         data = Product.objects.filter(isDeleted=False).order_by('-id')
         serializer = ProductSerializer(data, many=True, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
 
+    @method_permission_classes((IsServicemanOrAdmin,))
     def post(self, request, format=None):
         serializer = ProductSerializerr(data=request.data, context={'request': request})
 
@@ -49,7 +51,8 @@ class ProductApi(APIView):
                     errors_dict['Alış Fiyatı'] = value
 
             return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
-
+    
+    @method_permission_classes((IsServicemanOrAdmin,))
     def put(self, request, format=None):
         instance = Product.objects.get(uuid=request.data['uuid'])
         serializer = ProductSerializerr(data=request.data, instance=instance, context={'request': request})
@@ -59,7 +62,8 @@ class ProductApi(APIView):
             return Response({"message": "product is updated"}, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    
+    @method_permission_classes((IsAdmin,))
     def delete(self, request, format=None):
         product = Product.objects.get(uuid=request.GET.get('id'))
         data = dict()
@@ -67,9 +71,8 @@ class ProductApi(APIView):
         product.save()
         return Response(status=status.HTTP_200_OK)
 
-
 class SingleProductApi(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,IsServicemanOrAdmin,)
 
     def get(self, request, format=None):
         product = Product.objects.get(uuid=request.GET.get('id'))
@@ -90,9 +93,8 @@ class SingleProductApi(APIView):
         serializer = ProductSerializerr(data, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
 
-
 class SearchProductApi(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,IsServicemanOrAdmin,)
 
     def get(self, request, format=None):
         # data = Product.objects.filter(barcodeNumber__istartswith=request.GET.get('barcode')).order_by('-id')
@@ -101,10 +103,10 @@ class SearchProductApi(APIView):
         serializer = ProductSerializer(data, many=True, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
 
-
 class BrandApi(APIView):
     permission_classes = (IsAuthenticated,)
 
+    @method_permission_classes((IsServicemanOrAdmin,))
     def get(self, request, format=None):
         if request.GET.get('id') is None:
             data = Brand.objects.filter(isDeleted=False).order_by('-id')
@@ -119,6 +121,7 @@ class BrandApi(APIView):
             serializer = BrandSerializer(data, context={'request': request})
             return Response(serializer.data, status.HTTP_200_OK)
 
+    @method_permission_classes((IsServicemanOrAdmin,))
     def post(self, request, format=None):
 
         serializer = BrandSerializer(data=request.data, context={'request': request})
@@ -135,6 +138,7 @@ class BrandApi(APIView):
 
             return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
 
+    @method_permission_classes((IsServicemanOrAdmin,))
     def put(self, request, format=None):
         instance = Brand.objects.get(id=request.GET.get('id'))
         serializer = BrandSerializer(data=request.data, instance=instance, context={'request': request})
@@ -144,7 +148,8 @@ class BrandApi(APIView):
             return Response({"message": "brand is updated"}, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    
+    @method_permission_classes((IsAdmin,))
     def delete(self, request, format=None):
         brand = Brand.objects.get(pk=request.GET.get('id'))
         data = dict()
@@ -159,9 +164,8 @@ class BrandApi(APIView):
             brand.save()
             return Response(status=status.HTTP_200_OK)
 
-
 class BrandSelectApi(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,IsServicemanOrAdmin,)
 
     def get(self, request, format=None):
         brands = Brand.objects.filter(isDeleted=False)

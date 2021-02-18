@@ -10,10 +10,10 @@ from carService.models import Profile
 from carService.models.SelectObject import SelectObject
 from carService.serializers.GeneralSerializer import SelectSerializer
 from carService.serializers.UserSerializer import UserAddSerializer, UserGroupSerializer, UserSerializer
-
+from carService.permissions import IsAccountant,IsAccountantOrAdmin,IsAdmin,IsCustomer,IsCustomerOrAdmin,IsServiceman,IsServicemanOrAdmin
 
 class UserApi(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,IsAdmin,)
 
     def post(self, request, format=None):
         serializer = UserAddSerializer(data=request.data, context={'request': request})
@@ -29,9 +29,8 @@ class UserApi(APIView):
         serialzier = UserSerializer(users, context={'request': request}, many=True)
         return Response(serialzier.data, status.HTTP_200_OK)
 
-
 class GroupApi(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,IsAdmin,)
 
     def get(self, request, format=None):
         groups = Group.objects.filter(~Q(name='Customer'))

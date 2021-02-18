@@ -13,10 +13,10 @@ from carService.serializers.CheckingAccountSerializer import CheckingAccountPage
     PaymentDiscountSerializer
 from carService.serializers.GeneralSerializer import SelectSerializer
 from carService.services import ButtonServices
-
+from carService.permissions import IsAccountant,IsAccountantOrAdmin,IsAdmin,IsCustomer,IsCustomerOrAdmin,IsServiceman,IsServicemanOrAdmin
 
 class CheckingAccountApi(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,IsCustomerOrAdmin,)
 
     def get(self, request, format=None):
         checking_accounts = CheckingAccount.objects.all().order_by('-id')
@@ -50,7 +50,7 @@ class CheckingAccountApi(APIView):
 
 
 class CheckingAccountStatisticApi(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,IsAdmin,)
 
     def get(self, request, format=None):
         total_receivable = CheckingAccount.objects.filter(~Q(paymentSituation__name='Ödendi')).aggregate(
@@ -64,7 +64,7 @@ class CheckingAccountStatisticApi(APIView):
 
 
 class CheckingAccountByCustomerApi(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,IsCustomerOrAdmin)
 
     def get(self, request, format=None):
         profile = Profile.objects.get(uuid=request.GET.get('uuid'))
@@ -97,9 +97,8 @@ class CheckingAccountByCustomerApi(APIView):
         serializer = CheckingAccountPageSerializer(api_object, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
 
-
 class PaymentAccountDiscountApi(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,IsAdmin,)
 
     def post(self, request, format=None):
         serializer = PaymentDiscountSerializer(data=request.data, context={'request': request})
@@ -120,7 +119,7 @@ class PaymentAccountDiscountApi(APIView):
 
 
 class PaymentAccountApi(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,IsAdmin,)
 
     def get(self, request, format=None):
         try:
@@ -158,9 +157,8 @@ class PaymentAccountApi(APIView):
 
             return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
 
-
 class PaymentTypeSelectApi(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,IsAdmin,)
 
     def get(self, request, format=None):
         types = PaymentType.objects.filter(~Q(name='İndirim'))
