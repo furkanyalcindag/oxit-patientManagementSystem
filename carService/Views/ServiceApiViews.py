@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 import traceback
 from decimal import Decimal
@@ -9,7 +8,6 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
 
 from carService.exceptions import OutOfStockException
 
@@ -26,13 +24,16 @@ from carService.serializers.ServiceSerializer import ServicePageSerializer, Serv
 from carService.services import ButtonServices
 from weasyprint import HTML, CSS
 import datetime
-from carService.permissions import IsAccountant,IsAccountantOrAdmin,IsAdmin,IsCustomer,IsCustomerOrAdmin,IsServiceman,IsServicemanOrAdmin,method_permission_classes
+from carService.permissions import IsAccountant, IsAccountantOrAdmin, IsAdmin, IsCustomer, IsCustomerOrAdmin, \
+    IsServiceman, IsServicemanOrAdmin, method_permission_classes
+
+
 class ServiceApi(APIView):
     permission_classes = (IsAuthenticated,)
-    
-    @method_permission_classes((IsServicemanOrAdmin|IsCustomer,))
+
+    @method_permission_classes((IsServicemanOrAdmin | IsCustomer,))
     def get(self, request, format=None):
-        data = Service.objects.filter(car=Car.objects.get(
+        data = Service.objects.filter(isDeleted=False).filter(car=Car.objects.get(
             uuid=request.GET.get('carId'))).order_by('-id')
         api_object = APIObject()
         api_object.data = data
@@ -41,7 +42,15 @@ class ServiceApi(APIView):
         serializer = ServicePageSerializer(
             api_object, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
-    
+
+    @method_permission_classes((IsAdmin,))
+    def delete(self, request, format=None):
+        service = Service.objects.get(uuid=request.GET.get('id'))
+        data = dict()
+        service.isDeleted = True
+        service.save()
+        return Response(status=status.HTTP_200_OK)
+
     @method_permission_classes((IsAdmin,))
     def post(self, request, format=None):
 
@@ -68,8 +77,9 @@ class ServiceApi(APIView):
 
             return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
 
+
 class ServiceTypeSelectApi(APIView):
-    permission_classes = (IsAuthenticated,IsAdmin,)
+    permission_classes = (IsAuthenticated, IsAdmin,)
 
     def get(self, request, format=None):
         service_types = ServiceType.objects.all()
@@ -89,12 +99,13 @@ class ServiceTypeSelectApi(APIView):
             service_types_objects, many=True, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
 
+
 class GetCarServicesApi(APIView):
-    permission_classes = (IsAuthenticated,IsCustomerOrAdmin|IsServiceman,)
+    permission_classes = (IsAuthenticated, IsCustomerOrAdmin | IsServiceman,)
 
     def get(self, request, format=None):
         car = Car.objects.get(uuid=request.GET.get('uuid'))
-        services = Service.objects.filter(car=car).order_by('-id')
+        services = Service.objects.filter(isDeleted=False).filter(car=car).order_by('-id')
         service_array = []
 
         for service in services:
@@ -109,7 +120,7 @@ class GetCarServicesApi(APIView):
             data['creationDate'] = service.creationDate.strftime(
                 "%d-%m-%Y %H:%M:%S")
             data['serviceman'] = service.serviceman.user.first_name + \
-                ' ' + service.serviceman.user.last_name
+                                 ' ' + service.serviceman.user.last_name
             data['camera'] = None
             service_array.append(data)
 
@@ -127,13 +138,13 @@ class GetServicesApi(APIView):
         services = dict()
         if group_name == 'Tamirci':
             profile = Profile.objects.get(user=user)
-            services = Service.objects.filter(
+            services = Service.objects.filter(isDeleted=False).filter(
                 serviceman=profile).order_by('-id')
         elif group_name == 'Admin':
-            services = Service.objects.filter().order_by('-id')
+            services = Service.objects.filter(isDeleted=False).order_by('-id')
         elif group_name == 'Customer':
             cars = Car.objects.filter(profile=Profile.objects.get(user=user))
-            services = Service.objects.filter(car__in=cars).order_by('-id')
+            services = Service.objects.filter(isDeleted=False).filter(car__in=cars).order_by('-id')
 
         # services = Service.objects.filter().order_by('-id')
         service_array = []
@@ -156,7 +167,6 @@ class GetServicesApi(APIView):
 
             data['serviceman'] = service.serviceman.user.first_name + ' ' + service.serviceman.user.last_name
 
-
             data['camera'] = None
 
             data['buttons'] = ButtonServices.get_buttons(
@@ -174,8 +184,9 @@ class GetServicesApi(APIView):
         # serializer = ServiceSerializer(service_array, many=True, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
 
+
 class GetServiceDetailApi(APIView):
-    permission_classes = (IsAuthenticated,IsServicemanOrAdmin|IsCustomer,)
+    permission_classes = (IsAuthenticated, IsServicemanOrAdmin | IsCustomer,)
 
     def get(self, request, format=None):
         services = dict()
@@ -195,7 +206,7 @@ class GetServiceDetailApi(APIView):
         data['plate'] = service.car.plate
         data['responsiblePerson'] = service.responsiblePerson
         data['serviceman'] = service.serviceman.user.first_name + \
-            ' ' + service.serviceman.user.last_name
+                             ' ' + service.serviceman.user.last_name
         data['price'] = service.price
         data['totalPrice'] = service.totalPrice
         data['laborPrice'] = service.laborPrice
@@ -217,7 +228,7 @@ class GetServiceDetailApi(APIView):
 
 
 class DeterminationServiceApi(APIView):
-    permission_classes = (IsAuthenticated,IsServicemanOrAdmin,)
+    permission_classes = (IsAuthenticated, IsServicemanOrAdmin,)
 
     def post(self, request, format=None):
         try:
@@ -243,7 +254,7 @@ class DeterminationServiceApi(APIView):
                 serviceProduct.productTaxRate = productObj.taxRate
                 serviceProduct.quantity = 1
                 serviceProduct.productTotalPrice = productObj.netPrice + (
-                    productObj.netPrice * productObj.taxRate / 100)
+                        productObj.netPrice * productObj.taxRate / 100)
                 net_price = net_price + serviceProduct.productNetPrice
                 total_price = total_price + serviceProduct.productTotalPrice
                 serviceProduct.save()
@@ -266,7 +277,7 @@ class DeterminationServiceApi(APIView):
             service.laborTaxRate = labor_tax_rate
             service.laborName = labor_name
             service.totalPrice = service.totalPrice + \
-                labor_price + (labor_price * labor_tax_rate / 100)
+                                 labor_price + (labor_price * labor_tax_rate / 100)
             service.save()
 
             return Response("Başarılı", status.HTTP_200_OK)
@@ -275,15 +286,15 @@ class DeterminationServiceApi(APIView):
             traceback.print_exc()
             return Response("Başarısız", status.HTTP_400_BAD_REQUEST)
 
+
 class GetServiceProductsApi(APIView):
-    permission_classes = (IsAuthenticated,IsServicemanOrAdmin|IsCustomer,)
+    permission_classes = (IsAuthenticated, IsServicemanOrAdmin | IsCustomer,)
 
     def get(self, request, format=None):
         service = Service.objects.get(uuid=request.GET.get('uuid'))
         service_products = ServiceProduct.objects.filter(service=service)
         products = []
         for serviceProduct in service_products:
-
             product = serviceProduct.product
             product.netPrice = serviceProduct.productNetPrice
             product.totalProduct = serviceProduct.productTotalPrice
@@ -297,7 +308,7 @@ class GetServiceProductsApi(APIView):
 
 
 class GetServiceImagesApi(APIView):
-    permission_classes = (IsAuthenticated,IsServicemanOrAdmin|IsCustomer,)
+    permission_classes = (IsAuthenticated, IsServicemanOrAdmin | IsCustomer,)
 
     def get(self, request, format=None):
         service = Service.objects.get(uuid=request.GET.get('uuid'))
@@ -313,13 +324,13 @@ class GetServiceImagesApi(APIView):
         return Response(serializer.data, status.HTTP_200_OK)
 
 
-
 class GetServicePdfApi(APIView):
-    permission_classes = (IsAuthenticated,IsAdmin,)
+    permission_classes = (IsAuthenticated, IsAdmin,)
+
     def get(self, request, format=None):
         service = Service.objects.get(uuid=request.GET.get('uuid'))
         situation = ServiceSituation.objects.filter(service=service).order_by('-id')[:1][
-                0].situation.name
+            0].situation.name
         if situation == "Teslim Edildi":
             car = Car.objects.get(uuid=service.car.uuid)
             service_products = ServiceProduct.objects.filter(service=service)
@@ -327,7 +338,7 @@ class GetServicePdfApi(APIView):
             service_images = ServiceImage.objects.filter(service=service)
             images = ""
             for image in service_images:
-                html_tagged = '''<img class="car-image" src='''+image.image+'''></img>''' 
+                html_tagged = '''<img class="car-image" src=''' + image.image + '''></img>'''
                 images += html_tagged
             for serviceProduct in service_products:
                 product = serviceProduct.product
@@ -338,12 +349,13 @@ class GetServicePdfApi(APIView):
                 products.append(product)
             labor = ServiceProduct.product
             labor.barcodeNumber = '-'
-            labor.name= service.laborName
-            labor.brand= None
-            labor.quantity= 1
-            labor.netPrice= service.laborPrice
-            labor.taxRate= service.laborTaxRate
-            labor.totalProduct= (float(service.laborPrice) + (float(service.laborPrice) * float(service.laborTaxRate) / 100))
+            labor.name = service.laborName
+            labor.brand = None
+            labor.quantity = 1
+            labor.netPrice = service.laborPrice
+            labor.taxRate = service.laborTaxRate
+            labor.totalProduct = (
+                        float(service.laborPrice) + (float(service.laborPrice) * float(service.laborTaxRate) / 100))
             if labor.name != None:
                 products.append(labor)
             profile = car.profile
@@ -357,21 +369,21 @@ class GetServicePdfApi(APIView):
                 if product.brand != None:
                     brand_name = product.brand.name
                 product_table = product_table + '''<tr class="bordered">
-                        <td>'''+product.barcodeNumber+'''</td> 
-                        <td>'''+product.name+'''</td>
-                        <td>'''+brand_name+'''</td> 
-                        <td>'''+str(product.quantity)+'''</td>
-                        <td>'''+str(product.netPrice)+'''</td>
-                        <td>'''+str(product.taxRate)+'''</td>
-                        <td>'''+str(product.totalProduct)+'''</td>           
+                        <td>''' + product.barcodeNumber + '''</td> 
+                        <td>''' + product.name + '''</td>
+                        <td>''' + brand_name + '''</td> 
+                        <td>''' + str(product.quantity) + '''</td>
+                        <td>''' + str(product.netPrice) + '''</td>
+                        <td>''' + str(product.taxRate) + '''</td>
+                        <td>''' + str(product.totalProduct) + '''</td>           
                     </tr>'''
-            if(profile.firmName):
+            if (profile.firmName):
                 name = profile.firmName + "-" + \
-                    profile.user.first_name + " " + profile.user.last_name
+                       profile.user.first_name + " " + profile.user.last_name
             else:
                 name = profile.user.first_name + " " + profile.user.last_name
             serviceman = service.serviceman.user.first_name + \
-                " " + service.serviceman.user.last_name
+                         " " + service.serviceman.user.last_name
             try:
                 html = HTML(string='''
                     <!DOCTYPE html>
@@ -386,25 +398,26 @@ class GetServicePdfApi(APIView):
                 <div class="section-header">Servis Bilgileri</div>
                 <div class="container">
                     <div class="row">
-                        <div class="row col-6 entry"><h3 class="col-4">Müşteri:</h3><p>'''+name+'''</p></div>
-                        <div class="row col-6 entry"><h3 class="col-5">Servise Getiren:</h3><p>'''+service.responsiblePerson+'''</p></div>       
+                        <div class="row col-6 entry"><h3 class="col-4">Müşteri:</h3><p>''' + name + '''</p></div>
+                        <div class="row col-6 entry"><h3 class="col-5">Servise Getiren:</h3><p>''' + service.responsiblePerson + '''</p></div>       
                     </div>
                     <div class="row">
-                        <div class="row col-3 entry"><h3 class="col-4">Plaka:</h3><p>'''+car.plate+'''</p></div>
-                        <div class="row col-4 entry"><h3 class="col-6">Servis Tipi:</h3><p>''' + service.serviceType.name +'''</p></div>
-                        <div class="row col-5 entry"><h3 class="col-5">Kilometre:</h3><p>''' +str(service.serviceKM)+''' KM</p></div>     
+                        <div class="row col-3 entry"><h3 class="col-4">Plaka:</h3><p>''' + car.plate + '''</p></div>
+                        <div class="row col-4 entry"><h3 class="col-6">Servis Tipi:</h3><p>''' + service.serviceType.name + '''</p></div>
+                        <div class="row col-5 entry"><h3 class="col-5">Kilometre:</h3><p>''' + str(service.serviceKM) + ''' KM</p></div>     
                     </div>
                     <div class="row">
-                        <div class="row col-3 entry"><h3 class="col-4">Usta:</h3><p>''' +serviceman+'''</p></div>
-                        <div class="row col-4 entry"><h3 class="col-6">Giriş zamanı:</h3><p>'''+ str(service.creationDate).split(".")[0] +'''</p></div>
-                        <div class="row col-5 entry"><h3 class="col-5">Teslim Alan:</h3><p>''' +receiver+'''</p></div>
+                        <div class="row col-3 entry"><h3 class="col-4">Usta:</h3><p>''' + serviceman + '''</p></div>
+                        <div class="row col-4 entry"><h3 class="col-6">Giriş zamanı:</h3><p>''' +
+                                   str(service.creationDate).split(".")[0] + '''</p></div>
+                        <div class="row col-5 entry"><h3 class="col-5">Teslim Alan:</h3><p>''' + receiver + '''</p></div>
                           
                     </div> 
                 <div>
                 <div class="desc-header">Şikayet:</div>
-                <div class="description">'''+service.complaint+'''</div>
+                <div class="description">''' + service.complaint + '''</div>
                 <div class="desc-header">Tespit:</div> 
-                <div class="description">'''+service.description+'''</div>
+                <div class="description">''' + service.description + '''</div>
                 <table>
                 <caption>Servis  Ürün Listesi</caption>
                 <tr>
@@ -415,21 +428,21 @@ class GetServicePdfApi(APIView):
                     <th>Net Fiyat</th>
                     <th>KDV</th>
                     <th>Toplam Fiyat</th>    
-                </tr>'''+product_table+'''
+                </tr>''' + product_table + '''
                 <tr class="footer">
-                    <th>Net: </th><td class="last-td">'''+str(service.price) +''' ₺</td>
-                    <th>Toplam: </th><td class="last-td">'''+str(service.totalPrice) +''' ₺</td>
+                    <th>Net: </th><td class="last-td">''' + str(service.price) + ''' ₺</td>
+                    <th>Toplam: </th><td class="last-td">''' + str(service.totalPrice) + ''' ₺</td>
                 </tr>
                 </table>
                 <div>
                     <div class="section-header" style="page-break-before: avoid"> Araç Fotoğrafları </div>
                     '''
-                    +images+
-                    '''
-                </div>
-                </html>
-
-                ''')
+                                   + images +
+                                   '''
+                               </div>
+                               </html>
+               
+                               ''')
                 css = CSS(string='''
                 .bordered{border-bottom: 10000000px solid black;}
                 .last-td{
@@ -558,16 +571,17 @@ class GetServicePdfApi(APIView):
                 }
                 ''')
                 html.write_pdf(
-                    'tmp/report.pdf',stylesheets=[css])
-                return FileResponse(open('tmp/report.pdf', 'rb'),status= status.HTTP_200_OK, content_type='application/pdf')
+                    'tmp/report.pdf', stylesheets=[css])
+                return FileResponse(open('tmp/report.pdf', 'rb'), status=status.HTTP_200_OK,
+                                    content_type='application/pdf')
             except:
                 raise Exception("Error While creating service detail pdf")
-        else: 
-            return Response("Teslim edilmeden rapor alınamaz",status= status.HTTP_403_FORBIDDEN)
+        else:
+            return Response("Teslim edilmeden rapor alınamaz", status=status.HTTP_403_FORBIDDEN)
 
 
 class ServiceCustomerAcceptApi(APIView):
-    permission_classes = (IsAuthenticated,IsCustomerOrAdmin)
+    permission_classes = (IsAuthenticated, IsCustomerOrAdmin)
 
     def post(self, request, format=None):
 
@@ -627,6 +641,7 @@ class ServiceCustomerAcceptApi(APIView):
             traceback.print_exc()
             return Response("Servis ", status.HTTP_400_BAD_REQUEST)
 
+
 # usta admin ?????
 class ServiceProcessingApi(APIView):
     permission_classes = (IsAuthenticated,)
@@ -658,7 +673,7 @@ class ServiceProcessingApi(APIView):
                 checking_account.paymentSituation = PaymentSituation.objects.get(
                     name__exact='Ödenmedi')
                 checking_account.save()
-            #admin
+            # admin
             elif situation_no == 3:
                 situation = Situation.objects.get(name__exact='Teslim Edildi')
                 service_situation.situation = situation
