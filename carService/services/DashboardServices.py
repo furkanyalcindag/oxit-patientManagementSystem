@@ -29,6 +29,7 @@ def get_uncompleted_services_count():
     return ServiceSituation.objects.filter(id__in=x).filter(
         situation=Situation.objects.get(name__exact='İşlemde')).count()
 
+
 def get_waiting_approve_services_count():
     # x = ServiceSituation.objects.all().order_by('service', '-id').distinct('service').values()
     x = ServiceSituation.objects.order_by('service', '-id').distinct('service')
@@ -113,52 +114,54 @@ def get_total_checking_account(time_type):
         return 0
 
 
-#Serviceman
+# Serviceman
 
 
 def serviceman_get_uncompleted_services_count(user):
     profile = Profile.objects.get(user=user)
     services = Service.objects.filter(serviceman=profile).order_by('-id')
     x = ServiceSituation.objects.order_by('service', '-id').distinct('service')
-    return ServiceSituation.objects.filter(id__in=x,service__in=services).filter(
+    return ServiceSituation.objects.filter(id__in=x, service__in=services).filter(
         situation__in=Situation.objects.filter(Q(name__exact='İşlemde') | Q(name__exact='İşlem Bekleniyor'))).count()
 
-def serviceman_get_completed_services_count(user):
 
+def serviceman_get_completed_services_count(user):
     profile = Profile.objects.get(user=user)
     services = Service.objects.filter(serviceman=profile).order_by('-id')
     x = ServiceSituation.objects.order_by('service', '-id').distinct('service')
-    return ServiceSituation.objects.filter(id__in=x,service__in=services).filter(
+    return ServiceSituation.objects.filter(id__in=x, service__in=services).filter(
         situation__in=Situation.objects.filter(Q(name__exact='Tamamlandı') | Q(name__exact='Teslim Edildi'))).count()
 
+
 def serviceman_get_waiting_approve_services_count(user):
-    
     profile = Profile.objects.get(user=user)
     services = Service.objects.filter(serviceman=profile).order_by('-id')
     x = ServiceSituation.objects.order_by('service', '-id').distinct('service')
-    return ServiceSituation.objects.filter(id__in=x,service__in=services).filter(
+    return ServiceSituation.objects.filter(id__in=x, service__in=services).filter(
         situation=Situation.objects.get(name__exact='Arıza Tespiti Bekleniyor')).count()
-def serviceman_get_waiting_customer_approve_services_count(user):    
+
+
+def serviceman_get_waiting_customer_approve_services_count(user):
     profile = Profile.objects.get(user=user)
     services = Service.objects.filter(serviceman=profile).order_by('-id')
     x = ServiceSituation.objects.order_by('service', '-id').distinct('service')
-    return ServiceSituation.objects.filter(id__in=x,service__in=services).filter(
+    return ServiceSituation.objects.filter(id__in=x, service__in=services).filter(
         situation=Situation.objects.get(name__exact='Müşteri Onayı Bekleniyor')).count()
+
 
 def serviceman_get_canceled_services_count(user):
     profile = Profile.objects.get(user=user)
     services = Service.objects.filter(serviceman=profile).order_by('-id')
     x = ServiceSituation.objects.order_by('service', '-id').distinct('service')
-    return ServiceSituation.objects.filter(id__in=x,service__in=services).filter(
+    return ServiceSituation.objects.filter(id__in=x, service__in=services).filter(
         situation__in=Situation.objects.filter(name__exact='İptal Edildi')).count()
 
 
-#Customer
+# Customer
 
 def customer_get_car_count(user):
     profile = Profile.objects.get(user=user)
-    return Car.objects.filter(isDeleted=False,profile=profile).count()
-    
+    return Car.objects.filter(isDeleted=False, profile=profile).count()
 
 
 def customer_get_uncompleted_services_count(user):
@@ -166,51 +169,60 @@ def customer_get_uncompleted_services_count(user):
     cars = Car.objects.filter(profile=profile)
     services = Service.objects.filter(car__in=cars).order_by('-id')
     x = ServiceSituation.objects.order_by('service', '-id').distinct('service')
-    return ServiceSituation.objects.filter(id__in=x,service__in=services).filter(
+    return ServiceSituation.objects.filter(id__in=x, service__in=services).filter(
         situation__in=Situation.objects.filter(Q(name__exact='İşlemde') | Q(name__exact='İşlem Bekleniyor'))).count()
+
 
 def customer_get_completed_services_count(user):
     profile = Profile.objects.get(user=user)
     cars = Car.objects.filter(profile=profile)
     services = Service.objects.filter(car__in=cars).order_by('-id')
     x = ServiceSituation.objects.order_by('service', '-id').distinct('service')
-    return ServiceSituation.objects.filter(id__in=x,service__in=services).filter(
+    return ServiceSituation.objects.filter(id__in=x, service__in=services).filter(
         situation__in=Situation.objects.filter(Q(name__exact='Tamamlandı') | Q(name__exact='Teslim Edildi'))).count()
 
+
 def customer_get_waiting_approve_services_count(user):
-    
     profile = Profile.objects.get(user=user)
     cars = Car.objects.filter(profile=profile)
-    services = Service.objects.filter(car__in= cars).order_by('-id')
+    services = Service.objects.filter(car__in=cars).order_by('-id')
     x = ServiceSituation.objects.order_by('service', '-id').distinct('service')
-    return ServiceSituation.objects.filter(id__in=x,service__in=services).filter(
+    return ServiceSituation.objects.filter(id__in=x, service__in=services).filter(
         situation=Situation.objects.get(name__exact='Müşteri Onayı Bekleniyor')).count()
+
 
 def customer_get_canceled_services_count(user):
     profile = Profile.objects.get(user=user)
     cars = Car.objects.filter(profile=profile)
     services = Service.objects.filter(car__in=cars).order_by('-id')
     x = ServiceSituation.objects.order_by('service', '-id').distinct('service')
-    return ServiceSituation.objects.filter(id__in=x,service__in=services).filter(
+    return ServiceSituation.objects.filter(id__in=x, service__in=services).filter(
         situation__in=Situation.objects.filter(name__exact='İptal Edildi')).count()
+
 
 def customer_get_remain(user):
     # x = ServiceSituation.objects.all().order_by('service', '-id').distinct('service').values()
     profile = Profile.objects.get(user=user)
-    services = Service.objects.filter(car=Car.objects.get(profile=profile))
-    
-    return CheckingAccount.objects.filter(service__in=services).aggregate(
+    services = Service.objects.filter(car__in=Car.objects.filter(profile=profile))
+
+    remain = CheckingAccount.objects.filter(service__in=services).aggregate(
         Sum('remainingDebt'))['remainingDebt__sum']
+
+    if remain is not None:
+        return remain
+    else:
+        return 0
+
 
 def customer_get_total_checking_account(user):
     profile = Profile.objects.get(user=user)
-    services = Service.objects.filter(car=Car.objects.get(profile=profile))
+    services = Service.objects.filter(car__in=Car.objects.filter(profile=profile))
     checking_accounts = CheckingAccount.objects.filter(service__in=services)
-    if PaymentMovement.objects.filter(~Q(paymentType__name='İndirim')).filter(checkingAccount__in=checking_accounts).aggregate(
+    if PaymentMovement.objects.filter(~Q(paymentType__name='İndirim')).filter(
+            checkingAccount__in=checking_accounts).aggregate(
         Sum('paymentAmount'))['paymentAmount__sum'] is None:
         return 0
     else:
-        return PaymentMovement.objects.filter(~Q(paymentType__name='İndirim')).filter(checkingAccount__in=checking_accounts).aggregate(
+        return PaymentMovement.objects.filter(~Q(paymentType__name='İndirim')).filter(
+            checkingAccount__in=checking_accounts).aggregate(
             Sum('paymentAmount'))['paymentAmount__sum']
-    return 0
-
