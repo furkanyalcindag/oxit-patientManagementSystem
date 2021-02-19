@@ -9,7 +9,9 @@ from carService.models.CategorySelectObject import CategorySelectObject
 from carService.serializers.CategorySerializer import CategorySerializer, CategorySelectSerializer
 from carService.serializers.GeneralSerializer import ErrorSerializer
 from carService.services import CategoryServices
-from carService.permissions import IsAccountant,IsAccountantOrAdmin,IsAdmin,IsCustomer,IsCustomerOrAdmin,IsServiceman,IsServicemanOrAdmin,method_permission_classes
+from carService.permissions import IsAccountant, IsAccountantOrAdmin, IsAdmin, IsCustomer, IsCustomerOrAdmin, \
+    IsServiceman, IsServicemanOrAdmin, method_permission_classes
+
 
 class CategoryApi(APIView):
     permission_classes = (IsAuthenticated,)
@@ -40,7 +42,7 @@ class CategoryApi(APIView):
             # category_object.parentPath = CategoryServices.get_category_path(category, '')
             serializer = CategorySerializer(category_object, context={'request': request})
             return Response(serializer.data, status.HTTP_200_OK)
-    
+
     @method_permission_classes((IsServicemanOrAdmin,))
     def post(self, request, format=None):
         serializer = CategorySerializer(data=request.data, context={'request': request})
@@ -63,6 +65,7 @@ class CategoryApi(APIView):
             return Response({"message": "brand is updated"}, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     @method_permission_classes((IsAdmin,))
     def delete(self, request, format=None):
         category = Category.objects.get(pk=request.GET.get('id'))
@@ -90,7 +93,7 @@ class CategoryApi(APIView):
 
 
 class CategorySelectApi(APIView):
-    permission_classes = (IsAuthenticated,IsServicemanOrAdmin,)
+    permission_classes = (IsAuthenticated, IsServicemanOrAdmin,)
 
     def get(self, request, format=None):
         categories = Category.objects.filter(isDeleted=False).order_by("-id")
