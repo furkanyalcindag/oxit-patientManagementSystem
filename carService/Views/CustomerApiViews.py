@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db.models import Q
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -7,11 +8,14 @@ from rest_framework.views import APIView
 from carService.models import Profile
 from carService.models.ApiObject import APIObject
 from carService.serializers.UserSerializer import CustomerAddSerializer, CustomerPageSerializer
-from carService.permissions import IsAccountant,IsAccountantOrAdmin,IsAdmin,IsCustomer,IsCustomerOrAdmin,IsServiceman,IsServicemanOrAdmin,method_permission_classes
+from carService.permissions import IsAccountant, IsAccountantOrAdmin, IsAdmin, IsCustomer, IsCustomerOrAdmin, \
+    IsServiceman, IsServicemanOrAdmin, method_permission_classes
+
 
 class CustomerApi(APIView):
     permission_classes = (IsAuthenticated,)
-    @method_permission_classes((IsAccountantOrAdmin|IsCustomer,))
+
+    @method_permission_classes((IsAccountantOrAdmin | IsCustomer,))
     def get(self, request, format=None):
 
         search = request.GET.get('search')
@@ -22,9 +26,18 @@ class CustomerApi(APIView):
         start = (int(page) * int(per_page))
         end = start + int(per_page)
 
-        data = Profile.objects.filter(user__groups__name__iexact='Customer').filter(
-            Q(user__first_name__icontains=search) | Q(user__last_name__icontains=search) |
-            Q(firmName__icontains=search)).order_by('-id')[start:end]
+        user = User.objects.get(id=request.user.id)
+        group_name = request.user.groups.filter()[0].name
+
+        data = None
+        if group_name == 'Customer':
+            data = Profile.objects.filter(user=user).filter(user__groups__name__iexact='Customer').filter(
+                Q(user__first_name__icontains=search) | Q(user__last_name__icontains=search) |
+                Q(firmName__icontains=search)).order_by('-id')[start:end]
+        else:
+            data = Profile.objects.filter(user__groups__name__iexact='Customer').filter(
+                Q(user__first_name__icontains=search) | Q(user__last_name__icontains=search) |
+                Q(firmName__icontains=search)).order_by('-id')[start:end]
 
         apiObject = APIObject()
         apiObject.data = data
@@ -33,6 +46,7 @@ class CustomerApi(APIView):
 
         serializer = CustomerPageSerializer(apiObject, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
+
     @method_permission_classes((IsAdmin,))
     def post(self, request, format=None):
         serializer = CustomerAddSerializer(data=request.data, context={'request': request})
