@@ -19,13 +19,13 @@ class CustomerApi(APIView):
     def get(self, request, format=None):
 
         search = request.GET.get('search')
-
+        """
         per_page = request.GET.get('per_page')
         page = request.GET.get('page')
         page = int(page) - 1
         start = (int(page) * int(per_page))
         end = start + int(per_page)
-
+        """
         user = User.objects.get(id=request.user.id)
         group_name = request.user.groups.filter()[0].name
 
@@ -33,11 +33,11 @@ class CustomerApi(APIView):
         if group_name == 'Customer':
             data = Profile.objects.filter(user=user).filter(user__groups__name__iexact='Customer').filter(
                 Q(user__first_name__icontains=search) | Q(user__last_name__icontains=search) |
-                Q(firmName__icontains=search)).order_by('-id')[start:end]
+                Q(firmName__icontains=search)).order_by('-id')
         else:
             data = Profile.objects.filter(user__groups__name__iexact='Customer').filter(
                 Q(user__first_name__icontains=search) | Q(user__last_name__icontains=search) |
-                Q(firmName__icontains=search)).order_by('-id')[start:end]
+                Q(firmName__icontains=search)).order_by('-id')
 
         apiObject = APIObject()
         apiObject.data = data

@@ -15,6 +15,7 @@ from carService.Views.ServiceApiViews import ServiceTypeSelectApi, ServiceApi, G
     ServiceProcessingApi,GetServicePdfApi
 from carService.Views.StaffViews import StaffApi, ServicemanSelectApi
 from carService.Views.UserApiView import UserApi, GroupApi, UserPayload
+from carService.Views.SettingViews import SettingApi
 
 app_name = 'carService'
 
@@ -56,7 +57,7 @@ urlpatterns = [
     url(r'get-admin-dashboard-api/$', AdminDashboardViews.as_view()),
     url(r'get-serviceman-dashboard-api/$', ServicemanDashboardViews.as_view()),
     url(r'get-customer-dashboard-api/$', CustomerDashboardViews.as_view()),
-
+    url(r'get-settings-api/$', SettingApi.as_view()),
 
     # url(r'swagger/$', views.schema_view, name='swagger'),
 

@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-
+from carService.services import MailServices
 from carService.models.Profile import Profile
 
 
@@ -83,7 +83,8 @@ class CustomerAddSerializer(serializers.Serializer):
                                         email=validated_data.get('username'))
         user.first_name = validated_data.get("firstName")
         user.last_name = validated_data.get("lastName")
-        user.set_password("Servis123.")
+        password = User.objects.make_random_password()
+        user.set_password(password)
         user.save()
 
         try:
@@ -104,6 +105,7 @@ class CustomerAddSerializer(serializers.Serializer):
                 profile.isCorporate = False
 
             profile.save()
+            MailServices.send_password(password=password,to=user.email)
             return profile
         except Exception:
             user.delete()
@@ -138,9 +140,11 @@ class StaffSerializer(serializers.Serializer):
 
         user = User.objects.create_user(username=validated_data.get('username'),
                                         email=validated_data.get('username'))
+        email = user.email
+        password = User.objects.make_random_password()
         user.first_name = validated_data.get("firstName")
         user.last_name = validated_data.get("lastName")
-        user.set_password("Servis123.")
+        user.set_password(password)
         user.save()
 
         try:
@@ -151,6 +155,7 @@ class StaffSerializer(serializers.Serializer):
             profile.mobilePhone = validated_data.get('mobilePhone')
             profile.address = validated_data.get('address')
             profile.save()
+            MailServices.send_password(password=password,to=user.email)
             return profile
         except Exception:
             user.delete()

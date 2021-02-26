@@ -93,10 +93,10 @@ class CategoryApi(APIView):
 
 
 class CategorySelectApi(APIView):
-    permission_classes = (IsAuthenticated, IsServicemanOrAdmin,)
+    permission_classes = (IsAuthenticated,IsServicemanOrAdmin,)
 
     def get(self, request, format=None):
-        categories = Category.objects.filter(isDeleted=False).order_by("-id")
+        categories = Category.objects.filter(isDeleted=False).order_by("id")
         category_objects = []
         category_objectRoot = CategorySelectObject()
         category_objectRoot.label = "Yok"
