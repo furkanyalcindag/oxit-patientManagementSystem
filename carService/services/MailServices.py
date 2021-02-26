@@ -152,7 +152,6 @@ def send_mail(service,to):
     msg.send()
 
 def send_password(password,to):
-  print(password,to)
   text_content = 'Kulmer Motorlu Araçlar Servis Takip Yazılımı Hesap Bilgileri'
   subject, from_email = 'Kulmer Motorlu Araçlar Servis Takip Yazılımı Hesap Bilgileri', 'test@kulmer.com.tr'
   logo = Setting.objects.get(key="logo-dark").value
