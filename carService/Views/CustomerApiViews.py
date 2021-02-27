@@ -5,8 +5,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from carService.models import Profile
+from carService.models import Profile, Car, Service
 from carService.models.ApiObject import APIObject
+from carService.serializers.GeneralSerializer import ErrorSerializer
 from carService.serializers.UserSerializer import CustomerAddSerializer, CustomerPageSerializer
 from carService.permissions import IsAccountant, IsAccountantOrAdmin, IsAdmin, IsCustomer, IsCustomerOrAdmin, \
     IsServiceman, IsServicemanOrAdmin, method_permission_classes
@@ -32,10 +33,11 @@ class CustomerApi(APIView):
         data = None
         if group_name == 'Customer':
             data = Profile.objects.filter(user=user).filter(user__groups__name__iexact='Customer').filter(
+                isDeleted=False).filter(
                 Q(user__first_name__icontains=search) | Q(user__last_name__icontains=search) |
                 Q(firmName__icontains=search)).order_by('-id')
         else:
-            data = Profile.objects.filter(user__groups__name__iexact='Customer').filter(
+            data = Profile.objects.filter(user__groups__name__iexact='Customer').filter(isDeleted=False).filter(
                 Q(user__first_name__icontains=search) | Q(user__last_name__icontains=search) |
                 Q(firmName__icontains=search)).order_by('-id')
 
@@ -73,3 +75,34 @@ class CustomerApi(APIView):
                     errors_dict['Vergi Dairesi'] = value
 
             return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
+
+    @method_permission_classes((IsAdmin,))
+    def delete(self, request, format=None):
+        profile = Profile.objects.get(uuid=request.GET.get('id'))
+        user = profile.user
+        data = dict()
+        err = []
+        try:
+            if Car.objects.filter(isDeleted=False, profile=profile):
+                data['value'] = 'Bu Müşterinin, sistemde aracı yada araçları kayıtlı olduğu için silinemez'
+                err.append(data)
+                serializer = ErrorSerializer(err, many=True, context={'request': request})
+                return Response(serializer.data, status=status.HTTP_300_MULTIPLE_CHOICES)
+
+            elif Service.objects.filter(car__in=Car.objects.filter(profile=profile)):
+                data['value'] = 'Bu Müşterinin, sistemde servis kaydı yada kayıtları olduğu için silinemez'
+                err.append(data)
+                serializer = ErrorSerializer(err, many=True, context={'request': request})
+                return Response(serializer.data, status=status.HTTP_300_MULTIPLE_CHOICES)
+
+            else:
+                profile.isDeleted = True
+                profile.save()
+                user.is_active = False
+                user.save()
+                return Response(status=status.HTTP_200_OK)
+        except:
+            data['value'] = 'Beklenmeyen hata.'
+            err.append(data)
+            serializer = ErrorSerializer(err, many=True, context={'request': request})
+            return Response(serializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
