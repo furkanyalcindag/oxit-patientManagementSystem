@@ -11,7 +11,7 @@ from carService.models.SelectObject import SelectObject
 from carService.serializers.GeneralSerializer import SelectSerializer
 from carService.serializers.UserSerializer import UserAddSerializer, UserGroupSerializer, UserSerializer
 from carService.permissions import IsAccountant,IsAccountantOrAdmin,IsAdmin,IsCustomer,IsCustomerOrAdmin,IsServiceman,IsServicemanOrAdmin
-
+from carService.services import MailServices
 class UserApi(APIView):
     permission_classes = (IsAuthenticated,IsAdmin,)
 
@@ -57,3 +57,19 @@ class UserPayload(APIView):
         user_id = request.user.id
         user = User.objects.get(pk=user_id)
         return Response(user.first_name + ' ' + user.last_name, status.HTTP_200_OK)
+
+class UserPasswordRegen(APIView):
+    def post(self, request, format=None):
+        try:
+            user = User.objects.filter(email__exact=request.data['email'])
+            if len(user) != 0:
+                user = user[0]
+                password = User.objects.make_random_password()
+                user.set_password(password)
+                user.save()
+                MailServices.send_password(password=password,to=user.email)
+                return Response({"message": "success"}, status=status.HTTP_200_OK)
+            else:
+                return Response({"message": "fail"}, status=status.HTTP_400_BAD_REQUEST)
+        except:
+            raise Exception("problem while regenerating password")

@@ -101,6 +101,8 @@ def get_buttons(group_name: str, service_situation: str, service : Service):
         elif service_situation == 'Müşteri Onayı Bekleniyor':
             buttons.append(button_object_info)
             buttons.append(button_object_confirm)
+            if service.isCameraOpen:
+                buttons.append(button_object_camera)
 
         else:
             buttons.append(button_object_info)
