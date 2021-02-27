@@ -13,7 +13,7 @@ class CategorySerializer(serializers.Serializer):
         try:
             category = Category()
             category.name = validated_data.get('name')
-            if validated_data.get('parent') != 0:
+            if validated_data.get('parent') != '0':
                 parent_category = Category.objects.get(pk=int(validated_data.get('parent')))
                 category.parent = parent_category
 
