@@ -72,9 +72,9 @@ class CustomerAddSerializer(serializers.Serializer):
     address = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     mobilePhone = serializers.CharField(required=False)
     isCorporate = serializers.BooleanField(required=True)
-    taxNumber = serializers.CharField(required=False, allow_null=True,  allow_blank=True)
-    firmName = serializers.CharField(required=False,  allow_null=True, allow_blank=True)
-    taxOffice = serializers.CharField(required=False, allow_null=True,  allow_blank=True)
+    taxNumber = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    firmName = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    taxOffice = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     actions = serializers.CharField(read_only=True)
 
     def create(self, validated_data):
@@ -105,14 +105,39 @@ class CustomerAddSerializer(serializers.Serializer):
                 profile.isCorporate = False
 
             profile.save()
-            MailServices.send_password(password=password,to=user.email)
+            MailServices.send_password(password=password, to=user.email)
             return profile
         except Exception:
             user.delete()
             raise serializers.ValidationError("lütfen tekrar deneyiniz")
 
     def update(self, instance, validated_data):
-        pass
+        try:
+            user = instance.user
+            user.first_name = validated_data.get("firstName")
+            user.last_name = validated_data.get("lastName")
+            user.username = validated_data("username")
+            user.email = validated_data("email")
+            instance.mobilePhone = validated_data.get('mobilePhone')
+            instance.address = validated_data.get('address')
+
+            if validated_data.get('isCorporate'):
+                instance.taxNumber = validated_data.get('taxNumber')
+                instance.firmName = validated_data.get('firmName')
+                instance.taxOffice = validated_data.get('taxOffice')
+                instance.isCorporate = True
+
+            else:
+                instance.isCorporate = False
+
+            user.save()
+            instance.save()
+
+            return instance
+
+        except Exception:
+
+            raise serializers.ValidationError("lütfen tekrar deneyiniz")
 
 
 class CustomerPageSerializer(serializers.Serializer):
@@ -155,7 +180,7 @@ class StaffSerializer(serializers.Serializer):
             profile.mobilePhone = validated_data.get('mobilePhone')
             profile.address = validated_data.get('address')
             profile.save()
-            MailServices.send_password(password=password,to=user.email)
+            MailServices.send_password(password=password, to=user.email)
             return profile
         except Exception:
             user.delete()

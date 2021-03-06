@@ -21,7 +21,7 @@ from carService.models.ServiceType import ServiceType
 from carService.serializers.GeneralSerializer import SelectSerializer
 from carService.serializers.ProductSerializer import ProductSerializer
 from carService.serializers.ServiceSerializer import ServicePageSerializer, ServiceSerializer, ServiceImageSerializer
-from carService.services import ButtonServices,MailServices
+from carService.services import ButtonServices, MailServices
 from weasyprint import HTML, CSS
 import datetime
 from carService.permissions import IsAccountant, IsAccountantOrAdmin, IsAdmin, IsCustomer, IsCustomerOrAdmin, \
@@ -283,7 +283,7 @@ class DeterminationServiceApi(APIView):
                                  labor_price + (labor_price * labor_tax_rate / 100)
             service.save()
 
-            MailServices.send_mail(service=service,to=user_mail)
+            MailServices.send_mail(service=service, to=user_mail)
             return Response("Başarılı", status.HTTP_200_OK)
 
         except:
@@ -299,12 +299,27 @@ class GetServiceProductsApi(APIView):
         service_products = ServiceProduct.objects.filter(service=service)
         products = []
         for serviceProduct in service_products:
-            product = serviceProduct.product
-            product.netPrice = serviceProduct.productNetPrice
-            product.totalProduct = serviceProduct.productTotalPrice
-            product.taxRate = serviceProduct.productTaxRate
-            product.quantity = serviceProduct.quantity
-            products.append(product)
+
+            isExist = False
+            for productArr in products:
+                if serviceProduct.product.uuid == productArr.uuid:
+                    productArr.quantity = productArr.quantity+serviceProduct.quantity
+                    productArr.netPrice = serviceProduct.productNetPrice*productArr.quantity
+                    productArr.totalProduct = serviceProduct.productTotalPrice*productArr.quantity
+                    isExist=True
+
+
+
+            if not isExist:
+                product = serviceProduct.product
+                product.netPrice = serviceProduct.productNetPrice
+                product.totalProduct = serviceProduct.productTotalPrice
+                product.taxRate = serviceProduct.productTaxRate
+                product.quantity = serviceProduct.quantity
+                products.append(product)
+
+
+
 
         serializer = ProductSerializer(
             products, many=True, context={'request': request})
@@ -337,8 +352,8 @@ class GetServicePdfApi(APIView):
             0].situation.name
         if situation == "Teslim Edildi":
             car = Car.objects.get(uuid=service.car.uuid)
-            car_model =car.model
-            car_brand =car.brand
+            car_model = car.model
+            car_brand = car.brand
             service_products = ServiceProduct.objects.filter(service=service)
             products = []
             service_images = ServiceImage.objects.filter(service=service)
@@ -361,7 +376,7 @@ class GetServicePdfApi(APIView):
             labor.netPrice = service.laborPrice
             labor.taxRate = service.laborTaxRate
             labor.totalProduct = (
-                        float(service.laborPrice) + (float(service.laborPrice) * float(service.laborTaxRate) / 100))
+                    float(service.laborPrice) + (float(service.laborPrice) * float(service.laborTaxRate) / 100))
             if labor.name != None:
                 products.append(labor)
             profile = car.profile
@@ -390,7 +405,7 @@ class GetServicePdfApi(APIView):
                 name = profile.user.first_name + " " + profile.user.last_name
             serviceman = service.serviceman.user.first_name + \
                          " " + service.serviceman.user.last_name
-            
+
             logo = Setting.objects.get(key="logo-dark").value
             try:
                 html = HTML(string='''
@@ -401,7 +416,7 @@ class GetServicePdfApi(APIView):
                     <meta charset="utf-8" />
                 </head>
                 <div class="header">
-                    <img class="logo"  src="'''+logo+'''">
+                    <img class="logo"  src="''' + logo + '''">
                 </div>    
                 <div class="section-header">Servis Bilgileri</div>
                 <div class="container">
@@ -410,14 +425,15 @@ class GetServicePdfApi(APIView):
                         <div class="row col-6 entry"><h3 class="col-5">Servise Getiren:</h3><p>''' + service.responsiblePerson + '''</p></div>       
                     </div>
                     <div class="row">
-                        <div class="row col-3 entry"><h3>Plaka:</h3><p>'''+car.plate+'''</p></div>
-                        <div class="row col-5 entry"><h3>Marka/Model:</h3><p>''' + car_brand+'''/'''+car_model+'''</p></div>
-                        <div class="row col-4 entry"><h3>Kilometre:</h3><p>''' +str(service.serviceKM)+''' KM</p></div>      
+                        <div class="row col-3 entry"><h3>Plaka:</h3><p>''' + car.plate + '''</p></div>
+                        <div class="row col-5 entry"><h3>Marka/Model:</h3><p>''' + car_brand + '''/''' + car_model + '''</p></div>
+                        <div class="row col-4 entry"><h3>Kilometre:</h3><p>''' + str(service.serviceKM) + ''' KM</p></div>      
                     </div>
                     <div class="row">
-                        <div class="row col-3 entry"><h3>Usta:</h3><p>''' +serviceman+'''</p></div>
-                        <div class="row col-5 entry"><h3>Giriş zamanı:</h3><p>'''+ str(service.creationDate).split(".")[0] +'''</p></div>
-                        <div class="row col-4 entry"><h3>Teslim Alan:</h3><p>''' +receiver+'''</p></div>
+                        <div class="row col-3 entry"><h3>Usta:</h3><p>''' + serviceman + '''</p></div>
+                        <div class="row col-5 entry"><h3>Giriş zamanı:</h3><p>''' +
+                                   str(service.creationDate).split(".")[0] + '''</p></div>
+                        <div class="row col-4 entry"><h3>Teslim Alan:</h3><p>''' + receiver + '''</p></div>
 
                           
                     </div> 
@@ -608,7 +624,7 @@ class ServiceCustomerAcceptApi(APIView):
 
                     for service_product in service_products:
                         product = service_product.product
-                        if product.quantity > service_product.quantity:
+                        if product.quantity >= service_product.quantity:
                             product.quantity = product.quantity - service_product.quantity
                             product.save()
                         else:
@@ -686,7 +702,7 @@ class ServiceProcessingApi(APIView):
                 checking_account.paymentSituation = PaymentSituation.objects.get(
                     name__exact='Ödenmedi')
                 checking_account.save()
-                MailServices.send_mail(service=service,to=user_mail)
+                MailServices.send_mail(service=service, to=user_mail)
             # admin
             elif situation_no == 3:
                 situation = Situation.objects.get(name__exact='Teslim Edildi')
@@ -695,7 +711,7 @@ class ServiceProcessingApi(APIView):
                 receiver_person = request.data['receiverPerson']
                 service.receiverPerson = receiver_person
                 service.save()
-                MailServices.send_mail(service=service,to=user_mail)
+                MailServices.send_mail(service=service, to=user_mail)
 
             return Response("Servis ", status.HTTP_200_OK)
 

@@ -106,3 +106,31 @@ class CustomerApi(APIView):
             err.append(data)
             serializer = ErrorSerializer(err, many=True, context={'request': request})
             return Response(serializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @method_permission_classes((IsServicemanOrAdmin,))
+    def put(self, request, format=None):
+        instance = Profile.objects.get(uuid=request.GET.get('id'))
+        serializer = CustomerAddSerializer(data=request.data, instance=instance, context={'request': request})
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Customer is updated"}, status=status.HTTP_200_OK)
+        else:
+            errors_dict = dict()
+            for key, value in serializer.errors.items():
+                if key == 'group':
+                    errors_dict['Grup'] = value
+                elif key == 'username':
+                    errors_dict['Email'] = value
+                elif key == 'firstName':
+                    errors_dict['İsim'] = value
+                elif key == 'lastName':
+                    errors_dict['Soyisim'] = value
+                elif key == 'firmName':
+                    errors_dict['Firma Adı'] = value
+                elif key == 'taxNumber':
+                    errors_dict['Vergi Numarası'] = value
+                elif key == 'taxOffice':
+                    errors_dict['Vergi Dairesi'] = value
+
+            return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)

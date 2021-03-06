@@ -10,9 +10,9 @@ from carService.models import CheckingAccount, PaymentMovement, PaymentType, Pro
 from carService.models.ApiObject import APIObject
 from carService.models.SelectObject import SelectObject
 from carService.serializers.CheckingAccountSerializer import CheckingAccountPageSerializer, PaymentSerializer, \
-    PaymentDiscountSerializer
+    PaymentDiscountSerializer, CheckingAccountPageWithStatisticSerializer
 from carService.serializers.GeneralSerializer import SelectSerializer
-from carService.services import ButtonServices
+from carService.services import ButtonServices, DashboardServices
 from carService.permissions import IsAccountant,IsAccountantOrAdmin,IsAdmin,IsCustomer,IsCustomerOrAdmin,IsServiceman,IsServicemanOrAdmin
 
 class CheckingAccountApi(APIView):
@@ -93,8 +93,10 @@ class CheckingAccountByCustomerApi(APIView):
         api_object.data = checking_account_array
         api_object.recordsFiltered = checking_accounts.count()
         api_object.recordsTotal = checking_accounts.count()
+        api_object.remainCheckout = DashboardServices.customer_get_remain(profile.user)
+        api_object.totalCheckout = DashboardServices. customer_get_total_checking_account(profile.user)
 
-        serializer = CheckingAccountPageSerializer(api_object, context={'request': request})
+        serializer = CheckingAccountPageWithStatisticSerializer(api_object, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
 
 class PaymentAccountDiscountApi(APIView):

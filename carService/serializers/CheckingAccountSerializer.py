@@ -40,6 +40,20 @@ class CheckingAccountPageSerializer(serializers.Serializer):
         pass
 
 
+class CheckingAccountPageWithStatisticSerializer(serializers.Serializer):
+    data = CheckingAccountSerializer(many=True)
+    recordsTotal = serializers.IntegerField()
+    recordsFiltered = serializers.IntegerField()
+    totalCheckout = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
+    remainCheckout = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
+
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
+
+
 class PaymentDiscountSerializer(serializers.Serializer):
     checkingAccountUUID = serializers.UUIDField(write_only=True)
     paymentAmount = serializers.DecimalField(max_digits=10, decimal_places=2)
