@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from carService.models import Car
 from carService.serializers.CarSerializer import CarSerializer
 from carService.permissions import IsAccountant, IsAccountantOrAdmin, IsAdmin, IsCustomer, IsCustomerOrAdmin, \
-    IsServiceman, IsServicemanOrAdmin, method_permission_classes
+    IsServiceman, IsServicemanOrAdmin, method_permission_classes, IsAll
 
 
 class CarApi(APIView):
@@ -68,9 +68,11 @@ class CarApi(APIView):
 
 
 class GetCarApi(APIView):
-    permission_classes = (IsAuthenticated, IsCustomerOrAdmin,)
 
+
+    permission_classes = (IsAuthenticated, IsServicemanOrAdmin | IsCustomer,)
     def get(self, request, format=None):
         cars = Car.objects.get(uuid=request.GET.get('uuid'))
         serializer = CarSerializer(cars, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
+

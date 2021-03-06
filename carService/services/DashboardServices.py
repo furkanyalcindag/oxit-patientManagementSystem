@@ -161,9 +161,9 @@ def serviceman_get_canceled_services_count(user):
 
 def customer_get_car_count(user):
     profile = Profile.objects.get(user=user)
-    result = Car.objects.filter(isDeleted=False,profile=profile)
+    result = Car.objects.filter(isDeleted=False, profile=profile)
     return result.count()
-    
+
 
 def customer_get_uncompleted_services_count(user):
     profile = Profile.objects.get(user=user)
@@ -205,7 +205,7 @@ def customer_get_remain(user):
     # x = ServiceSituation.objects.all().order_by('service', '-id').distinct('service').values()
     profile = Profile.objects.get(user=user)
     services = Service.objects.filter(car__in=Car.objects.filter(profile=profile))
-    
+
     remain = CheckingAccount.objects.filter(service__in=services).aggregate(
         Sum('remainingDebt'))['remainingDebt__sum']
 
@@ -227,3 +227,14 @@ def customer_get_total_checking_account(user):
         return PaymentMovement.objects.filter(~Q(paymentType__name='İndirim')).filter(
             checkingAccount__in=checking_accounts).aggregate(
             Sum('paymentAmount'))['paymentAmount__sum']
+
+
+def customer_checking_account_total(user):
+    profile = Profile.objects.get(user=user)
+    total = services = Service.objects.filter(car__in=Car.objects.filter(profile=profile)) \
+        .aggregate(Sum('totalPrice'))['totalPrice__sum']
+
+    if total is not None:
+        return total
+    else:
+        return 0
