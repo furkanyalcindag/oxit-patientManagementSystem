@@ -250,17 +250,20 @@ class DeterminationServiceApi(APIView):
             total_price = 0
             for product in products:
                 productObj = Product.objects.get(uuid=product['uuid'])
-                serviceProduct = ServiceProduct()
-                serviceProduct.product = productObj
-                serviceProduct.service = service
-                serviceProduct.productNetPrice = productObj.netPrice
-                serviceProduct.productTaxRate = productObj.taxRate
-                serviceProduct.quantity = 1
-                serviceProduct.productTotalPrice = productObj.netPrice + (
-                        productObj.netPrice * productObj.taxRate / 100)
-                net_price = net_price + serviceProduct.productNetPrice
-                total_price = total_price + serviceProduct.productTotalPrice
-                serviceProduct.save()
+                for i in range(product['quantity']):
+                    serviceProduct = ServiceProduct()
+                    serviceProduct.product = productObj
+                    serviceProduct.service = service
+                    serviceProduct.productNetPrice = productObj.netPrice
+                    serviceProduct.productTaxRate = productObj.taxRate
+                    serviceProduct.quantity = 1
+                    serviceProduct.productTotalPrice = productObj.netPrice + (
+                            productObj.netPrice * productObj.taxRate / 100)
+                    net_price = net_price + serviceProduct.productNetPrice
+                    total_price = total_price + serviceProduct.productTotalPrice
+                    serviceProduct.save()
+
+
 
             for photo in photos:
                 serviceImage = ServiceImage()
