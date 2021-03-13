@@ -168,6 +168,7 @@ class CustomerSendPasswordApi(APIView):
         password = User.objects.make_random_password()
         user.set_password(password)
         user.save()
+        profile.isSendMail=True
         MailServices.send_password(password=password, to=user.email)
 
         return Response(None, status.HTTP_200_OK)

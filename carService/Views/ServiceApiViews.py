@@ -240,7 +240,7 @@ class DeterminationServiceApi(APIView):
             labor_price = Decimal(request.data['laborPrice'])
             labor_tax_rate = Decimal(request.data['laborTaxRate'])
             labor_name = request.data['laborName']
-            net_price = request.data['netPrice']
+
             service = Service.objects.get(uuid=uuid)
 
             user_mail = service.car.profile.user.email
@@ -255,12 +255,12 @@ class DeterminationServiceApi(APIView):
                     serviceProduct = ServiceProduct()
                     serviceProduct.product = productObj
                     serviceProduct.service = service
-                    serviceProduct.productNetPrice = float(product['netPrice'])
+                    serviceProduct.productNetPrice = Decimal(product['netPrice'])
                     serviceProduct.productTaxRate = productObj.taxRate
                     serviceProduct.quantity = 1
-                    serviceProduct.productTotalPrice = float(product['netPrice']) + (
-                            float(product['netPrice']) * productObj.taxRate / 100)
-                    net_price = net_price + float(product['netPrice'])
+                    serviceProduct.productTotalPrice = Decimal(product['netPrice']) + (
+                            Decimal(product['netPrice']) * productObj.taxRate / 100)
+                    net_price = net_price + Decimal(product['netPrice'])
                     total_price = total_price + serviceProduct.productTotalPrice
                     serviceProduct.save()
 
