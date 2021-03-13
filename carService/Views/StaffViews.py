@@ -9,11 +9,13 @@ from carService.models import Profile
 from carService.models.ApiObject import APIObject
 from carService.models.SelectObject import SelectObject
 from carService.serializers.GeneralSerializer import SelectSerializer
-from carService.serializers.UserSerializer import StaffSerializer, StaffPageSerializer
-from carService.permissions import IsAccountant,IsAccountantOrAdmin,IsAdmin,IsCustomer,IsCustomerOrAdmin,IsServiceman,IsServicemanOrAdmin
+from carService.serializers.UserSerializer import StaffSerializer, StaffPageSerializer, StaffSingleSerializer
+from carService.permissions import IsAccountant, IsAccountantOrAdmin, IsAdmin, IsCustomer, IsCustomerOrAdmin, \
+    IsServiceman, IsServicemanOrAdmin, method_permission_classes
+
 
 class StaffApi(APIView):
-    permission_classes = (IsAuthenticated,IsAdmin,)
+    permission_classes = (IsAuthenticated, IsAdmin,)
 
     def get(self, request, format=None):
         '''  search = request.GET.get('search')
@@ -28,16 +30,28 @@ class StaffApi(APIView):
               Q(user__first_name__icontains=search) | Q(user__last_name__icontains=search) |
               Q(firmName__icontains=search)).order_by('-id')[start:end]
   '''
+        if request.GET.get('id') is None:
+            # data = Profile.objects.filter(~Q(user__groups__name__iexact=request.Get.get('name')))
+            data = Profile.objects.filter(~Q(user__groups__name__iexact='Customer')).filter(isDeleted=False)
+            apiObject = APIObject()
+            apiObject.data = data
+            apiObject.recordsFiltered = data.count()
+            apiObject.recordsTotal = data.count()
+            serializer = StaffPageSerializer(apiObject, context={'request': request})
+            return Response(serializer.data, status.HTTP_200_OK)
 
-        # data = Profile.objects.filter(~Q(user__groups__name__iexact=request.Get.get('name')))
-        data = Profile.objects.filter(~Q(user__groups__name__iexact='Customer'))
-        apiObject = APIObject()
-        apiObject.data = data
-        apiObject.recordsFiltered = data.count()
-        apiObject.recordsTotal = data.count()
-
-        serializer = StaffPageSerializer(apiObject, context={'request': request})
-        return Response(serializer.data, status.HTTP_200_OK)
+        else:
+            profile = Profile.objects.get(uuid=request.GET.get('id'))
+            data = dict()
+            data['firstName'] = profile.user.first_name
+            data['lastName'] = profile.user.last_name
+            data['username'] = profile.user.username
+            data['mobilePhone'] = profile.mobilePhone
+            data['address'] = profile.address
+            data['group'] =profile.user.groups.filter()[0].id
+            data['uuid'] = profile.uuid
+            serializer = StaffSingleSerializer(data, context={'request': request})
+            return Response(serializer.data, status.HTTP_200_OK)
 
     def post(self, request, format=None):
 
@@ -60,12 +74,46 @@ class StaffApi(APIView):
 
             return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
 
-class ServicemanSelectApi(APIView):
+    @method_permission_classes((IsAdmin,))
+    def delete(self, request, format=None):
+        try:
 
-    permission_classes = (IsAuthenticated,IsAdmin,)
+            profile = Profile.objects.get(uuid=request.GET.get('id'))
+            profile.isDeleted = True
+            profile.user.is_active = False
+            profile.save()
+            return Response(status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @method_permission_classes((IsServicemanOrAdmin,))
+    def put(self, request, format=None):
+        instance = Profile.objects.get(uuid=request.GET.get('id'))
+        serializer = StaffSerializer(data=request.data, instance=instance, context={'request': request})
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Staff is updated"}, status=status.HTTP_200_OK)
+        else:
+            errors_dict = dict()
+            for key, value in serializer.errors.items():
+                if key == 'group':
+                    errors_dict['Grup'] = value
+                elif key == 'username':
+                    errors_dict['Email'] = value
+                elif key == 'firstName':
+                    errors_dict['İsim'] = value
+                elif key == 'lastName':
+                    errors_dict['Soyisim'] = value
+
+            return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ServicemanSelectApi(APIView):
+    permission_classes = (IsAuthenticated, IsAdmin,)
 
     def get(self, request, format=None):
-        servicemans = Profile.objects.filter(user__groups__name__exact='Tamirci')
+        servicemans = Profile.objects.filter(user__groups__name__exact='Tamirci').filter(isDeleted=False)
         serviceman_objects = []
         select_object_root = SelectObject()
         select_object_root.label = "Seçiniz"

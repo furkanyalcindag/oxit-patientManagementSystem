@@ -8,9 +8,10 @@ from rest_framework.views import APIView
 from carService.models import Profile, Car, Service
 from carService.models.ApiObject import APIObject
 from carService.serializers.GeneralSerializer import ErrorSerializer
-from carService.serializers.UserSerializer import CustomerAddSerializer, CustomerPageSerializer
+from carService.serializers.UserSerializer import CustomerAddSerializer, CustomerPageSerializer, CustomerGetSerializer
 from carService.permissions import IsAccountant, IsAccountantOrAdmin, IsAdmin, IsCustomer, IsCustomerOrAdmin, \
     IsServiceman, IsServicemanOrAdmin, method_permission_classes
+from carService.services import MailServices
 
 
 class CustomerApi(APIView):
@@ -134,3 +135,39 @@ class CustomerApi(APIView):
                     errors_dict['Vergi Dairesi'] = value
 
             return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CustomerGetApi(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    @method_permission_classes((IsAccountantOrAdmin | IsCustomer,))
+    def get(self, request, format=None):
+        profile = Profile.objects.get(uuid=request.GET.get('id'))
+        data = dict()
+        data['firstName'] = profile.user.first_name
+        data['lastName'] = profile.user.last_name
+        data['username'] = profile.user.username
+        data['mobilePhone'] = profile.mobilePhone
+        data['address'] = profile.address
+        data['firmName'] = profile.firmName
+        data['taxOffice'] = profile.taxOffice
+        data['taxNumber'] = profile.taxNumber
+        data['isCorporate'] = profile.taxNumber
+        data['uuid'] = profile.uuid
+        serializer = CustomerGetSerializer(data, context={'request': request})
+        return Response(serializer.data, status.HTTP_200_OK)
+
+
+class CustomerSendPasswordApi(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    @method_permission_classes((IsAccountantOrAdmin | IsCustomer,))
+    def post(self, request, format=None):
+        profile = Profile.objects.get(uuid=request.GET.get('id'))
+        user = profile.user
+        password = User.objects.make_random_password()
+        user.set_password(password)
+        user.save()
+        MailServices.send_password(password=password, to=user.email)
+
+        return Response(None, status.HTTP_200_OK)

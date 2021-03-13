@@ -7,7 +7,7 @@ from carService.Views.CarApiViews import CarApi, GetCarApi
 from carService.Views.CategoryApiViews import CategoryApi, CategorySelectApi
 from carService.Views.CheckingAccountViews import CheckingAccountApi, PaymentAccountApi, PaymentTypeSelectApi, \
     PaymentAccountDiscountApi, CheckingAccountByCustomerApi
-from carService.Views.CustomerApiViews import CustomerApi
+from carService.Views.CustomerApiViews import CustomerApi, CustomerGetApi, CustomerSendPasswordApi
 from carService.Views.DashboardViews import AdminDashboardViews,ServicemanDashboardViews,CustomerDashboardViews
 from carService.Views.ProductApiViews import ProductApi, SearchProductApi, BrandApi, BrandSelectApi, SingleProductApi
 from carService.Views.ServiceApiViews import ServiceTypeSelectApi, ServiceApi, GetCarServicesApi, GetServicesApi, \
@@ -26,6 +26,8 @@ urlpatterns = [
     url(r'user-payload-api/$', UserPayload.as_view()),
     url(r'group-api/$', GroupApi.as_view(), name='group-api'),
     url(r'customer-api/', CustomerApi.as_view(), name='customer-api'),
+    url(r'customer-get-api/', CustomerGetApi.as_view(), name='customer-get-api'),
+    url(r'customer-send-password-api/', CustomerSendPasswordApi.as_view()),
     url(r'product-api/$', ProductApi.as_view(), name='product-api'),
     url(r'product-single-api/$', SingleProductApi.as_view()),
     url(r'car-api/$', CarApi.as_view(), name='car-api'),
