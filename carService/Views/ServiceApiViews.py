@@ -240,6 +240,7 @@ class DeterminationServiceApi(APIView):
             labor_price = Decimal(request.data['laborPrice'])
             labor_tax_rate = Decimal(request.data['laborTaxRate'])
             labor_name = request.data['laborName']
+            net_price = request.data['netPrice']
             service = Service.objects.get(uuid=uuid)
 
             user_mail = service.car.profile.user.email
@@ -254,16 +255,14 @@ class DeterminationServiceApi(APIView):
                     serviceProduct = ServiceProduct()
                     serviceProduct.product = productObj
                     serviceProduct.service = service
-                    serviceProduct.productNetPrice = productObj.netPrice
+                    serviceProduct.productNetPrice = float(product['netPrice'])
                     serviceProduct.productTaxRate = productObj.taxRate
                     serviceProduct.quantity = 1
-                    serviceProduct.productTotalPrice = productObj.netPrice + (
-                            productObj.netPrice * productObj.taxRate / 100)
-                    net_price = net_price + serviceProduct.productNetPrice
+                    serviceProduct.productTotalPrice = float(product['netPrice']) + (
+                            float(product['netPrice']) * productObj.taxRate / 100)
+                    net_price = net_price + float(product['netPrice'])
                     total_price = total_price + serviceProduct.productTotalPrice
                     serviceProduct.save()
-
-
 
             for photo in photos:
                 serviceImage = ServiceImage()
@@ -306,12 +305,10 @@ class GetServiceProductsApi(APIView):
             isExist = False
             for productArr in products:
                 if serviceProduct.product.uuid == productArr.uuid:
-                    productArr.quantity = productArr.quantity+serviceProduct.quantity
-                    productArr.netPrice = serviceProduct.productNetPrice*productArr.quantity
-                    productArr.totalProduct = serviceProduct.productTotalPrice*productArr.quantity
-                    isExist=True
-
-
+                    productArr.quantity = productArr.quantity + serviceProduct.quantity
+                    productArr.netPrice = serviceProduct.productNetPrice * productArr.quantity
+                    productArr.totalProduct = serviceProduct.productTotalPrice * productArr.quantity
+                    isExist = True
 
             if not isExist:
                 product = serviceProduct.product
@@ -320,9 +317,6 @@ class GetServiceProductsApi(APIView):
                 product.taxRate = serviceProduct.productTaxRate
                 product.quantity = serviceProduct.quantity
                 products.append(product)
-
-
-
 
         serializer = ProductSerializer(
             products, many=True, context={'request': request})

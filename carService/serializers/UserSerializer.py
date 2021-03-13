@@ -58,14 +58,34 @@ class UserAddSerializer(serializers.Serializer):
         pass
 
 
+class CustomerGetSerializer(serializers.Serializer):
+    uuid = serializers.UUIDField(read_only=True)
+    user = UserSerializer(read_only=True)
+    gender = serializers.CharField(required=False)
+    firstName = serializers.CharField(required=True)
+    lastName = serializers.CharField(required=True)
+    username = serializers.CharField(required=False,
+                                     validators=[UniqueValidator(queryset=User.objects.all())])
+    # password = serializers.CharField(write_only=True)
+    birthDate = serializers.DateField(required=False)
+    city = serializers.CharField(required=False)
+    address = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    mobilePhone = serializers.CharField(required=False)
+    isCorporate = serializers.BooleanField(required=True)
+    taxNumber = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    firmName = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    taxOffice = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    actions = serializers.CharField(read_only=True)
+
+
 class CustomerAddSerializer(serializers.Serializer):
     uuid = serializers.UUIDField(read_only=True)
     user = UserSerializer(read_only=True)
     gender = serializers.CharField(required=False)
     firstName = serializers.CharField(required=True, write_only=True)
     lastName = serializers.CharField(required=True, write_only=True)
-    username = serializers.CharField(write_only=True, required=False,
-                                     validators=[UniqueValidator(queryset=User.objects.all())])
+    username = serializers.CharField(required=False, write_only=True,
+                                     )
     # password = serializers.CharField(write_only=True)
     birthDate = serializers.DateField(required=False)
     city = serializers.CharField(required=False)
@@ -105,7 +125,7 @@ class CustomerAddSerializer(serializers.Serializer):
                 profile.isCorporate = False
 
             profile.save()
-            MailServices.send_password(password=password, to=user.email)
+            # MailServices.send_password(password=password, to=user.email)
             return profile
         except Exception:
             user.delete()
@@ -116,8 +136,8 @@ class CustomerAddSerializer(serializers.Serializer):
             user = instance.user
             user.first_name = validated_data.get("firstName")
             user.last_name = validated_data.get("lastName")
-            user.username = validated_data("username")
-            user.email = validated_data("email")
+            user.username = validated_data.get("username")
+            user.email = validated_data.get("username")
             instance.mobilePhone = validated_data.get('mobilePhone')
             instance.address = validated_data.get('address')
 
@@ -146,6 +166,22 @@ class CustomerPageSerializer(serializers.Serializer):
     recordsFiltered = serializers.IntegerField()
 
 
+class StaffSingleSerializer(serializers.Serializer):
+    uuid = serializers.UUIDField(read_only=True)
+    user = UserSerializer(read_only=True)
+    gender = serializers.CharField(required=False)
+    firstName = serializers.CharField(required=True, allow_blank=False)
+    lastName = serializers.CharField(required=True, allow_blank=False)
+    username = serializers.CharField(required=False,
+                                     validators=[UniqueValidator(queryset=User.objects.all())])
+    # password = serializers.CharField(write_only=True)
+
+    mobilePhone = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    actions = serializers.CharField(read_only=True)
+    group = serializers.CharField(read_only=True, label="grup")
+    address = serializers.CharField(allow_null=True, required=False, allow_blank=True)
+
+
 class StaffSerializer(serializers.Serializer):
     uuid = serializers.UUIDField(read_only=True)
     user = UserSerializer(read_only=True)
@@ -153,7 +189,7 @@ class StaffSerializer(serializers.Serializer):
     firstName = serializers.CharField(required=True, write_only=True, allow_blank=False)
     lastName = serializers.CharField(required=True, write_only=True, allow_blank=False)
     username = serializers.CharField(write_only=True, required=False,
-                                     validators=[UniqueValidator(queryset=User.objects.all())])
+                                     )
     # password = serializers.CharField(write_only=True)
 
     mobilePhone = serializers.CharField(required=False, allow_null=True, allow_blank=True)
@@ -187,7 +223,25 @@ class StaffSerializer(serializers.Serializer):
             raise serializers.ValidationError("lütfen tekrar deneyiniz")
 
     def update(self, instance, validated_data):
-        pass
+        try:
+            user = instance.user
+            user.first_name = validated_data.get("firstName")
+            user.last_name = validated_data.get("lastName")
+            user.username = validated_data.get("username")
+            user.email = validated_data.get("username")
+            instance.mobilePhone = validated_data.get('mobilePhone')
+            instance.address = validated_data.get('address')
+            user.groups.clear()
+            user.groups.add(Group.objects.get(id=int(validated_data.get("group"))))
+
+            user.save()
+            instance.save()
+
+            return instance
+
+        except Exception:
+
+            raise serializers.ValidationError("lütfen tekrar deneyiniz")
 
 
 class StaffPageSerializer(serializers.Serializer):
