@@ -169,6 +169,7 @@ class CustomerSendPasswordApi(APIView):
         user.set_password(password)
         user.save()
         profile.isSendMail=True
+        profile.save()
         MailServices.send_password(password=password, to=user.email)
 
         return Response(None, status.HTTP_200_OK)
