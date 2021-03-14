@@ -6,7 +6,7 @@ from carService.Views.CameraApiViews import CameraSelectApi, CameraApiView
 from carService.Views.CarApiViews import CarApi, GetCarApi
 from carService.Views.CategoryApiViews import CategoryApi, CategorySelectApi
 from carService.Views.CheckingAccountViews import CheckingAccountApi, PaymentAccountApi, PaymentTypeSelectApi, \
-    PaymentAccountDiscountApi, CheckingAccountByCustomerApi
+    PaymentAccountDiscountApi, CheckingAccountByCustomerApi, GetCheckingAccountPdfApi
 from carService.Views.CustomerApiViews import CustomerApi, CustomerGetApi, CustomerSendPasswordApi
 from carService.Views.DashboardViews import AdminDashboardViews,ServicemanDashboardViews,CustomerDashboardViews
 from carService.Views.ProductApiViews import ProductApi, SearchProductApi, BrandApi, BrandSelectApi, SingleProductApi
@@ -61,6 +61,9 @@ urlpatterns = [
     url(r'get-serviceman-dashboard-api/$', ServicemanDashboardViews.as_view()),
     url(r'get-customer-dashboard-api/$', CustomerDashboardViews.as_view()),
     url(r'get-settings-api/$', SettingApi.as_view()),
+    url(r'get-payment-movement-pdf-api/$', GetCheckingAccountPdfApi.as_view()),
+
+
 
     # url(r'swagger/$', views.schema_view, name='swagger'),
 

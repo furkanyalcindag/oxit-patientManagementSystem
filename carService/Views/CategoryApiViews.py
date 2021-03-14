@@ -98,6 +98,13 @@ class CategorySelectApi(APIView):
     def get(self, request, format=None):
         categories = Category.objects.filter(isDeleted=False).order_by("id")
         category_objects = []
+
+        select_object_root = CategorySelectObject()
+        select_object_root.label = "Seçiniz"
+        select_object_root.value = ""
+        category_objects.append(select_object_root)
+
+
         category_objectRoot = CategorySelectObject()
         category_objectRoot.label = "Yok"
         category_objectRoot.value = "0"
