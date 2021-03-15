@@ -61,7 +61,29 @@ class ProductApi(APIView):
             serializer.save()
             return Response({"message": "product is updated"}, status=status.HTTP_200_OK)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            errors_dict = dict()
+            for key, value in serializer.errors.items():
+                if key == 'barcodeNumber':
+                    errors_dict['Barkod'] = value
+                elif key == 'name':
+                    errors_dict['Ürün Adı'] = value
+                elif key == 'quantity':
+                    errors_dict['Stok'] = value
+                elif key == 'netPrice':
+                    errors_dict['Net Fiyat'] = value
+                elif key == 'taxRate':
+                    errors_dict['Vergi Oranı'] = value
+                elif key == 'categories':
+                    errors_dict['Kategori'] = value
+                elif key == 'shelf':
+                    errors_dict['Raf'] = value
+                elif key == 'brand':
+                    errors_dict['Marka'] = value
+                elif key == 'purchasePrice':
+                    errors_dict['Alış Fiyatı'] = value
+
+            return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
+            # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     @method_permission_classes((IsAdmin,))
     def delete(self, request, format=None):
@@ -147,7 +169,11 @@ class BrandApi(APIView):
             serializer.save()
             return Response({"message": "brand is updated"}, status=status.HTTP_200_OK)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            errors_dict = dict()
+            for key, value in serializer.errors.items():
+                if key == 'name':
+                    errors_dict['Marka'] = value
+            return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
     
     @method_permission_classes((IsAdmin,))
     def delete(self, request, format=None):
