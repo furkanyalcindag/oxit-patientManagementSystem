@@ -51,8 +51,12 @@ class CategoryApi(APIView):
             serializer.save()
             return Response({"message": "category is created"}, status=status.HTTP_200_OK)
         else:
-            print(serializer.errors())
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            errors_dict = dict()
+            for key, value in serializer.errors.items():
+                if key == 'name':
+                    errors_dict['Kategori'] = value
+
+            return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
 
     @method_permission_classes((IsServicemanOrAdmin,))
     def put(self, request, format=None):
@@ -62,9 +66,14 @@ class CategoryApi(APIView):
 
         if serializer.is_valid():
             serializer.save()
-            return Response({"message": "brand is updated"}, status=status.HTTP_200_OK)
+            return Response({"message": "category is updated"}, status=status.HTTP_200_OK)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            errors_dict = dict()
+            for key, value in serializer.errors.items():
+                if key == 'name':
+                    errors_dict['Kategori'] = value
+
+            return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
 
     @method_permission_classes((IsAdmin,))
     def delete(self, request, format=None):
@@ -84,6 +93,7 @@ class CategoryApi(APIView):
             data['value'] = 'Bu kategori, kaydedilen bir ürünle ilişkili olduğu için silinemez'
             err.append(data)
             serializer = ErrorSerializer(err, many=True, context={'request': request})
+            print("serialize.data", serializer)
             return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
 
         else:

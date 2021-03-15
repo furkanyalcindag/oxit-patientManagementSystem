@@ -43,7 +43,7 @@ class ServiceSerializer(serializers.Serializer):
     laborName = serializers.CharField(read_only=True)
     description = serializers.CharField(read_only=True)
     receiverPerson = serializers.CharField(read_only=True)
-    camera = serializers.CharField(allow_blank=False)
+    camera = serializers.CharField(allow_blank=False, required=True, allow_null=True)
 
     def create(self, validated_data):
         try:

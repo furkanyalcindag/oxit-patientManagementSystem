@@ -55,7 +55,24 @@ class CarApi(APIView):
             serializer.save()
             return Response({"message": "car is updated"}, status=status.HTTP_200_OK)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            errors_dict = dict()
+            for key, value in serializer.errors.items():
+                if key == 'plate':
+                    errors_dict['Plaka'] = value
+                elif key == 'brand':
+                    errors_dict['Marka'] = value
+                elif key == 'model':
+                    errors_dict['Model'] = value
+                elif key == 'year':
+                    errors_dict['Yıl'] = value
+                elif key == 'chassisNumber':
+                    errors_dict['Şase Numarası'] = value
+                elif key == 'currentKM':
+                    errors_dict['KM'] = value
+                elif key == 'engine':
+                    errors_dict['Motor'] = value
+
+            return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
 
     @method_permission_classes((IsAdmin,))
     def delete(self, request, format=None):

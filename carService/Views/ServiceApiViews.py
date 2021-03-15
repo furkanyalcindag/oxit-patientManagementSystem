@@ -75,6 +75,8 @@ class ServiceApi(APIView):
                     errors_dict['Sorumlu Kişi'] = value
                 elif key == 'serviceman':
                     errors_dict['Usta'] = value
+                elif key == 'camera':
+                    errors_dict['kamera'] = value
 
             return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
 
