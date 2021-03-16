@@ -213,6 +213,7 @@ class GetCheckingAccountPdfApi(APIView):
         car = service.car
         profile = car.profile
         logo = Setting.objects.get(key="logo-dark").value
+        total_price = service.totalPrice
         name = ''
         if (profile.firmName):
             name = profile.firmName + "-" + \
@@ -225,7 +226,7 @@ class GetCheckingAccountPdfApi(APIView):
         # Rendered
         html_string = render_to_string('pdf.html',
                                        {'paymentMovement': payment_movement_array, 'service': service, 'car': car,
-                                        'profile': profile, 'logo': logo, 'name': name,'remain':remain})
+                                        'profile': profile, 'logo': logo, 'name': name,'remain':remain,'totalPrice':total_price})
 
         html_string=html_string.encode('utf-8').strip()
         html = HTML(string=html_string)
