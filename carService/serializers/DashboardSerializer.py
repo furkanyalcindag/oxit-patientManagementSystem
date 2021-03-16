@@ -14,6 +14,7 @@ class AdminDashboardSerializer(serializers.Serializer):
     totalCheckingAccountDaily = serializers.DecimalField(max_digits=10, decimal_places=2)
     totalCheckingAccountMonthly = serializers.DecimalField(max_digits=10, decimal_places=2)
     totalCheckingAccountYearly = serializers.DecimalField(max_digits=10, decimal_places=2)
+    lineChartIncome = serializers.ListField(child=serializers.DecimalField(max_digits=10, decimal_places=2))
 
 
 class ServicemanDashboardSerializer(serializers.Serializer):
