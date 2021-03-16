@@ -58,6 +58,22 @@ def get_remain():
         Sum('remainingDebt'))['remainingDebt__sum']
 
 
+def get_total_checking_account_for_line_chart():
+    income_array = []
+    today = datetime.date.today()
+
+    for i in range(12):
+        x=PaymentMovement.objects.filter(~Q(paymentType__name='İndirim')).filter(
+            creationDate__month=i+1).filter(creationDate__year=today.year).aggregate(
+            Sum('paymentAmount'))['paymentAmount__sum']
+        if x is None:
+            income_array.append(0)
+        else:
+            income_array.append(x)
+
+    return income_array
+
+
 def get_total_checking_account(time_type):
     today = datetime.date.today()
 
