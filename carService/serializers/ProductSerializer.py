@@ -80,7 +80,7 @@ class ProductSerializerr(serializers.Serializer):
             instance.shelf = validated_data.get('shelf')
             instance.purchasePrice = validated_data.get('purchasePrice')
 
-            if validated_data.get('productImage') is not None or validated_data.get('productImage') != '':
+            if validated_data.get('productImage') is not None:
                 instance.productImage = validated_data.get('productImage')
             instance.totalProduct = validated_data.get('netPrice') + (
                     validated_data.get('netPrice') * validated_data.get('taxRate') / 100)

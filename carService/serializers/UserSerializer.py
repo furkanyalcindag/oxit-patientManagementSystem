@@ -96,6 +96,7 @@ class CustomerAddSerializer(serializers.Serializer):
     firmName = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     taxOffice = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     actions = serializers.CharField(read_only=True)
+    isSendMail = serializers.BooleanField(read_only=True)
 
     def create(self, validated_data):
 

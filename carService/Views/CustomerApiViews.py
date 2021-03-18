@@ -164,12 +164,19 @@ class CustomerSendPasswordApi(APIView):
     @method_permission_classes((IsAccountantOrAdmin | IsCustomer,))
     def post(self, request, format=None):
         profile = Profile.objects.get(uuid=request.GET.get('id'))
-        user = profile.user
-        password = User.objects.make_random_password()
-        user.set_password(password)
-        user.save()
-        profile.isSendMail=True
-        profile.save()
-        MailServices.send_password(password=password, to=user.email)
+        if request.GET.get('type') == 'sendMail':
+            if profile.isSendMail:
+                profile.isSendMail = False
+            else:
+                profile.isSendMail = True
+
+            profile.save()
+
+        else:
+            user = profile.user
+            password = User.objects.make_random_password()
+            user.set_password(password)
+            user.save()
+            MailServices.send_password(password=password, to=user.email)
 
         return Response(None, status.HTTP_200_OK)
