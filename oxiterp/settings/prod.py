@@ -18,8 +18,8 @@ DATABASES = {
 }
 
 EMAIL_HOST = "smtp.yandex.com.tr"
-EMAIL_HOST_USER = "test@kulmer.com.tr"
-EMAIL_HOST_PASSWORD ="Test2021"
+EMAIL_HOST_USER = "servis@kulmer.com.tr"
+EMAIL_HOST_PASSWORD ="Servis2021"
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 EMAIL_USE_TLS = False
