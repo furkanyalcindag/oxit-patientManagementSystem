@@ -104,6 +104,9 @@ def get_buttons(group_name: str, service_situation: str, service : Service):
             if service.isCameraOpen:
                 buttons.append(button_object_camera)
 
+        elif service_situation == 'Teslim Edildi':
+            buttons.append(button_object_info)
+
         else:
             buttons.append(button_object_info)
             if service.isCameraOpen:
