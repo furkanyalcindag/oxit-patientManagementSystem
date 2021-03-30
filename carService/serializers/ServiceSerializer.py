@@ -84,6 +84,7 @@ class ServicePageSerializer(serializers.Serializer):
     data = ServiceSerializer(many=True)
     recordsTotal = serializers.IntegerField()
     recordsFiltered = serializers.IntegerField()
+    activePage = serializers.IntegerField()
 
     def update(self, instance, validated_data):
         pass

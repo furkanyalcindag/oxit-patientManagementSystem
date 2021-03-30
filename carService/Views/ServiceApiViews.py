@@ -40,6 +40,7 @@ class ServiceApi(APIView):
         api_object.data = data
         api_object.recordsFiltered = data.count()
         api_object.recordsTotal = data.count()
+        api_object.activePage = 1
         serializer = ServicePageSerializer(
             api_object, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
@@ -139,15 +140,24 @@ class GetServicesApi(APIView):
         user = User.objects.get(id=request.user.id)
         group_name = request.user.groups.filter()[0].name
         services = dict()
+        count = 0
+
+        active_page = int(request.GET.get('activePage'))
+        lim_start = 10 * (active_page - 1)
+        lim_end = lim_start + 10
         if group_name == 'Tamirci':
             profile = Profile.objects.get(user=user)
             services = Service.objects.filter(isDeleted=False).filter(
-                serviceman=profile).order_by('-id')
+                serviceman=profile).order_by('-id')[lim_start:lim_end]
+            count = Service.objects.filter(isDeleted=False).filter(
+                serviceman=profile).count()
         elif group_name == 'Admin':
-            services = Service.objects.filter(isDeleted=False).order_by('-id')
+            services = Service.objects.filter(isDeleted=False).order_by('-id')[lim_start:lim_end]
+            count = Service.objects.filter(isDeleted=False).count()
         elif group_name == 'Customer':
             cars = Car.objects.filter(profile=Profile.objects.get(user=user))
-            services = Service.objects.filter(isDeleted=False).filter(car__in=cars).order_by('-id')
+            services = Service.objects.filter(isDeleted=False).filter(car__in=cars).order_by('-id')[lim_start:lim_end]
+            count = Service.objects.filter(isDeleted=False).filter(car__in=cars).count()
 
         # services = Service.objects.filter().order_by('-id')
         service_array = []
@@ -180,7 +190,11 @@ class GetServicesApi(APIView):
         api_object = APIObject()
         api_object.data = service_array
         api_object.recordsFiltered = services.count()
-        api_object.recordsTotal = services.count()
+        api_object.recordsTotal = count
+        if count % 10 == 0:
+            api_object.activePage = count / 10
+        else:
+            api_object.activePage = (count / 10) + 1
         serializer = ServicePageSerializer(
             api_object, context={'request': request})
 
