@@ -141,8 +141,10 @@ class GetServicesApi(APIView):
         group_name = request.user.groups.filter()[0].name
         services = dict()
         count = 0
+        active_page =1
+        if request.GET.get('activePage') is not None:
+            active_page = int(request.GET.get('activePage'))
 
-        active_page = int(request.GET.get('activePage'))
         lim_start = 10 * (active_page - 1)
         lim_end = lim_start + 10
         if group_name == 'Tamirci':
