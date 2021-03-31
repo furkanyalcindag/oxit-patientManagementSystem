@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'accounts',
 
-    'carService'
+    'carService',
+    'drf_api_logger',
 
 ]
 
@@ -61,6 +62,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'drf_api_logger.middleware.api_logger_middleware.APILoggerMiddleware',  # Add here
 
 ]
 
@@ -211,6 +214,10 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
+
+DRF_API_LOGGER_DATABASE = True
+DRF_LOGGER_QUEUE_MAX_SIZE = 50
+DRF_LOGGER_INTERVAL = 10 
 
 SWAGGER_SETTINGS = {
 
