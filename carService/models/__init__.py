@@ -17,3 +17,4 @@ from .PaymentSituation import PaymentSituation
 from .PaymentMovement import PaymentMovement
 from .CheckingAccount import CheckingAccount
 from .Camera import Camera
+from .ApiLogsModel import APILogsModel
