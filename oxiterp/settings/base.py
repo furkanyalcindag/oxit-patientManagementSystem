@@ -47,8 +47,6 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'accounts',
-
-    'carService',
     'drf_api_logger',
 
 ]
