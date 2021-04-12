@@ -1,10 +1,11 @@
-import uuid as uuid
 from django.db import models
 
 from career.models.BaseModel import BaseModel
+from career.models.Profile import Profile
 
 
 class Company(BaseModel):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     city = models.CharField(max_length=255, blank=True, null=True)
     district = models.CharField(max_length=100, blank=True, null=True)
     address = models.CharField(max_length=255, null=True, blank=True)

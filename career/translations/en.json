@@ -1,0 +1,12 @@
+{
+  "male": "Male",
+  "female": "Female",
+  "unknown": "Unknown",
+  "single": "Single",
+  "married": "Married",
+  "postponed": "Postponed",
+  "done": "Done",
+  "undone": "Undone",
+  "english": "English",
+  "turkish": "Turkish"
+}

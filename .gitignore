@@ -3,3 +3,4 @@
 .vscode/launch.json
 oxiterp/settings/dev.py
 manage.py
+/venv/

@@ -5,7 +5,7 @@ from career.models.City import City
 from career.models.Company import Company
 from career.models.District import District
 from career.models.JobType import JobType
-from career.models.MilitarySituation import MilitarySituation
+from career.models.MilitaryStatus import MilitarySituation
 
 
 class JobPost(BaseModel):

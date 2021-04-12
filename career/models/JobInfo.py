@@ -1,4 +1,3 @@
-import uuid as uuid
 from django.db import models
 
 from career.models.BaseModel import BaseModel

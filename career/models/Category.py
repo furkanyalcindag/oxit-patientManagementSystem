@@ -1,5 +1,7 @@
 from django.db import models
 
+from career.models.BaseModel import BaseModel
 
-class Category(models.Model):
+
+class Category(BaseModel):
     keyword = models.CharField(max_length=256)

@@ -1,0 +1,13 @@
+{
+  "male": "Erkek",
+  "female": "Kadın",
+  "unknown": "Bilinmiyor",
+  "single": "Bekar",
+  "married": "Evli",
+  "postponed": "Tecilli",
+  "done": "Yapıldı",
+  "undone": "Yapılmadı",
+  "english": "İngilizce",
+  "turkish": "Türkçe"
+
+}
