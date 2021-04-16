@@ -6,7 +6,7 @@ from career.models.Instructor import Instructor
 
 class Lecture(BaseModel):
     name = models.CharField(max_length=128)
-    capacity = models.IntegerField(max_length=128)
+    capacity = models.IntegerField()
     date = models.DateField()
     time = models.TimeField()
     place = models.CharField(max_length=128)

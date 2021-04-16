@@ -7,3 +7,6 @@ class BaseModel(models.Model):
     isDeleted = models.BooleanField(default=False)
     creationDate = models.DateTimeField(auto_now_add=True)
     modificationDate = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True  # Set this model as Abstract

@@ -5,6 +5,7 @@ from career.models.BaseModel import BaseModel
 from career.models.Gender import Gender
 from career.models.MaritalStatus import MaritalStatus
 from career.models.MilitaryStatus import MilitaryStatus
+
 from career.models.Nationality import Nationality
 
 

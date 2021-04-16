@@ -5,7 +5,7 @@ from career.models.City import City
 from career.models.Company import Company
 from career.models.District import District
 from career.models.JobType import JobType
-from career.models.MilitaryStatus import MilitarySituation
+from career.models.MilitaryStatus import MilitaryStatus
 
 
 class JobPost(BaseModel):
@@ -18,7 +18,7 @@ class JobPost(BaseModel):
     salaryMax = models.IntegerField()
     staffCount = models.IntegerField()
     experienceYear = models.IntegerField()
-    militarySituation = models.ForeignKey(MilitarySituation, on_delete=models.CASCADE)
+    militaryStatus = models.ForeignKey(MilitaryStatus, on_delete=models.CASCADE)
     startDate = models.DateField()
     finishDate = models.DateField()
     viewCount = models.IntegerField()

@@ -8,4 +8,3 @@ class BlogDescription(BaseModel):
     title = models.CharField(max_length=256)
     article = models.TextField()
     language = models.ForeignKey(Language, on_delete=models.CASCADE)
-    isDeleted = models.BooleanField(default=False)
