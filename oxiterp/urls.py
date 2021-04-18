@@ -40,7 +40,7 @@ urlpatterns = [
     path('api/token/', CustomTokenObtainPairView.as_view()),
     path('api/token/refresh', TokenRefreshView.as_view()),
 
-    path('car-service/', include('carService.urls')),
+    #path('car-service/', include('carService.urls')),
 
 ]
 
