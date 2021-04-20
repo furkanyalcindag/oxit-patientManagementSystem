@@ -32,8 +32,10 @@ def add_military_status(uuid, military_status_id):
     military_status = MilitaryStatus.objects.get(id=military_status_id)
     student.profile.militaryStatus = military_status
     student.save()
+    return student
 
 
 def get_military_status(uuid):
     student = Student.objects.get(uuid=uuid)
-
+    military_status = student.profile.militaryStatus
+    return military_status
