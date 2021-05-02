@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from career.models import Student
+from career.models import Student, StudentEducationInfo
 from career.models.APIObject import APIObject
 from career.serializers.StudentSerializer import StudentSerializer, StudentPageableSerializer
 
@@ -46,8 +46,3 @@ class StudentApi(APIView):
             return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-class StudentEducationInfo(APIView):
-
-    def get(self, request, format=None):
-        return None
