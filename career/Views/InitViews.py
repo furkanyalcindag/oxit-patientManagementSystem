@@ -1,4 +1,5 @@
-from django.contrib.auth.models import Group
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import Group, User
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -12,9 +13,9 @@ from career.models.GenderDescription import GenderDescription
 class InitDataApi(APIView):
 
     def get(self, request, format=None):
-        group = Group()
-        group.name = 'Admin'
-        group.save()
+        group_admin = Group()
+        group_admin.name = 'Admin'
+        group_admin.save()
 
         group = Group()
         group.name = 'Student'
@@ -31,6 +32,13 @@ class InitDataApi(APIView):
         group = Group()
         group.name = 'ContentManager'
         group.save()
+
+        superuser = User()
+        superuser.username = 'admin'
+        superuser.is_superuser = True
+        superuser.password = make_password('oxit2016')
+        superuser.groups.add(group_admin)
+        superuser.save()
 
         language_tr = Language()
         language_tr.name = 'Turkish'
@@ -138,6 +146,10 @@ class InitDataApi(APIView):
 
         job_type = JobType()
         job_type.name = 'Full Time'
+        job_type.save()
+
+        job_type = JobType()
+        job_type.name = 'Remote'
         job_type.save()
 
         return Response({"message": "initial datas added"}, status=status.HTTP_200_OK)
