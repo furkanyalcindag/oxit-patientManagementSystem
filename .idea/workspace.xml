@@ -4,17 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0c972ec9-8c54-4dfe-a63e-e6d519b90ddf" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/carService/migrations/0032_merge_20210315_1001.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/src2.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/src2.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/carService/Views/CarApiViews.py" beforeDir="false" afterPath="$PROJECT_DIR$/carService/Views/CarApiViews.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/carService/Views/CategoryApiViews.py" beforeDir="false" afterPath="$PROJECT_DIR$/carService/Views/CategoryApiViews.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/carService/Views/ProductApiViews.py" beforeDir="false" afterPath="$PROJECT_DIR$/carService/Views/ProductApiViews.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/carService/Views/ServiceApiViews.py" beforeDir="false" afterPath="$PROJECT_DIR$/carService/Views/ServiceApiViews.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/carService/serializers/ServiceSerializer.py" beforeDir="false" afterPath="$PROJECT_DIR$/carService/serializers/ServiceSerializer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oxiterp/settings/dev.py" beforeDir="false" afterPath="$PROJECT_DIR$/oxiterp/settings/dev.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tmp/report.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/tmp/report.pdf" afterDir="false" />
+    <list default="true" id="0c972ec9-8c54-4dfe-a63e-e6d519b90ddf" name="Default Changelist" comment="created initial models">
+      <change afterPath="$PROJECT_DIR$/career/Views/CVViews.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/career/Views/InitViews.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/career/models/ForeignLanguageDescription.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/career/models/GenderDescription.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/career/models/MaritalStatusDescription.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/career/serializers/CVSerializer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/career/Views/StudentViews.py" beforeDir="false" afterPath="$PROJECT_DIR$/career/Views/StudentViews.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/career/models/BlogDescription.py" beforeDir="false" afterPath="$PROJECT_DIR$/career/models/BlogDescription.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/career/serializers/StudentSerializer.py" beforeDir="false" afterPath="$PROJECT_DIR$/career/serializers/StudentSerializer.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,6 +27,7 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="HTML File" />
         <option value="Python Script" />
       </list>
     </option>
@@ -34,7 +35,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="leantime-duzenleme" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -53,15 +54,39 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="full.screen.before.presentation.mode" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../front-carService" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Django Server.career-center">
+    <configuration name="wsgi" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="src2" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/oxiterp" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/oxiterp/wsgi.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration default="true" type="Python.DjangoServer" factoryName="Django server">
       <module name="src2" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -86,7 +111,7 @@
       <option name="customRunCommand" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="car-service" type="Python.DjangoServer" factoryName="Django server">
+    <configuration name="career-center" type="Python.DjangoServer" factoryName="Django server">
       <module name="src2" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -94,9 +119,9 @@
         <env name="PYTHONUNBUFFERED" value="1" />
         <env name="DJANGO_SETTINGS_MODULE" value="oxiterp.settings.dev" />
       </envs>
-      <option name="SDK_HOME" value="$PROJECT_DIR$/../oxit-carServicevenv/bin/python" />
+      <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
+      <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="launchJavascriptDebuger" value="false" />
@@ -110,6 +135,11 @@
       <option name="customRunCommand" value="" />
       <method v="2" />
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.wsgi" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -135,7 +165,27 @@
       <workItem from="1615618872803" duration="2220000" />
       <workItem from="1615788306894" duration="16236000" />
       <workItem from="1615818583181" duration="5000" />
+      <workItem from="1618038471600" duration="20781000" />
+      <workItem from="1618645485142" duration="23845000" />
+      <workItem from="1619720434146" duration="5938000" />
+      <workItem from="1619850741157" duration="10264000" />
+      <workItem from="1619880150014" duration="4672000" />
     </task>
+    <task id="LOCAL-00001" summary="created initial models">
+      <created>1618065224252</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1618065224252</updated>
+    </task>
+    <task id="LOCAL-00002" summary="created initial models">
+      <created>1619729062672</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1619729062672</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -152,5 +202,9 @@
       </map>
     </option>
     <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="created initial models" />
+    <option name="LAST_COMMIT_MESSAGE" value="created initial models" />
   </component>
 </project>

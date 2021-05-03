@@ -2,9 +2,8 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from career.models import Student
+from career.models import Student, StudentEducationInfo
 from career.models.APIObject import APIObject
-from career.serializers.GeneralSerializers import PageSerializer
 from career.serializers.StudentSerializer import StudentSerializer, StudentPageableSerializer
 
 
@@ -45,3 +44,5 @@ class StudentApi(APIView):
                     errors_dict['Öğrenci Numarası'] = value
 
             return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
+
+

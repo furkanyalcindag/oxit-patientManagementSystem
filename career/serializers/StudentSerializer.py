@@ -12,6 +12,7 @@ from oxiterp.serializers import UserSerializer
 
 
 class StudentSerializer(serializers.Serializer):
+    # TODO: Student serializer
     uuid = serializers.UUIDField(read_only=True)
     user = UserSerializer(read_only=True)
     firstName = serializers.CharField(required=False)
@@ -52,3 +53,11 @@ class StudentSerializer(serializers.Serializer):
 
 class StudentPageableSerializer(PageSerializer):
     data = StudentSerializer(many=True)
+
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
+
+

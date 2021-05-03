@@ -5,6 +5,5 @@ pillow
 psycopg2-binary
 django-cors-headers
 djangorestframework_simplejwt
-django-rest-swagger
 WeasyPrint
 drf-api-logger
