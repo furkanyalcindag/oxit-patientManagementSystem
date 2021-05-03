@@ -7,3 +7,4 @@ django-cors-headers
 djangorestframework_simplejwt
 WeasyPrint
 drf-api-logger
+gunicorn
