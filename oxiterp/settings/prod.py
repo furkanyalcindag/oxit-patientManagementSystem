@@ -9,10 +9,10 @@ ALLOWED_HOSTS = ['*']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'oxit_service',
-        'USER': 'oxitowner',
-        'PASSWORD': 'oxit2016',
-        'HOST': 'localhost',
+        'NAME': 'dfrdqvu734v8c',
+        'USER': 'zdqozojtqxtaef',
+        'PASSWORD': '616ad722cef96d815d78b1f0beb2c0cd5a4a596440c78644a827864ef88b6a93',
+        'HOST': 'ec2-54-196-111-158.compute-1.amazonaws.com',
         'PORT': '5432',
     }
 }
