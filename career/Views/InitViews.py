@@ -37,7 +37,8 @@ class InitDataApi(APIView):
         superuser.username = 'admin'
         superuser.is_superuser = True
         superuser.password = make_password('oxit2016')
-        superuser.groups.add(group_admin)
+        superuser.save()
+        superuser.groups.add(Group.objects.get(name='Admin'))
         superuser.save()
 
         language_tr = Language()
@@ -90,12 +91,14 @@ class InitDataApi(APIView):
 
         foreign_language_description = ForeignLanguageDescription()
         foreign_language_description.name = 'English'
+        foreign_language_description.foreignLanguage = foreign_language
         foreign_language_description.language = language_en
         foreign_language_description.save()
 
         foreign_language_description = ForeignLanguageDescription()
         foreign_language_description.name = 'İngilizce'
         foreign_language_description.language = language_tr
+        foreign_language_description.foreignLanguage = foreign_language
         foreign_language_description.save()
 
         foreign_language = ForeignLanguage()
@@ -104,11 +107,13 @@ class InitDataApi(APIView):
 
         foreign_language_description = ForeignLanguageDescription()
         foreign_language_description.name = 'French'
+        foreign_language_description.foreignLanguage = foreign_language
         foreign_language_description.language = language_en
         foreign_language_description.save()
 
         foreign_language_description = ForeignLanguageDescription()
         foreign_language_description.name = 'Fransızca'
+        foreign_language_description.foreignLanguage = foreign_language
         foreign_language_description.language = language_tr
         foreign_language_description.save()
 
@@ -118,11 +123,13 @@ class InitDataApi(APIView):
 
         foreign_language_description = ForeignLanguageDescription()
         foreign_language_description.name = 'Italian'
+        foreign_language_description.foreignLanguage = foreign_language
         foreign_language_description.language = language_en
         foreign_language_description.save()
 
         foreign_language_description = ForeignLanguageDescription()
         foreign_language_description.name = 'İtalyanca'
+        foreign_language_description.foreignLanguage = foreign_language
         foreign_language_description.language = language_tr
         foreign_language_description.save()
 
@@ -132,10 +139,12 @@ class InitDataApi(APIView):
 
         foreign_language_description = ForeignLanguageDescription()
         foreign_language_description.name = 'German'
+        foreign_language_description.foreignLanguage = foreign_language
         foreign_language_description.language = language_en
         foreign_language_description.save()
 
         foreign_language_description = ForeignLanguageDescription()
+        foreign_language_description.foreignLanguage = foreign_language
         foreign_language_description.name = 'Almanca'
         foreign_language_description.language = language_tr
         foreign_language_description.save()

@@ -15,11 +15,11 @@ class StudentSerializer(serializers.Serializer):
     # TODO: Student serializer
     uuid = serializers.UUIDField(read_only=True)
     user = UserSerializer(read_only=True)
-    firstName = serializers.CharField(required=False)
-    lastName = serializers.CharField(required=False)
-    username = serializers.CharField(write_only=True, required=False,
-                                     validators=[UniqueValidator(queryset=User.objects.all())])
-    password = serializers.CharField(write_only=True)
+    firstName = serializers.CharField(required=True)
+    lastName = serializers.CharField(required=True)
+    email = serializers.CharField(required=True,
+                                  validators=[UniqueValidator(queryset=User.objects.all())])
+    # password = serializers.CharField(write_only=True)
     studentNumber = serializers.CharField(required=True)
 
     def update(self, instance, validated_data):
@@ -28,11 +28,12 @@ class StudentSerializer(serializers.Serializer):
     def create(self, validated_data):
         try:
             with transaction.atomic():
-                user = User.objects.create_user(username=validated_data.get('username'),
-                                                email=validated_data.get('username'))
+                user = User.objects.create_user(username=validated_data.get('email'),
+                                                email=validated_data.get('email'))
                 user.first_name = validated_data.get("firstName")
                 user.last_name = validated_data.get("lastName")
-                user.set_password(validated_data.get('password'))
+                # user.set_password(validated_data.get('password'))
+                user.set_password('oxit2016')
                 user.save()
 
                 group = Group.objects.get(name='Student')
@@ -59,5 +60,3 @@ class StudentPageableSerializer(PageSerializer):
 
     def create(self, validated_data):
         pass
-
-

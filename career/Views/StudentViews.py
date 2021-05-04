@@ -1,4 +1,5 @@
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -8,6 +9,7 @@ from career.serializers.StudentSerializer import StudentSerializer, StudentPagea
 
 
 class StudentApi(APIView):
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
         data = Student.objects.all().order_by('-id')
@@ -18,6 +20,7 @@ class StudentApi(APIView):
             api_data['lastName'] = x.profile.user.last_name
             api_data['uuid'] = x.uuid
             api_data['studentNumber'] = x.studentNumber
+            api_data['email'] = x.profile.user.username
             arr.append(api_data)
 
         api_object = APIObject()
