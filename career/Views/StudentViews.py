@@ -46,6 +46,6 @@ class StudentApi(APIView):
                 if key == 'studentNumber':
                     errors_dict['Öğrenci Numarası'] = value
 
-            return Response(errors_dict, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
