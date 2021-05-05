@@ -23,6 +23,7 @@ class StudentApi(APIView):
             api_data['uuid'] = x.uuid
             api_data['studentNumber'] = x.studentNumber
             api_data['email'] = x.profile.user.username
+            api_data['isActive'] = x.profile.user.is_active
             arr.append(api_data)
 
         api_object = APIObject()
