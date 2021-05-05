@@ -54,18 +54,21 @@ class StudentApi(APIView):
     def delete(self, request, format=None):
         try:
             student = Student.objects.get(uuid=request.GET.get('id'))
-            if request.GET.get('makeActive'):
+            if request.GET.get('makeActive') == 'true':
                 student.isDeleted = False
                 student.profile.user.is_active = True
                 student.profile.isDeleted = False
                 student.save()
-            else:
+                return Response(status=status.HTTP_200_OK)
+            elif request.GET.get('makeActive') == 'false':
                 student.isDeleted = True
                 student.profile.user.is_active = False
                 student.profile.isDeleted = True
                 student.save()
+                return Response(status=status.HTTP_200_OK)
 
-            return Response(status=status.HTTP_200_OK)
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
         except:
             traceback.print_exc()
             return Response(status=status.HTTP_400_BAD_REQUEST)
