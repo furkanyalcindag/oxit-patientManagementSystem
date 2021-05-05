@@ -1,9 +1,11 @@
+import traceback
+
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from career.models import Student, StudentEducationInfo
+from career.models import Student
 from career.models.APIObject import APIObject
 from career.serializers.StudentSerializer import StudentSerializer, StudentPageableSerializer
 
@@ -48,4 +50,21 @@ class StudentApi(APIView):
 
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request, format=None):
+        try:
+            student = Student.objects.get(uuid=request.GET.get('id'))
+            if request.GET.get('makeActive'):
+                student.isDeleted = False
+                student.profile.user.is_active = True
+                student.profile.isDeleted = False
+                student.save()
+            else:
+                student.isDeleted = True
+                student.profile.user.is_active = False
+                student.profile.isDeleted = True
+                student.save()
 
+            return Response(status=status.HTTP_200_OK)
+        except:
+            traceback.print_exc()
+            return Response(status=status.HTTP_400_BAD_REQUEST)
