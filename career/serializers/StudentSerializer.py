@@ -21,6 +21,7 @@ class StudentSerializer(serializers.Serializer):
                                   validators=[UniqueValidator(queryset=User.objects.all())])
     # password = serializers.CharField(write_only=True)
     studentNumber = serializers.CharField(required=True)
+    isActive = serializers.BooleanField(read_only=True)
 
     def update(self, instance, validated_data):
         pass
