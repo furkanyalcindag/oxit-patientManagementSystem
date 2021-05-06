@@ -24,6 +24,7 @@ class CompanyApi(APIView):
             api_data['companyName'] = x.name
             api_data['email'] = x.profile.user.username
             api_data['isInstitution'] = x.isInstitution
+            api_data['isActive'] = x.profile.user.is_active
             arr.append(api_data)
 
         api_object = APIObject()

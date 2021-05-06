@@ -21,6 +21,7 @@ class CompanySerializer(serializers.Serializer):
     # password = serializers.CharField(write_only=True)
     companyName = serializers.CharField(required=True)
     isInstitution = serializers.BooleanField(required=True)
+    isActive = serializers.BooleanField(read_only=True)
 
     def update(self, instance, validated_data):
         pass
@@ -50,7 +51,6 @@ class CompanySerializer(serializers.Serializer):
         except Exception as e:
             traceback.print_exc()
             raise serializers.ValidationError("lütfen tekrar deneyiniz")
-
 
 
 class CompanyPageableSerializer(PageSerializer):
