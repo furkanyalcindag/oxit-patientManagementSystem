@@ -1,3 +1,5 @@
+import traceback
+
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -48,3 +50,32 @@ class CompanyApi(APIView):
                     errors_dict['Öğrenci Numarası'] = value
 
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    def delete(self, request, format=None):
+        try:
+            company = Company.objects.get(uuid=request.GET.get('id'))
+            profile = company.profile
+            user = profile.user
+            if request.GET.get('makeActive') == 'true':
+                company.isDeleted = False
+                user.is_active = True
+                profile.isDeleted = False
+                company.save()
+                profile.save()
+                user.save()
+                return Response(status=status.HTTP_200_OK)
+            elif request.GET.get('makeActive') == 'false':
+                company.isDeleted = True
+                user.is_active = False
+                profile.isDeleted = True
+                company.save()
+                profile.save()
+                user.save()
+                return Response(status=status.HTTP_200_OK)
+
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+        except:
+            traceback.print_exc()
+            return Response(status=status.HTTP_400_BAD_REQUEST)
