@@ -1,8 +1,8 @@
 from django.db import models
 
-from career.models.BaseModel import BaseModel
-from career.models.Profile import Profile
-from career.models.SocialMedia import SocialMedia
+from pms.models.BaseModel import BaseModel
+from pms.models.Profile import Profile
+from pms.models.SocialMedia import SocialMedia
 
 
 class ProfileSocialMedia(BaseModel):

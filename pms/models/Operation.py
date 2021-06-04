@@ -15,3 +15,6 @@ class Operation(BaseModel):
     operationTime = models.TimeField()
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     hospital = models.ForeignKey(Hospital, on_delete=models.CASCADE)
+    doctorComment = models.TextField()
+    patientComment = models.TextField()
+    report = models.TextField()

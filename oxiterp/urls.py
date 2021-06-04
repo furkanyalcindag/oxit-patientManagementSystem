@@ -40,8 +40,9 @@ urlpatterns = [
     path('api/token/', CustomTokenObtainPairView.as_view()),
     path('api/token/refresh', TokenRefreshView.as_view()),
 
-    path('career-service/', include('career.urls')),
+
     #path('car-service/', include('carService.urls')),
+    path('pms-service/', include('pms.urls')),
 
 ]
 
