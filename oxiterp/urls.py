@@ -31,7 +31,7 @@ import accounts
 from accounts import views
 
 urlpatterns = [
-    #path('admin/', admin.site.urls),
+    # path('admin/', admin.site.urls),
 
     path('accounts/', include('accounts.urls')),
     path('', views.login, name='index'),
@@ -39,9 +39,9 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('api/token/', CustomTokenObtainPairView.as_view()),
     path('api/token/refresh', TokenRefreshView.as_view()),
+    path('management/', include('management.urls')),
 
-    path('career-service/', include('career.urls')),
-    #path('car-service/', include('carService.urls')),
+    # path('car-service/', include('carService.urls')),
 
 ]
 
