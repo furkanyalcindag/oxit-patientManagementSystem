@@ -11,17 +11,31 @@ from pms.models import Clinic, District, City, Staff, Profile, Branch
 
 class ClinicSerializer(serializers.Serializer):
     clinicName = serializers.CharField()
-    id = serializers.IntegerField(read_only=True)
+    uuid = serializers.UUIDField(read_only=True)
     taxNumber = serializers.CharField()
     taxOffice = serializers.CharField()
     address = serializers.CharField()
-    cityId = serializers.UUIDField(write_only=True)
-    districtId = serializers.UUIDField(write_only=True)
+    cityId = serializers.IntegerField(write_only=True)
+    districtId = serializers.IntegerField(write_only=True)
     city = SelectSerializer(read_only=True)
     district = SelectSerializer(read_only=True)
+    cityDistrict = serializers.CharField(allow_blank=False, read_only=True, allow_null=True)
 
     def update(self, instance, validated_data):
-        pass
+        try:
+            instance.name = validated_data.get('clinicName')
+            instance.taxNumber = validated_data.get('taxNumber')
+            instance.taxOffice = validated_data.get('taxOffice')
+            instance.address = validated_data.get('address')
+            instance.district = District.objects.get(id=validated_data.get('districtId'))
+            instance.city = City.objects.get(id=validated_data.get('cityId'))
+            instance.save()
+
+            return instance
+
+        except Exception as e:
+            traceback.print_exc()
+            raise ValidationError("lütfen tekrar deneyiniz")
 
     def create(self, validated_data):
         try:
@@ -30,8 +44,8 @@ class ClinicSerializer(serializers.Serializer):
             clinic.taxNumber = validated_data.get('taxNumber')
             clinic.taxOffice = validated_data.get('taxOffice')
             clinic.address = validated_data.get('address')
-            clinic.district = District.objects.get(uuid=validated_data.get('districtId'))
-            clinic.city = City.objects.get(uuid=validated_data.get('cityId'))
+            clinic.district = District.objects.get(id=validated_data.get('districtId'))
+            clinic.city = City.objects.get(id=validated_data.get('cityId'))
             clinic.save()
 
             return clinic
