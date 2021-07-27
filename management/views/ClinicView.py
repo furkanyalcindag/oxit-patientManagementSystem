@@ -27,6 +27,10 @@ class ClinicApi(APIView):
                 api_object['taxOffice'] = clinic.taxOffice
                 api_object['taxNumber'] = clinic.taxNumber
                 api_object['address'] = clinic.address
+                api_object['staffName'] = clinic.profile.user.first_name
+                api_object['staffSurname'] = clinic.profile.user.last_name
+                api_object['email'] = clinic.profile.user.email
+                api_object['telephoneNumber'] = clinic.telephoneNumber
 
                 api_city_data = dict()
                 api_city_data['label'] = clinic.city.name
@@ -75,6 +79,10 @@ class ClinicApi(APIView):
                     api_object['taxNumber'] = clinic.taxNumber
                     api_object['address'] = clinic.address
                     api_object['cityDistrict'] = clinic.city.name + '/' + clinic.district.name
+                    api_object['staffName'] = clinic.profile.user.first_name
+                    api_object['staffSurname'] = clinic.profile.user.last_name
+                    api_object['email'] = clinic.profile.user.email
+                    api_object['telephoneNumber'] = clinic.telephoneNumber
 
                     api_city_data = dict()
                     api_city_data['label'] = clinic.city.name
@@ -124,6 +132,14 @@ class ClinicApi(APIView):
                     errors['İl'] = value
                 elif key == 'districtId':
                     errors['İlçe'] = value
+                elif key == 'mail':
+                    errors['Mail'] = value
+                elif key == 'staffName':
+                    errors['Yetkili Ad'] = value
+                elif key == 'staffSurname':
+                    errors['Yetkili Soyadı'] = value
+                elif key == 'telephoneNumber':
+                    errors['Telefon Numarası'] = value
 
             return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
