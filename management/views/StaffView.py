@@ -15,13 +15,17 @@ class StaffApi(APIView):
         try:
             if request.GET.get('id') is not None:
                 staff = Profile.objects.get(uuid=request.GET.get('id'))
-                print("staff", staff)
                 api_object = dict()
                 api_object['uuid'] = staff.uuid
                 api_object['firstName'] = staff.user.first_name
                 api_object['lastName'] = staff.user.last_name
                 api_object['mobilePhone'] = staff.mobilePhone
                 api_object['email'] = staff.user.email
+                api_group_data = dict()
+                api_group_data['label'] = staff.user.groups.filter()[0].name
+                api_group_data['value'] = staff.user.groups.filter()[0].id
+
+                api_object['group'] = api_group_data
 
                 serializer = StaffSerializer(api_object, context={'request': request})
                 return Response(serializer.data, status.HTTP_200_OK)
@@ -53,6 +57,10 @@ class StaffApi(APIView):
                     api_object['lastName'] = staff.user.last_name
                     api_object['mobilePhone'] = staff.mobilePhone
                     api_object['email'] = staff.user.email
+                    api_group_data = dict()
+                    api_group_data['label'] = staff.user.groups.filter()[0].name
+                    api_group_data['value'] = staff.user.groups.filter()[0].id
+                    api_object['group'] = api_group_data
                     arr.append(api_object)
                 api_object = APIObject()
                 api_object.data = arr
@@ -79,6 +87,8 @@ class StaffApi(APIView):
                     errors['soyisim'] = value
                 elif key == 'email':
                     errors['mail'] = value
+                elif key == 'groupId':
+                    errors['group'] = value
             return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, format=None):
