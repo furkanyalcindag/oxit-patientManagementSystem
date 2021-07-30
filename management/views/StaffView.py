@@ -20,6 +20,7 @@ class StaffApi(APIView):
                 api_object['firstName'] = staff.user.first_name
                 api_object['lastName'] = staff.user.last_name
                 api_object['mobilePhone'] = staff.mobilePhone
+                api_object['address'] = staff.address
                 api_object['email'] = staff.user.email
                 api_group_data = dict()
                 api_group_data['label'] = staff.user.groups.filter()[0].name
@@ -56,6 +57,7 @@ class StaffApi(APIView):
                     api_object['firstName'] = staff.user.first_name
                     api_object['lastName'] = staff.user.last_name
                     api_object['mobilePhone'] = staff.mobilePhone
+                    api_object['address'] = staff.address
                     api_object['email'] = staff.user.email
                     api_group_data = dict()
                     api_group_data['label'] = staff.user.groups.filter()[0].name
@@ -89,6 +91,8 @@ class StaffApi(APIView):
                     errors['mail'] = value
                 elif key == 'groupId':
                     errors['group'] = value
+                elif key == 'address':
+                    errors['address'] = value
             return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, format=None):

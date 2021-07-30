@@ -3,12 +3,12 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from management.serializers.GeneralSerializer import PageSerializer, SelectSerializer
-from pms.models.Advertising import Advertising
-from pms.models.AdvertisingLocation import AdvertisingLocation
+from pms.models.CompanyAdvertising import CompanyAdvertising
 from pms.models.Company import Company
+from pms.models.Advertising import Advertising
 
 
-class AdvertisingManagementSerializer(serializers.Serializer):
+class CompanyAdvertisingSerializer(serializers.Serializer):
     uuid = serializers.UUIDField(read_only=True)
     name = serializers.CharField()
     companyId = serializers.IntegerField(write_only=True)
@@ -23,7 +23,7 @@ class AdvertisingManagementSerializer(serializers.Serializer):
         try:
             instance.name = validated_data.get('name')
             instance.company = Company.objects.get(id=validated_data.get('companyId'))
-            instance.ad = AdvertisingLocation.objects.get(id=validated_data.get('locationId'))
+            instance.ad = Advertising.objects.get(id=validated_data.get('locationId'))
             instance.publishStartDate = validated_data.get('publishStartDate')
             instance.publishEndDate = validated_data.get('publishEndDate')
             instance.price = validated_data.get('price')
@@ -35,10 +35,10 @@ class AdvertisingManagementSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         try:
-            advertising = Advertising()
+            advertising = CompanyAdvertising()
             advertising.name = validated_data.get('name')
             advertising.company = Company.objects.get(id=validated_data.get('companyId'))
-            advertising.ad = AdvertisingLocation.objects.get(id=validated_data.get('locationId'))
+            advertising.ad = Advertising.objects.get(id=validated_data.get('locationId'))
             advertising.publishStartDate = validated_data.get('publishStartDate')
             advertising.publishEndDate = validated_data.get('publishEndDate')
             advertising.price = validated_data.get('price')
@@ -50,8 +50,8 @@ class AdvertisingManagementSerializer(serializers.Serializer):
             raise ValidationError("lütfen tekrar deneyiniz")
 
 
-class AdvertisingManagementPageableSerializer(PageSerializer):
-    data = AdvertisingManagementSerializer(many=True)
+class CompanyAdvertisingPageableSerializer(PageSerializer):
+    data = CompanyAdvertisingSerializer(many=True)
 
     def update(self, instance, validated_data):
         pass

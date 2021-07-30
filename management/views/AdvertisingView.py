@@ -5,13 +5,13 @@ from rest_framework import status
 from rest_framework.views import APIView
 
 from management.models.APIObject import APIObject
-from management.serializers.AdvertisingManagementSerializer import AdvertisingManagementSerializer, \
-    AdvertisingManagementPageableSerializer
-from pms.models.AdvertisingLocation import AdvertisingLocation
+from management.serializers.AdvertisingSerializer import AdvertisingSerializer, AdvertisingPageableSerializer
+from management.serializers.GeneralSerializer import SelectSerializer
 from pms.models.Advertising import Advertising
+from pms.models.SelectObject import SelectObject
 
 
-class AdvertisingManagementApi(APIView):
+class AdvertisingApi(APIView):
     def get(self, request, format=None):
         try:
             if request.GET.get('id') is not None:
@@ -19,20 +19,10 @@ class AdvertisingManagementApi(APIView):
                 api_object = dict()
                 api_object['uuid'] = advertising.uuid
                 api_object['name'] = advertising.name
-                api_object['company'] = advertising.company.name
-                api_object['location'] = advertising.ad.name
-                api_object['publishEndDate'] = advertising.publishEndDate
-                api_object['publishStartDate'] = advertising.publishStartDate
+                api_object['width'] = advertising.width
+                api_object['height'] = advertising.height
                 api_object['price'] = advertising.price
-                api_company_data = dict()
-                api_company_data['label'] = advertising.company.user.first_name
-                api_company_data['value'] = advertising.company.id
-                api_location_data = dict()
-                api_location_data['label'] = advertising.ad.name
-                api_location_data['value'] = advertising.ad.id
-                api_object['company'] = api_company_data
-                api_object['location'] = api_location_data
-                serializer = AdvertisingManagementSerializer(api_object, context={'request': request})
+                serializer = AdvertisingSerializer(api_object, context={'request': request})
                 return Response(serializer.data, status.HTTP_200_OK)
 
             else:
@@ -57,30 +47,22 @@ class AdvertisingManagementApi(APIView):
                     api_object = dict()
                     api_object['uuid'] = d.uuid
                     api_object['name'] = d.name
-                    api_object['publishEndDate'] = d.publishEndDate
-                    api_object['publishStartDate'] = d.publishStartDate
+                    api_object['width'] = d.width
+                    api_object['height'] = d.height
                     api_object['price'] = d.price
-                    api_company_data = dict()
-                    api_company_data['label'] = d.company.user.first_name
-                    api_company_data['value'] = d.company.id
-                    api_location_data = dict()
-                    api_location_data['label'] = d.ad.name
-                    api_location_data['value'] = d.ad.id
-                    api_object['company'] = api_company_data
-                    api_object['location'] = api_location_data
                     arr.append(api_object)
                 api_object = APIObject()
                 api_object.data = arr
                 api_object.recordsFiltered = filtered_count
-                api_object.recordsTotal = AdvertisingLocation.objects.filter(isDeleted=False).count()
-                serializer = AdvertisingManagementPageableSerializer(api_object, context={'request': request})
+                api_object.recordsTotal = Advertising.objects.filter(isDeleted=False).count()
+                serializer = AdvertisingPageableSerializer(api_object, context={'request': request})
                 return Response(serializer.data, status.HTTP_200_OK)
         except Exception as e:
             traceback.print_exc()
             return Response("", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def post(self, request, format=None):
-        serializer = AdvertisingManagementSerializer(data=request.data, context={'request': request})
+        serializer = AdvertisingSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response({"message": "company is created"}, status.HTTP_200_OK)
@@ -89,14 +71,10 @@ class AdvertisingManagementApi(APIView):
             for key, value in serializer.errors.items():
                 if key == 'name':
                     errors['name'] = value
-                elif key == 'companyId':
-                    errors['companyId'] = value
-                elif key == 'locationId':
-                    errors['locationId'] = value
-                elif key == 'publishEndDate':
-                    errors['publishEndDate'] = value
-                elif key == 'publishStartDate':
-                    errors['publishStartDate'] = value
+                elif key == 'width':
+                    errors['width'] = value
+                elif key == 'height':
+                    errors['height'] = value
                 elif key == 'price':
                     errors['price'] = value
             return Response(errors, status.HTTP_400_BAD_REQUEST)
@@ -104,8 +82,8 @@ class AdvertisingManagementApi(APIView):
     def put(self, request, format=None):
         try:
             instance = Advertising.objects.get(uuid=request.GET.get('id'))
-            serializer = AdvertisingManagementSerializer(data=request.data, instance=instance,
-                                                         context={'request', request})
+            serializer = AdvertisingSerializer(data=request.data, instance=instance,
+                                               context={'request', request})
 
             if serializer.is_valid():
                 serializer.save()
@@ -125,3 +103,19 @@ class AdvertisingManagementApi(APIView):
         except Exception as e:
             traceback.print_exc()
             return Response(status.HTTP_400_BAD_REQUEST)
+
+
+class AdvertisingSelectApi(APIView):
+    def get(self, request, format=None):
+        try:
+            data = Advertising.objects.filter(isDeleted=False)
+            arr = []
+            for d in data:
+                select_object = SelectObject()
+                select_object.label = d.name
+                select_object.value = d.id
+                arr.append(select_object)
+            serializer = SelectSerializer(arr, many=True, context={'request': request})
+            return Response(serializer.data, status.HTTP_200_OK)
+        except:
+            return Response("error", status.HTTP_500_INTERNAL_SERVER_ERROR)

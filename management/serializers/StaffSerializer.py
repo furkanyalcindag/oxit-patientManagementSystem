@@ -19,6 +19,7 @@ class StaffSerializer(serializers.Serializer):
     email = serializers.CharField()
     group = SelectSerializer(read_only=True)
     groupId = serializers.IntegerField(write_only=True, allow_null=True)
+    address = serializers.CharField()
 
     def update(self, instance, validated_data):
         try:
@@ -33,6 +34,7 @@ class StaffSerializer(serializers.Serializer):
                 user.groups.add(Group.objects.get(id=validated_data.get('groupId')))
                 user.save()
                 instance.mobilePhone = validated_data.get('mobilePhone')
+                instance.address = validated_data.get('address')
                 instance.save()
 
                 return instance
@@ -55,6 +57,7 @@ class StaffSerializer(serializers.Serializer):
                 user.save()
                 profile = Profile.objects.create(user=user)
                 profile.mobilePhone = validated_data.get('mobilePhone')
+                profile.address = validated_data.get('address')
                 profile.save()
                 return profile
 
