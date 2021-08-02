@@ -43,12 +43,13 @@ INSTALLED_APPS = [
     'corsheaders',
     'management',
     'pms',
+    'rest_framework',
 
 
 
     # own
 
-    'rest_framework',
+    'pmsDoctor',
     'accounts',
     'drf_api_logger',
 
