@@ -1,5 +1,6 @@
 from django.db import models
 
+from pms.models.Patient import Patient
 from pms.models.BaseModel import BaseModel
 from pms.models.Staff import Staff
 
@@ -11,4 +12,5 @@ class Appointment(BaseModel):
     isCome = models.BooleanField(default=True)
     isPaid = models.BooleanField(default=False)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    endTime = models.TimeField()
