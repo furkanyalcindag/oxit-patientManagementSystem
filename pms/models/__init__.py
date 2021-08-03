@@ -6,12 +6,12 @@ from .AcademicArticle import AcademicArticle
 from .Account import Account
 from .AccountType import AccountType
 from .BaseModel import BaseModel
-from .Branch import Branch
 from .Category import Category
 from .CheckingAccount import CheckingAccount
 from .Clinic import Clinic
 from .ClinicPlan import ClinicPlan
 from .ClinicContractedHospital import ClinicContractedHospital
+from .Department import Department
 from .District import District
 from .DoctorVideo import DoctorVideo
 from .FAQ import FAQ

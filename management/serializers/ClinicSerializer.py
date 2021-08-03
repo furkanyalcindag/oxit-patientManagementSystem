@@ -8,7 +8,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueValidator
 
 from management.serializers.GeneralSerializer import SelectSerializer, PageSerializer
-from pms.models import Clinic, District, City, Staff, Profile, Branch
+from pms.models import Clinic, District, City, Staff, Profile
 
 
 class ClinicSerializer(serializers.Serializer):
@@ -80,50 +80,3 @@ class ClinicPageableSerializer(PageSerializer):
 
     def create(self, validated_data):
         pass
-
-
-class ClinicStaffSerializer(serializers.Serializer):
-    clinicId = serializers.UUIDField()
-    firstName = serializers.CharField()
-    lastName = serializers.CharField()
-    email = serializers.CharField()
-    groupId = serializers.IntegerField()
-    diplomaNo = serializers.CharField()
-    title = serializers.CharField()
-    insuranceNo = serializers.CharField()
-    branch = SelectSerializer()
-    branchId = serializers.UUIDField()
-
-    def update(self, instance, validated_data):
-        pass
-
-    def create(self, validated_data):
-        try:
-            with atomic:
-                user = User()
-                user.first_name = validated_data.get('firstName')
-                user.last_name = validated_data.get('lastName')
-                user.username = validated_data.get('email')
-                user.email = validated_data.get('email')
-                user.set_password('oxit2016')
-                user.save()
-
-                group = Group.objects.get(id=validated_data.get('groupId'))
-
-                user.groups.add(group)
-                user.save()
-
-                profile = Profile()
-                profile.user = user
-                profile.save()
-
-                staff = Staff()
-                staff.title = validated_data.get('title')
-                staff.profile = profile
-                staff.branch = Branch.objects.get(uuid=validated_data.get('branchId'))
-                staff.diplomaNo = validated_data.get('diplomaNo')
-                staff.save()
-
-                return staff
-        except Exception as e:
-            raise ValidationError("Lütfen tekrar deneyiniz")

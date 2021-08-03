@@ -8,33 +8,40 @@ from rest_framework.validators import UniqueValidator
 from rest_framework.exceptions import ValidationError
 
 from management.serializers.GeneralSerializer import PageSerializer, SelectSerializer
-from pms.models import Profile
+from pms.models import Profile, Patient
+from pms.models.BloodGroup import BloodGroup
+from pms.models.Gender import Gender
 
 
-class StaffSerializer(serializers.Serializer):
+class PatientSerializer(serializers.Serializer):
     uuid = serializers.UUIDField(read_only=True)
     firstName = serializers.CharField()
     lastName = serializers.CharField()
-    mobilePhone = serializers.CharField()
+    identityNumber = serializers.CharField()
     email = serializers.CharField()
-    group = SelectSerializer(read_only=True)
-    groupId = serializers.IntegerField(write_only=True, allow_null=True)
     address = serializers.CharField()
+    mobilePhone = serializers.CharField()
+    genderId = serializers.IntegerField(write_only=True)
+    gender = SelectSerializer(read_only=True)
+    birthDate = serializers.DateField()
+    bloodGroupId = serializers.IntegerField(write_only=True)
+    bloodGroup = SelectSerializer(read_only=True)
 
     def update(self, instance, validated_data):
         try:
             with transaction.atomic():
 
-                user = instance.user
+                user = instance.profile.user
                 user.first_name = validated_data.get('firstName')
                 user.last_name = validated_data.get('lastName')
                 user.email = validated_data.get('email')
                 user.username = validated_data.get('email')
-                user.groups.clear()
-                user.groups.add(Group.objects.get(id=validated_data.get('groupId')))
                 user.save()
-                instance.mobilePhone = validated_data.get('mobilePhone')
-                instance.address = validated_data.get('address')
+                instance.profile.mobilePhone = validated_data.get('mobilePhone')
+                instance.profile.address = validated_data.get('address')
+                instance.birthDate = validated_data.get('birthDate')
+                instance.bloodGroup = BloodGroup.objects.get(id=validated_data.get('bloodGroupId'))
+                instance.gender = Gender.objects.get(id=validated_data.get('genderId'))
                 instance.save()
 
                 return instance
@@ -52,14 +59,23 @@ class StaffSerializer(serializers.Serializer):
                 user.first_name = validated_data.get('firstName')
                 user.last_name = validated_data.get('lastName')
                 user.set_password('oxit2016')
-                y = validated_data.get('groupId')
-                user.groups.add(y)
+                group = Group.objects.get(name='Patient')
+                user.groups.add(group)
                 user.save()
-                profile = Profile.objects.create(user=user)
-                profile.mobilePhone = validated_data.get('mobilePhone')
+                profile = Profile()
+                profile.user = user
+                profile.identityNumber = validated_data.get('identityNumber')
                 profile.address = validated_data.get('address')
+                profile.mobilePhone = validated_data.get('mobilePhone')
                 profile.save()
-                return profile
+                patient = Patient()
+                patient.profile = profile
+                patient.birthDate = validated_data.get('birthDate')
+                patient.bloodGroup = BloodGroup.objects.get(id=validated_data.get('bloodGroupId'))
+                patient.gender = Gender.objects.get(id=validated_data.get('genderId'))
+
+                patient.save()
+                return patient
 
         except Exception as e:
             traceback.print_exc()
@@ -70,24 +86,19 @@ class StaffSerializer(serializers.Serializer):
         user = None
         if self.instance is not None:
 
-            user = Profile.objects.get(uuid=self.context['request'].query_params['id']).user
+            user = Patient.objects.get(uuid=self.context['request'].query_params['id']).profile.user
 
             if User.objects.exclude(id=user.id).filter(username=email).count() > 0:
                 raise serializers.ValidationError("Bu email sistemde kayıtlıdır")
 
         else:
-
-            # if isinstance(list(self.context)[0], str):
-            #     user = Profile.objects.get(uuid=list(self.context)[1].query_params['id']).user
-            # else:
-            #     user = Profile.objects.get(uuid=list(self.context)[0].query_params['id']).user
             if User.objects.filter(username=email).count() > 0:
                 raise serializers.ValidationError("Bu email sistemde kayıtlıdır")
         return email
 
 
-class StaffPageableSerializer(PageSerializer):
-    data = StaffSerializer(many=True)
+class PatientPageableSerializer(PageSerializer):
+    data = PatientSerializer(many=True)
 
     def update(self, instance, validated_data):
         pass
