@@ -132,7 +132,7 @@ class DoctorSelectApi(APIView):
     def get(self, request, format=None):
         try:
             select_arr = []
-            data = Staff.objects.all()
+            data = Staff.objects.filter(isDeleted=False)
 
             for doctor in data:
                 select_object = SelectObject()

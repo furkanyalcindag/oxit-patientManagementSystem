@@ -4,8 +4,11 @@ import traceback
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
+
+from pms.models.SelectObject import SelectObject
 from pmsDoctor.models.APIObject import APIObject
 from pms.models.Patient import Patient
+from pmsDoctor.serializers.GeneralSerializer import SelectSerializer
 from pmsDoctor.serializers.PatientSerializer import PatientSerializer, PatientPageableSerializer
 
 
@@ -139,3 +142,22 @@ class PatientApi(APIView):
         except:
             traceback.print_exc()
             return Response(status.HTTP_400_BAD_REQUEST)
+
+
+class PatientSelectApi(APIView):
+    def get(self, request, format=None):
+        try:
+            select_arr = []
+            data = Patient.objects.filter(isDeleted=False)
+
+            for patient in data:
+                select_object = SelectObject()
+                select_object.value = patient.profile.user.id
+                select_object.label = patient.profile.user.first_name + ' ' + patient.profile.user.last_name
+                select_arr.append(select_object)
+
+            serializer = SelectSerializer(select_arr, many=True, context={'request': request})
+
+            return Response(serializer.data, status.HTTP_200_OK)
+        except Exception as e:
+            return Response("error", status.HTTP_500_INTERNAL_SERVER_ERROR)
