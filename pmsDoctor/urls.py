@@ -7,6 +7,8 @@ from pmsDoctor.views.GenderView import GenderSelectApi
 from pmsDoctor.views.PatientView import PatientApi, PatientSelectApi
 from pmsDoctor.views.BloodGroupView import BloodGroupSelectApi
 from pmsDoctor.views.AppointmentView import AppointmentApi, AppointmentCalendarApi
+from pmsDoctor.views.AssayView import AssaySelectApi, AssayApi
+from pmsDoctor.views.ProtocolView import ProtocolApi
 
 app_name = 'pmsDoctor'
 
@@ -22,5 +24,8 @@ urlpatterns = [
     path('patient-select-api/', PatientSelectApi.as_view(), name='patient-select-api'),
     path('appointment-api/', AppointmentApi.as_view(), name='appointment-api'),
     path('appointment-calendar-api/', AppointmentCalendarApi.as_view(), name='appointment-calendar-api'),
+    path('assay-select-api/', AssaySelectApi.as_view(), name='assay-select-api'),
+    path('assay-api/', AssayApi.as_view(), name='assay-api'),
+    path('protocol-api/', ProtocolApi.as_view(), name='protocol-api'),
 
 ]
