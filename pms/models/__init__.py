@@ -1,4 +1,5 @@
 from .Appointment import Appointment
+from .AssayResult import AssayResult
 from .Blog import Blog
 from .City import City
 from .Profile import Profile
@@ -12,6 +13,7 @@ from .Clinic import Clinic
 from .ClinicPlan import ClinicPlan
 from .ClinicContractedHospital import ClinicContractedHospital
 from .Department import Department
+from .Diagnosis import Diagnosis
 from .District import District
 from .DoctorVideo import DoctorVideo
 from .FAQ import FAQ
@@ -23,8 +25,10 @@ from .Operation import Operation
 from .OperationStaff import OperationStaff
 from .Patient import Patient
 from .PaymentType import PaymentType
+from .ProtocolAssay import ProtocolAssay
 from .Prize import Prize
 from .Profile import Profile
+from .Protocol import Protocol
 from .ProfileSocialMedia import ProfileSocialMedia
 from .SocialMedia import SocialMedia
 from .Staff import Staff

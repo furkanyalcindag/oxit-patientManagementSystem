@@ -7,8 +7,11 @@ from pmsDoctor.views.GenderView import GenderSelectApi
 from pmsDoctor.views.PatientView import PatientApi, PatientSelectApi
 from pmsDoctor.views.BloodGroupView import BloodGroupSelectApi
 from pmsDoctor.views.AppointmentView import AppointmentApi, AppointmentCalendarApi
-from pmsDoctor.views.AssayView import AssaySelectApi, AssayApi
+from pmsDoctor.views.AssayView import AssaySelectApi, AssayApi, PatientAssayApi
 from pmsDoctor.views.ProtocolView import ProtocolApi
+from pmsDoctor.views.AssayResultView import AssayResultApi
+from pmsDoctor.views.DiagnosisView import DiagnosisApi
+from pmsDoctor.views.MedicineView import MedicineDiagnosisApi
 
 app_name = 'pmsDoctor'
 
@@ -27,5 +30,9 @@ urlpatterns = [
     path('assay-select-api/', AssaySelectApi.as_view(), name='assay-select-api'),
     path('assay-api/', AssayApi.as_view(), name='assay-api'),
     path('protocol-api/', ProtocolApi.as_view(), name='protocol-api'),
+    path('assay-result-api/', AssayResultApi.as_view(), name='assay-result-api'),
+    path('diagnosis-api/', DiagnosisApi.as_view(), name='diagnosis-api'),
+    path('patient-assay-api/', PatientAssayApi.as_view(), name='patient-assay-api'),
+    path('medicine-diagnosis-api/', MedicineDiagnosisApi.as_view(), name='medicine-diagnosis-api'),
 
 ]

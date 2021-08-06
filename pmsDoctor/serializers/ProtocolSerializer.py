@@ -6,6 +6,7 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from pms.models.ProtocolAssay import ProtocolAssay
 from pmsDoctor.serializers.AssaySerializer import AssaySerializer
 from pmsDoctor.serializers.GeneralSerializer import PageSerializer, SelectSerializer
 from pms.models.Patient import Patient
@@ -17,9 +18,10 @@ class ProtocolSerializer(serializers.Serializer):
     uuid = serializers.UUIDField(read_only=True)
     patientId = serializers.CharField(write_only=True)
     patient = SelectSerializer(read_only=True)
-    assays = serializers.ListSerializer(write_only=True, child=serializers.UUIDField())
+    assays = serializers.ListSerializer(required=False, write_only=True, child=serializers.UUIDField())
     assayList = AssaySerializer(many=True, read_only=True, required=False)
     description = serializers.CharField()
+    protocolId = serializers.IntegerField(read_only=True)
 
     # barcode = serializers.CharField()
 
@@ -46,12 +48,17 @@ class ProtocolSerializer(serializers.Serializer):
         try:
             with transaction.atomic():
                 protocol = Protocol()
+
                 protocol.patient = Patient.objects.get(uuid=validated_data.get('patientId'))
-                for assayUUID in validated_data.get('assays'):
-                    assay = Assay.objects.get(uuid=assayUUID)
-                    protocol.assay = assay
-                    protocol.save()
                 protocol.description = validated_data.get('description')
+                protocol.save()
+                if validated_data.get('assays') is not None:
+                    for assayUUID in validated_data.get('assays'):
+                        assay = Assay.objects.get(uuid=assayUUID)
+                        protocolAssay = ProtocolAssay()
+                        protocolAssay.assay = assay
+                        protocolAssay.protocol = protocol
+                        protocolAssay.save()
                 protocol.save()
                 return protocol
 

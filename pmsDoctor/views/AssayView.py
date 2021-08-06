@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 
 from management.models.APIObject import APIObject
 from pms.models.Assay import Assay
+from pms.models.ProtocolAssay import ProtocolAssay
 from pms.models.SelectObject import SelectObject
 from pmsDoctor.serializers.AssaySerializer import AssaySerializer, AssayPageableSerializer
 from pmsDoctor.serializers.GeneralSerializer import SelectSerializer
@@ -105,6 +106,26 @@ class AssaySelectApi(APIView):
                 select_object = SelectObject()
                 select_object.value = assay.uuid
                 select_object.label = assay.name
+                select_arr.append(select_object)
+
+            serializer = SelectSerializer(select_arr, many=True, context={'request': request})
+
+            return Response(serializer.data, status.HTTP_200_OK)
+        except Exception as e:
+            return Response("error", status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class PatientAssayApi(APIView):
+    def get(self, request, format=None):
+
+        try:
+            select_arr = []
+            data = ProtocolAssay.objects.filter(protocol__uuid=request.GET.get('id'))
+
+            for d in data:
+                select_object = SelectObject()
+                select_object.value = d.assay.uuid
+                select_object.label = d.assay.name
                 select_arr.append(select_object)
 
             serializer = SelectSerializer(select_arr, many=True, context={'request': request})

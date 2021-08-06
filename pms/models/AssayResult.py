@@ -5,7 +5,7 @@ from pms.models.Assay import Assay
 from pms.models.BaseModel import BaseModel
 
 
-class Protocol(BaseModel):
+class AssayResult(BaseModel):
+    assay = models.ForeignKey(Assay, on_delete=models.CASCADE)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    description = models.CharField(max_length=1028)
-    barcode = models.CharField(max_length=256)
+    result = models.CharField(max_length=256)
