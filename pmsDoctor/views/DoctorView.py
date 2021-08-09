@@ -1,15 +1,17 @@
 # oxit doctor view
 import traceback
 
-from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from management.serializers.GeneralSerializer import SelectSerializer
+from pms.models import Profile
 from pms.models.SelectObject import SelectObject
-from pmsDoctor.models.APIObject import APIObject
-from pmsDoctor.serializers.DoctorSerializer import DoctorPageSerializer, DoctorSerializer
 from pms.models.Staff import Staff
+from pmsDoctor.models.APIObject import APIObject
+from pmsDoctor.serializers.DoctorSerializer import DoctorPageSerializer, DoctorSerializer, DoctorGeneralInfoSerializer, \
+    DoctorContactInfoSerializer, DoctorAboutSerializer
 
 
 class DoctorApi(APIView):
@@ -145,3 +147,119 @@ class DoctorSelectApi(APIView):
             return Response(serializer.data, status.HTTP_200_OK)
         except Exception as e:
             return Response("error", status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class DoctorGeneralInfoApi(APIView):
+    def get(self, request, format=None):
+        try:
+            staff = Staff.objects.get(profile__user=request.user)
+            api_data = dict()
+            api_data['firstName'] = staff.profile.user.first_name
+            api_data['lastName'] = staff.profile.user.last_name
+            api_data['profileImage'] = staff.profile.profileImage
+            api_data['diplomaNo'] = staff.diplomaNo
+            api_data['profession'] = staff.profession
+            api_data['title'] = staff.title
+            api_department_data = dict()
+            api_department_data['label'] = staff.department.name
+            api_department_data['value'] = staff.department.id
+            api_data['department'] = api_department_data
+
+            serializer = DoctorGeneralInfoSerializer(api_data, context={'request': request})
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            traceback.print_exc()
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def put(self, request, format=None):
+        try:
+            instance = Staff.objects.get(profile__user=request.user)
+            serializer = DoctorGeneralInfoSerializer(data=request.data, instance=instance,
+                                                     context={'request': request})
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"message": "doctor information is updated"}, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except:
+            traceback.print_exc()
+            return Response('error', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class DoctorContactInfoApi(APIView):
+    def get(self, request, format=None):
+        try:
+            profile = Profile.objects.get(user=request.user)
+            api_data = dict()
+            api_data['address'] = profile.address
+            api_data['website'] = profile.website
+            api_data['mobilePhone'] = profile.mobilePhone
+            api_data['instagram'] = profile.instagram
+            api_data['facebook'] = profile.facebook
+            api_data['youtube'] = profile.youtube
+            api_data['linkedin'] = profile.linkedin
+            api_data['email'] = profile.user.email
+
+            serializer = DoctorContactInfoSerializer(api_data, context={'request': request})
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            traceback.print_exc()
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def put(self, request, format=None):
+        try:
+            instance = Profile.objects.get(user=request.user)
+            serializer = DoctorContactInfoSerializer(data=request.data, instance=instance,
+                                                     context={'request': request})
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"message": "doctor information is updated"}, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except:
+            traceback.print_exc()
+            return Response('error', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class DoctorAboutApi(APIView):
+    def get(self, request, format=None):
+        try:
+            staff = Staff.objects.get(profile__user=request.user)
+            api_data = dict()
+            api_data['about'] = staff.about
+
+            serializer = DoctorAboutSerializer(api_data, context={'request': request})
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            traceback.print_exc()
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def put(self, request, format=None):
+        try:
+            instance = Staff.objects.get(profile__user=request.user)
+            serializer = DoctorAboutSerializer(data=request.data, instance=instance,
+                                               context={'request': request})
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"message": "doctor information is updated"}, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except:
+            traceback.print_exc()
+            return Response('error', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def delete(self, request, format=None):
+        try:
+            staff = Staff.objects.get(uuid=request.GET.get('id'))
+            staff.about = ''
+            staff.save()
+            return Response('delete is success', status.HTTP_200_OK)
+        except:
+            traceback.print_exc()
+            return Response(status.HTTP_400_BAD_REQUEST)

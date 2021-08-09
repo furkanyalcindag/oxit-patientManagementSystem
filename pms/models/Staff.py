@@ -11,3 +11,5 @@ class Staff(BaseModel):
     insuranceNumber = models.CharField(max_length=256, null=True)
     title = models.CharField(max_length=256, null=False)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
+    profession = models.CharField(max_length=256)
+    about = models.CharField(max_length=1028)

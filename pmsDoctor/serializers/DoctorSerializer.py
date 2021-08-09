@@ -1,8 +1,8 @@
 import traceback
 
+from django.contrib.auth.models import User, Group
 from django.db import transaction
 from rest_framework import serializers
-from django.contrib.auth.models import User, Group
 from rest_framework.exceptions import ValidationError
 
 from pms.models import Staff, Department, Profile
@@ -83,6 +83,82 @@ class DoctorPageSerializer(PageSerializer):
 
     def update(self, instance, validated_data):
         pass
+
+    def create(self, validated_data):
+        pass
+
+
+class DoctorGeneralInfoSerializer(serializers.Serializer):
+    uuid = serializers.UUIDField(read_only=True)
+    firstName = serializers.CharField(read_only=True)
+    lastName = serializers.CharField(read_only=True)
+    profileImage = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    diplomaNo = serializers.CharField()
+    department = SelectSerializer(read_only=True)
+    departmentId = serializers.IntegerField(write_only=True)
+    profession = serializers.CharField(required=False, allow_blank=True)
+    title = serializers.CharField(required=False, allow_blank=True)
+
+    def update(self, instance, validated_data):
+        try:
+            instance.profileImage = validated_data.get('profileImage')
+            instance.department = Department.objects.get(id=validated_data.get('departmentId'))
+            instance.profession = validated_data.get('profession')
+            instance.title = validated_data.get('title')
+            instance.save()
+            return instance
+        except:
+            traceback.print_exc()
+            raise serializers.ValidationError("lütfen tekrar deneyiniz")
+
+    def create(self, validated_data):
+        pass
+
+
+class DoctorAboutSerializer(serializers.Serializer):
+    uuid = serializers.UUIDField(read_only=True)
+    about = serializers.CharField(required=False, allow_blank=True)
+
+    def update(self, instance, validated_data):
+        try:
+            instance.about = validated_data.get('about')
+            instance.save()
+            return instance
+        except:
+            traceback.print_exc()
+            raise serializers.ValidationError("lütfen tekrar deneyiniz")
+
+    def create(self, validated_data):
+        pass
+
+
+class DoctorContactInfoSerializer(serializers.Serializer):
+    uuid = serializers.UUIDField(read_only=True)
+    email = serializers.CharField(read_only=True)
+    address = serializers.CharField(required=False, allow_blank=True)
+    website = serializers.CharField(required=False, allow_blank=True)
+    youtube = serializers.CharField(required=False, allow_blank=True)
+    facebook = serializers.CharField(required=False, allow_blank=True)
+    linkedin = serializers.CharField(required=False, allow_blank=True)
+    instagram = serializers.CharField(required=False, allow_blank=True)
+    mobilePhone = serializers.CharField(required=False, allow_blank=True)
+
+    def update(self, instance, validated_data):
+        try:
+            user = instance.user
+            user.save()
+            instance.address = validated_data.get('address')
+            instance.website = validated_data.get('website')
+            instance.youtube = validated_data.get('youtube')
+            instance.facebook = validated_data.get('facebook')
+            instance.linkedin = validated_data.get('linkedin')
+            instance.instagram = validated_data.get('instagram')
+            instance.mobilePhone = validated_data.get('mobilePhone')
+            instance.save()
+            return instance
+        except:
+            traceback.print_exc()
+            raise serializers.ValidationError("lütfen tekrar deneyiniz")
 
     def create(self, validated_data):
         pass
