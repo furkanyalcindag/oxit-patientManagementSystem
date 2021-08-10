@@ -1,7 +1,8 @@
 from django.urls import path
 
 from pmsDoctor.views.DepartmentView import DepartmentSelectApi
-from pmsDoctor.views.DoctorView import DoctorApi, DoctorSelectApi
+from pmsDoctor.views.DoctorView import DoctorApi, DoctorSelectApi, DoctorGeneralInfoApi, DoctorContactInfoApi, \
+    DoctorAboutApi
 from pmsDoctor.views.SecretaryView import SecretaryApi
 from pmsDoctor.views.GenderView import GenderSelectApi
 from pmsDoctor.views.PatientView import PatientApi, PatientSelectApi
@@ -34,5 +35,8 @@ urlpatterns = [
     path('diagnosis-api/', DiagnosisApi.as_view(), name='diagnosis-api'),
     path('patient-assay-api/', PatientAssayApi.as_view(), name='patient-assay-api'),
     path('medicine-diagnosis-api/', MedicineDiagnosisApi.as_view(), name='medicine-diagnosis-api'),
+    path('general-info-api/', DoctorGeneralInfoApi.as_view(), name='general-info-api'),
+    path('contact-info-api/', DoctorContactInfoApi.as_view(), name='contact-info-api'),
+    path('about-api/', DoctorAboutApi.as_view(), name='about-api'),
 
 ]

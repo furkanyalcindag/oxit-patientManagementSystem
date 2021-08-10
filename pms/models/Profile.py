@@ -16,3 +16,8 @@ class Profile(BaseModel):
     deviceOSType = models.CharField(max_length=128)
     deviceId = models.CharField(max_length=256)
     identityNumber = models.CharField(max_length=256, null=False)
+    website = models.CharField(max_length=256)
+    instagram = models.CharField(max_length=256)
+    facebook = models.CharField(max_length=256)
+    youtube = models.CharField(max_length=256)
+    linkedin = models.CharField(max_length=256)
