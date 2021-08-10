@@ -5,7 +5,9 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from pms.models import Staff, Department, Profile
+from pms.models import Staff, Department, Profile, Prize
+from pms.models.DoctorEducation import DoctorEducation
+from pms.models.EducationType import EducationType
 from pmsDoctor.serializers.GeneralSerializer import SelectSerializer, PageSerializer
 
 
@@ -159,6 +161,102 @@ class DoctorContactInfoSerializer(serializers.Serializer):
         except:
             traceback.print_exc()
             raise serializers.ValidationError("lütfen tekrar deneyiniz")
+
+    def create(self, validated_data):
+        pass
+
+
+class DoctorEducationSerializer(serializers.Serializer):
+    uuid = serializers.UUIDField(read_only=True)
+    universityName = serializers.CharField()
+    facultyName = serializers.CharField()
+    departmentName = serializers.CharField()
+    educationTypeId = serializers.IntegerField(write_only=True)
+    educationType = SelectSerializer(read_only=True)
+
+    def update(self, instance, validated_data):
+        try:
+            with transaction.atomic():
+                instance.universityName = validated_data.get('universityName')
+                instance.facultyName = validated_data.get('facultyName')
+                instance.departmentName = validated_data.get('departmentName')
+                instance.educationType = EducationType.objects.get(id=validated_data.get('educationTypeId'))
+                instance.save()
+                return instance
+        except:
+            traceback.print_exc()
+            raise ValidationError("lütfen tekrar deneyiniz")
+
+    def create(self, validated_data):
+        try:
+            with transaction.atomic():
+
+                education = DoctorEducation()
+                education.universityName = validated_data.get('universityName')
+                education.facultyName = validated_data.get('facultyName')
+                education.departmentName = validated_data.get('departmentName')
+                education.educationType = EducationType.objects.get(id=validated_data.get('educationTypeId'))
+                education.save()
+
+                return education
+        except:
+            traceback.print_exc()
+            raise ValidationError("lütfen tekrar deneyiniz")
+
+
+class DoctorEducationPageSerializer(PageSerializer):
+    data = DoctorEducationSerializer(many=True)
+
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
+
+
+class DoctorPrizeSerializer(serializers.Serializer):
+    uuid = serializers.UUIDField(read_only=True)
+    title = serializers.CharField(required=True)
+    description = serializers.CharField(required=True)
+    date = serializers.DateField(required=False, allow_null=False)
+    image = serializers.CharField(required=False, allow_blank=True)
+
+    def update(self, instance, validated_data):
+        try:
+            instance.title = validated_data.get('title')
+            instance.description = validated_data.get('description')
+            instance.date = validated_data.get('date')
+            instance.image = validated_data.get('image')
+
+            instance.save()
+            return instance
+        except Exception as e:
+            traceback.print_exc()
+            raise serializers.ValidationError("lütfen tekrar deneyiniz")
+
+    def create(self, validated_data):
+        try:
+            doctor = Staff.objects.get(profile__user=self.context['request'].user)
+
+            prize = Prize()
+            prize.title = validated_data.get('title')
+            prize.description = validated_data.get('description')
+            prize.date = validated_data.get('date')
+            prize.image = validated_data.get('image')
+            prize.doctor = doctor
+            prize.save()
+            return prize
+
+        except Exception as e:
+            traceback.print_exc()
+            raise serializers.ValidationError("lütfen tekrar deneyiniz")
+
+
+class DoctorPrizePageSerializer(PageSerializer):
+    data = DoctorPrizeSerializer(many=True)
+
+    def update(self, instance, validated_data):
+        pass
 
     def create(self, validated_data):
         pass

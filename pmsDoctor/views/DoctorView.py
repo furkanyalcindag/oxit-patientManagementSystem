@@ -6,12 +6,15 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from management.serializers.GeneralSerializer import SelectSerializer
-from pms.models import Profile
+from pms.models import Profile, Prize
+from pms.models.DoctorEducation import DoctorEducation
+from pms.models.EducationType import EducationType
 from pms.models.SelectObject import SelectObject
 from pms.models.Staff import Staff
 from pmsDoctor.models.APIObject import APIObject
 from pmsDoctor.serializers.DoctorSerializer import DoctorPageSerializer, DoctorSerializer, DoctorGeneralInfoSerializer, \
-    DoctorContactInfoSerializer, DoctorAboutSerializer
+    DoctorContactInfoSerializer, DoctorAboutSerializer, DoctorEducationSerializer, DoctorEducationPageSerializer, \
+    DoctorPrizeSerializer, DoctorPrizePageSerializer
 
 
 class DoctorApi(APIView):
@@ -86,7 +89,7 @@ class DoctorApi(APIView):
         serializer = DoctorSerializer(data=request.data, context={'request', request})
         if serializer.is_valid():
             serializer.save()
-            return Response({"message": "Doctor is created"}, status=status.HTTP_200_OK)
+            return Response({"message": "prize is created"}, status=status.HTTP_200_OK)
         else:
             errors = dict()
             for key, value in serializer.errors.items():
@@ -263,3 +266,193 @@ class DoctorAboutApi(APIView):
         except:
             traceback.print_exc()
             return Response(status.HTTP_400_BAD_REQUEST)
+
+
+class DoctorEducationApi(APIView):
+    def get(self, request, format=None):
+        try:
+            if request.GET.get('id') is not None:
+                education = DoctorEducation.objects.get(uuid=request.GET.get('id'))
+                api_object = dict()
+                api_object['uuid'] = education.uuid
+                api_object['universityName'] = education.universityName
+                api_object['facultyName'] = education.facultyName
+                api_object['departmentName'] = education.departmentName
+                api_type_data = dict()
+                api_type_data['label'] = education.educationType.name
+                api_type_data['value'] = education.educationType.id
+
+                api_object['educationType'] = api_type_data
+
+                serializer = DoctorEducationSerializer(api_object, context={'request': request})
+                return Response(serializer.data, status.HTTP_200_OK)
+
+            else:
+                data = DoctorEducation.objects.filter(isDeleted=False).order_by('-id')
+                filtered_count = DoctorEducation.objects.filter(isDeleted=False).count()
+                arr = []
+
+                for education in data:
+                    api_object = dict()
+                    api_object['uuid'] = education.uuid
+                    api_object['universityName'] = education.universityName
+                    api_object['facultyName'] = education.facultyName
+                    api_object['departmentName'] = education.departmentName
+                    api_type_data = dict()
+                    api_type_data['label'] = education.educationType.name
+                    api_type_data['value'] = education.educationType.id
+
+                    api_object['educationType'] = api_type_data
+                    arr.append(api_object)
+                api_object = APIObject()
+                api_object.data = arr
+                api_object.recordsFiltered = filtered_count
+                api_object.recordsTotal = DoctorEducation.objects.filter(isDeleted=False).count()
+                serializer = DoctorEducationPageSerializer(api_object, context={'request': request})
+                return Response(serializer.data, status.HTTP_200_OK)
+
+        except Exception as e:
+            traceback.print_exc()
+            return Response("", status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def post(self, request, format=None):
+        serializer = DoctorEducationSerializer(data=request.data, context={'request', request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Doctor is created"}, status=status.HTTP_200_OK)
+        else:
+            errors = dict()
+            for key, value in serializer.errors.items():
+                if key == 'universityName':
+                    errors['universityName'] = value
+                elif key == 'facultyName':
+                    errors['facultyName'] = value
+                elif key == 'departmentName':
+                    errors['departmentName'] = value
+                elif key == 'educationType':
+                    errors['educationType'] = value
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, format=None):
+        try:
+            instance = DoctorEducation.objects.get(uuid=request.GET.get('id'))
+            serializer = DoctorEducationSerializer(data=request.data, instance=instance, context={'request': request})
+            if serializer.is_valid():
+                serializer.save()
+                return Response({'message': "staff is updated"}, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            traceback.print_exc()
+            return Response(status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, format=None):
+        try:
+            education = DoctorEducation.objects.get(uuid=request.GET.get('id'))
+            education.isDeleted = True
+            education.save()
+            return Response('delete is success', status.HTTP_200_OK)
+        except:
+            traceback.print_exc()
+            return Response(status.HTTP_400_BAD_REQUEST)
+
+
+class EducationTypeSelectApi(APIView):
+    def get(self, request, format=None):
+        try:
+            select_arr = []
+            data = EducationType.objects.all()
+
+            for type in data:
+                select_object = SelectObject()
+                select_object.value = type.id
+                select_object.label = type.name
+                select_arr.append(select_object)
+
+            serializer = SelectSerializer(select_arr, many=True, context={'request': request})
+
+            return Response(serializer.data, status.HTTP_200_OK)
+        except Exception as e:
+            return Response("error", status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class DoctorPrizeApi(APIView):
+
+    def get(self, request, format=None):
+
+        try:
+            if request.GET.get('id') is not None:
+                prize = Prize.objects.get(doctor__profile__user=request.user,
+                                          uuid=request.GET.get('id'))
+
+                api_data = dict()
+
+                api_data['uuid'] = prize.uuid
+                api_data['title'] = prize.title
+                api_data['description'] = prize.description
+                api_data['date'] = prize.date
+                api_data['image'] = prize.image
+
+                serializer = DoctorPrizeSerializer(api_data, context={'request': request})
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+
+                prizes = Prize.objects.filter(doctor__profile__user=request.user,
+                                              isDeleted=False)
+                arr = []
+                for prize in prizes:
+                    api_data = dict()
+
+                    api_data['uuid'] = prize.uuid
+                    api_data['title'] = prize.title
+                    api_data['description'] = prize.description
+                    api_data['image'] = prize.image
+                    api_data['date'] = prize.date
+
+                    arr.append(api_data)
+
+                serializer = DoctorPrizeSerializer(arr, many=True, context={'request': request})
+                return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            traceback.print_exc()
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, format=None):
+        try:
+            instance = Prize.objects.get(doctor__profile__user=request.user,
+                                         uuid=request.GET.get('id'))
+            serializer = DoctorPrizeSerializer(data=request.data, instance=instance, context={'request': request})
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"message": "prize is updated"}, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except:
+            traceback.print_exc()
+            return Response("error", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def post(self, request, format=None):
+        serializer = DoctorPrizeSerializer(data=request.data, context={'request': request})
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "prize is created"}, status=status.HTTP_200_OK)
+        else:
+            errors_dict = dict()
+            for key, value in serializer.errors.items():
+                if key == 'title':
+                    errors_dict['title'] = value
+
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, format=None):
+        try:
+            prize = Prize.objects.get(uuid=request.GET.get('id'),
+                                      student__profile__user=request.user)
+            prize.isDeleted = True
+            prize.save()
+
+            return Response(status=status.HTTP_200_OK)
+        except Exception:
+            traceback.print_exc()
+            return Response(status=status.HTTP_400_BAD_REQUEST)

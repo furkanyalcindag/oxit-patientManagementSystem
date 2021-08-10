@@ -2,7 +2,7 @@ from django.urls import path
 
 from pmsDoctor.views.DepartmentView import DepartmentSelectApi
 from pmsDoctor.views.DoctorView import DoctorApi, DoctorSelectApi, DoctorGeneralInfoApi, DoctorContactInfoApi, \
-    DoctorAboutApi
+    DoctorAboutApi, EducationTypeSelectApi, DoctorEducationApi, DoctorPrizeApi
 from pmsDoctor.views.SecretaryView import SecretaryApi
 from pmsDoctor.views.GenderView import GenderSelectApi
 from pmsDoctor.views.PatientView import PatientApi, PatientSelectApi
@@ -38,5 +38,8 @@ urlpatterns = [
     path('general-info-api/', DoctorGeneralInfoApi.as_view(), name='general-info-api'),
     path('contact-info-api/', DoctorContactInfoApi.as_view(), name='contact-info-api'),
     path('about-api/', DoctorAboutApi.as_view(), name='about-api'),
+    path('education-type-api/', EducationTypeSelectApi.as_view(), name='education-type-api'),
+    path('doctor-education-api/', DoctorEducationApi.as_view(), name='doctor-education-api'),
+    path('doctor-prize-api/', DoctorPrizeApi.as_view(), name='doctor-prize-api'),
 
 ]
