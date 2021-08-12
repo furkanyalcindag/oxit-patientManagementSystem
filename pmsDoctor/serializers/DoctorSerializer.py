@@ -6,6 +6,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from pms.models import Staff, Department, Profile, Prize
+from pms.models.DoctorArticle import DoctorArticle
 from pms.models.DoctorEducation import DoctorEducation
 from pms.models.EducationType import EducationType
 from pmsDoctor.serializers.GeneralSerializer import SelectSerializer, PageSerializer
@@ -252,11 +253,55 @@ class DoctorPrizeSerializer(serializers.Serializer):
             raise serializers.ValidationError("lütfen tekrar deneyiniz")
 
 
-class DoctorPrizePageSerializer(PageSerializer):
-    data = DoctorPrizeSerializer(many=True)
+class DoctorArticleSerializer(serializers.Serializer):
+    uuid = serializers.UUIDField(read_only=True)
+    title = serializers.CharField(required=True)
+    link = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    date = serializers.DateField()
 
     def update(self, instance, validated_data):
-        pass
+        try:
+            with transaction.atomic():
+                instance.title = validated_data.get('title')
+                instance.link = validated_data.get('link')
+                instance.date = validated_data.get('date')
+
+                instance.save()
+                return instance
+        except Exception as e:
+            traceback.print_exc()
+            raise serializers.ValidationError("lütfen tekrar deneyiniz")
 
     def create(self, validated_data):
-        pass
+        try:
+            with transaction.atomic():
+                doctor = Staff.objects.get(profile__user=self.context['request'].user)
+
+                article = DoctorArticle()
+                article.title = validated_data.get('title')
+                article.link = validated_data.get('link')
+                article.date = validated_data.get('date')
+                article.doctor = doctor
+                article.save()
+                return article
+
+        except Exception as e:
+            traceback.print_exc()
+            raise serializers.ValidationError("lütfen tekrar deneyiniz")
+
+
+class DoctorArticleTimelineSerializer(serializers.Serializer):
+    title = serializers.CharField()
+    date = serializers.CharField()
+    category = serializers.CharField()
+    color = serializers.CharField(read_only=False)
+
+    def to_representation(self, obj):
+        return {
+
+            'title': obj['title'],
+            'date': obj['date'],
+            'category': obj['category'],
+            'color': obj['color'],
+
+        }

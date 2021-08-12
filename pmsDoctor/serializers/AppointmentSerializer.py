@@ -85,7 +85,7 @@ class AppointmentCalendarSerializer(serializers.Serializer):
     end = serializers.CharField()
     title = serializers.CharField()
     id = serializers.CharField(read_only=False)
-    studentName = serializers.CharField(read_only=True, required=False)
+    doctorName = serializers.CharField(read_only=True, required=False)
 
     def to_representation(self, obj):
         return {
