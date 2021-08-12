@@ -3,7 +3,7 @@ from django.urls import path
 from pmsDoctor.views.DepartmentView import DepartmentSelectApi
 from pmsDoctor.views.DoctorView import DoctorApi, DoctorSelectApi, DoctorGeneralInfoApi, DoctorContactInfoApi, \
     DoctorAboutApi, EducationTypeSelectApi, DoctorEducationApi, DoctorPrizeApi, DoctorArticleApi, \
-    DoctorArticleTimelineApi
+    DoctorArticleTimelineApi, DoctorMediaApi
 from pmsDoctor.views.SecretaryView import SecretaryApi
 from pmsDoctor.views.GenderView import GenderSelectApi
 from pmsDoctor.views.PatientView import PatientApi, PatientSelectApi
@@ -40,9 +40,10 @@ urlpatterns = [
     path('contact-info-api/', DoctorContactInfoApi.as_view(), name='contact-info-api'),
     path('about-api/', DoctorAboutApi.as_view(), name='about-api'),
     path('education-type-api/', EducationTypeSelectApi.as_view(), name='education-type-api'),
-    path('doctor-education-api/', DoctorEducationApi.as_view(), name='doctor-education-api'),
-    path('doctor-prize-api/', DoctorPrizeApi.as_view(), name='doctor-prize-api'),
-    path('doctor-article-api/', DoctorArticleApi.as_view(), name='doctor-article-api'),
+    path('education-api/', DoctorEducationApi.as_view(), name='doctor-education-api'),
+    path('prize-api/', DoctorPrizeApi.as_view(), name='doctor-prize-api'),
+    path('article-api/', DoctorArticleApi.as_view(), name='article-api'),
     path('article-timeline-api/', DoctorArticleTimelineApi.as_view(), name='article-timeline-api'),
+    path('media-api/', DoctorMediaApi.as_view(), name='media-api'),
 
 ]

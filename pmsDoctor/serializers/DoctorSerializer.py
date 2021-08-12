@@ -9,6 +9,7 @@ from pms.models import Staff, Department, Profile, Prize
 from pms.models.DoctorArticle import DoctorArticle
 from pms.models.DoctorEducation import DoctorEducation
 from pms.models.EducationType import EducationType
+from pms.models.Media import Media
 from pmsDoctor.serializers.GeneralSerializer import SelectSerializer, PageSerializer
 
 
@@ -171,7 +172,7 @@ class DoctorEducationSerializer(serializers.Serializer):
     uuid = serializers.UUIDField(read_only=True)
     universityName = serializers.CharField()
     facultyName = serializers.CharField()
-    departmentName = serializers.CharField()
+    departmentName = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     educationTypeId = serializers.IntegerField(write_only=True)
     educationType = SelectSerializer(read_only=True)
 
@@ -298,10 +299,31 @@ class DoctorArticleTimelineSerializer(serializers.Serializer):
 
     def to_representation(self, obj):
         return {
-
             'title': obj['title'],
             'date': obj['date'],
             'category': obj['category'],
             'color': obj['color'],
 
         }
+
+
+class DoctorMediaSerializer(serializers.Serializer):
+    uuid = serializers.UUIDField(read_only=True)
+    media = serializers.CharField(required=True)
+
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        try:
+            with transaction.atomic():
+                doctor = Staff.objects.get(profile__user=self.context['request'].user)
+                media = Media()
+                media.media = validated_data.get('media')
+                media.doctor = doctor
+                media.save()
+                return media
+
+        except Exception as e:
+            traceback.print_exc()
+            raise serializers.ValidationError("lütfen tekrar deneyiniz")
