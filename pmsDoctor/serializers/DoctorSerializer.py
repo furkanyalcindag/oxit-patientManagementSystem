@@ -133,7 +133,14 @@ class DoctorAboutSerializer(serializers.Serializer):
             raise serializers.ValidationError("lütfen tekrar deneyiniz")
 
     def create(self, validated_data):
-        pass
+        try:
+            staff = Staff.objects.get(profile__user=self.context['request'].user)
+            staff.about = validated_data.get('about')
+            staff.save()
+            return staff
+        except:
+            traceback.print_exc()
+            raise serializers.ValidationError("lütfen tekrar deneyiniz")
 
 
 class DoctorContactInfoSerializer(serializers.Serializer):

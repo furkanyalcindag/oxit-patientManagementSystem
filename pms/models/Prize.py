@@ -9,4 +9,4 @@ class Prize(BaseModel):
     description = models.CharField(max_length=256)
     date = models.DateField()
     doctor = models.ForeignKey(Staff, on_delete=models.CASCADE)
-    image = models.CharField(max_length=1028)
+    image = models.TextField(null=True, blank=True)
