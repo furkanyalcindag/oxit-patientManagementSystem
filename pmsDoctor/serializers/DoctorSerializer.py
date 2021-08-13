@@ -6,8 +6,10 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from pms.models import Staff, Department, Profile, Prize
+from pms.models.DoctorArticle import DoctorArticle
 from pms.models.DoctorEducation import DoctorEducation
 from pms.models.EducationType import EducationType
+from pms.models.Media import Media
 from pmsDoctor.serializers.GeneralSerializer import SelectSerializer, PageSerializer
 
 
@@ -170,7 +172,7 @@ class DoctorEducationSerializer(serializers.Serializer):
     uuid = serializers.UUIDField(read_only=True)
     universityName = serializers.CharField()
     facultyName = serializers.CharField()
-    departmentName = serializers.CharField()
+    departmentName = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     educationTypeId = serializers.IntegerField(write_only=True)
     educationType = SelectSerializer(read_only=True)
 
@@ -252,11 +254,76 @@ class DoctorPrizeSerializer(serializers.Serializer):
             raise serializers.ValidationError("lütfen tekrar deneyiniz")
 
 
-class DoctorPrizePageSerializer(PageSerializer):
-    data = DoctorPrizeSerializer(many=True)
+class DoctorArticleSerializer(serializers.Serializer):
+    uuid = serializers.UUIDField(read_only=True)
+    title = serializers.CharField(required=True)
+    link = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    date = serializers.DateField()
+
+    def update(self, instance, validated_data):
+        try:
+            with transaction.atomic():
+                instance.title = validated_data.get('title')
+                instance.link = validated_data.get('link')
+                instance.date = validated_data.get('date')
+
+                instance.save()
+                return instance
+        except Exception as e:
+            traceback.print_exc()
+            raise serializers.ValidationError("lütfen tekrar deneyiniz")
+
+    def create(self, validated_data):
+        try:
+            with transaction.atomic():
+                doctor = Staff.objects.get(profile__user=self.context['request'].user)
+
+                article = DoctorArticle()
+                article.title = validated_data.get('title')
+                article.link = validated_data.get('link')
+                article.date = validated_data.get('date')
+                article.doctor = doctor
+                article.save()
+                return article
+
+        except Exception as e:
+            traceback.print_exc()
+            raise serializers.ValidationError("lütfen tekrar deneyiniz")
+
+
+class DoctorArticleTimelineSerializer(serializers.Serializer):
+    title = serializers.CharField()
+    date = serializers.CharField()
+    category = serializers.CharField()
+    color = serializers.CharField(read_only=False)
+
+    def to_representation(self, obj):
+        return {
+            'title': obj['title'],
+            'date': obj['date'],
+            'category': obj['category'],
+            'color': obj['color'],
+
+        }
+
+
+class DoctorMediaSerializer(serializers.Serializer):
+    uuid = serializers.UUIDField(read_only=True)
+    media = serializers.CharField(required=True)
 
     def update(self, instance, validated_data):
         pass
 
     def create(self, validated_data):
-        pass
+        try:
+            with transaction.atomic():
+                doctor = Staff.objects.get(profile__user=self.context['request'].user)
+                media = Media()
+                media.media = validated_data.get('media')
+                media.doctor = doctor
+                media.save()
+                return media
+
+        except Exception as e:
+            traceback.print_exc()
+            raise serializers.ValidationError("lütfen tekrar deneyiniz")

@@ -34,3 +34,4 @@ from .SocialMedia import SocialMedia
 from .Staff import Staff
 from .ClinicStaff import ClinicStaff
 from .Notification import Notification
+from .Media import Media

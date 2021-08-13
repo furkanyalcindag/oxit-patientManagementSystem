@@ -1,12 +1,17 @@
 # oxit doctor view
 import traceback
 
+from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from management.serializers.GeneralSerializer import SelectSerializer
-from pms.models import Profile, Prize
+from pms.models.Media import Media
+from pms.models.Prize import Prize
+from pms.models.Profile import Profile
+from pms.models.DoctorArticle import DoctorArticle
+
 from pms.models.DoctorEducation import DoctorEducation
 from pms.models.EducationType import EducationType
 from pms.models.SelectObject import SelectObject
@@ -14,7 +19,7 @@ from pms.models.Staff import Staff
 from pmsDoctor.models.APIObject import APIObject
 from pmsDoctor.serializers.DoctorSerializer import DoctorPageSerializer, DoctorSerializer, DoctorGeneralInfoSerializer, \
     DoctorContactInfoSerializer, DoctorAboutSerializer, DoctorEducationSerializer, DoctorEducationPageSerializer, \
-    DoctorPrizeSerializer, DoctorPrizePageSerializer
+    DoctorPrizeSerializer, DoctorArticleSerializer, DoctorMediaSerializer
 
 
 class DoctorApi(APIView):
@@ -448,9 +453,164 @@ class DoctorPrizeApi(APIView):
     def delete(self, request, format=None):
         try:
             prize = Prize.objects.get(uuid=request.GET.get('id'),
-                                      student__profile__user=request.user)
+                                      doctor__profile__user=request.user)
             prize.isDeleted = True
             prize.save()
+
+            return Response(status=status.HTTP_200_OK)
+        except Exception:
+            traceback.print_exc()
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class DoctorArticleApi(APIView):
+
+    def get(self, request, format=None):
+
+        try:
+            if request.GET.get('id') is not None:
+                article = DoctorArticle.objects.get(doctor__profile__user=request.user,
+                                                    uuid=request.GET.get('id'))
+
+                api_data = dict()
+
+                api_data['uuid'] = article.uuid
+                api_data['title'] = article.title
+                api_data['link'] = article.link
+                api_data['date'] = article.date
+
+                serializer = DoctorArticleSerializer(api_data, context={'request': request})
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+
+                articles = DoctorArticle.objects.filter(doctor__profile__user=request.user,
+                                                        isDeleted=False)
+                arr = []
+                for article in articles:
+                    api_data = dict()
+
+                    api_data['uuid'] = article.uuid
+                    api_data['title'] = article.title
+                    api_data['link'] = article.link
+                    api_data['date'] = article.date
+
+                    arr.append(api_data)
+
+                serializer = DoctorArticleSerializer(arr, many=True, context={'request': request})
+                return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            traceback.print_exc()
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, format=None):
+        try:
+            instance = DoctorArticle.objects.get(doctor__profile__user=request.user,
+                                                 uuid=request.GET.get('id'))
+            serializer = DoctorArticleSerializer(data=request.data, instance=instance, context={'request': request})
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"message": "prize is updated"}, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except:
+            traceback.print_exc()
+            return Response("error", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def post(self, request, format=None):
+        serializer = DoctorArticleSerializer(data=request.data, context={'request': request})
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "prize is created"}, status=status.HTTP_200_OK)
+        else:
+            errors_dict = dict()
+            for key, value in serializer.errors.items():
+                if key == 'title':
+                    errors_dict['title'] = value
+
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, format=None):
+        try:
+            article = DoctorArticle.objects.get(uuid=request.GET.get('id'),
+                                                doctor__profile__user=request.user)
+            article.isDeleted = True
+            article.save()
+
+            return Response(status=status.HTTP_200_OK)
+        except Exception:
+            traceback.print_exc()
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class DoctorArticleTimelineApi(APIView):
+
+    def get(self, request, format=None):
+
+        try:
+            articles = DoctorArticle.objects.filter(doctor__profile__user=request.user,
+                                                    isDeleted=False).order_by('date')
+            year_arr = []
+            dict_by_year = dict()
+            for article in articles:
+                if article.date.year not in year_arr:
+                    year_arr.append(str(article.date.year))
+            for year in year_arr:
+                articles_arr = []
+                year_articles = DoctorArticle.objects.filter(doctor__profile__user=request.user,
+                                                             isDeleted=False, date__year=year).order_by('-date')
+                for art in year_articles:
+                    record = {"title": art.title, "date": art.date}
+                    articles_arr.append(record)
+                dict_by_year[str(year)] = articles_arr
+            return Response(dict_by_year, status=status.HTTP_200_OK)
+        except Exception as e:
+            traceback.print_exc()
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class DoctorMediaApi(APIView):
+
+    def get(self, request, format=None):
+
+        try:
+            medias = Media.objects.filter(doctor__profile__user=request.user,
+                                          isDeleted=False)
+            arr = []
+            for media in medias:
+                api_data = dict()
+
+                api_data['uuid'] = media.uuid
+                api_data['media'] = media.media
+
+                arr.append(api_data)
+
+            serializer = DoctorMediaSerializer(arr, many=True, context={'request': request})
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            traceback.print_exc()
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self, request, format=None):
+        serializer = DoctorMediaSerializer(data=request.data, context={'request': request})
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "media is created"}, status=status.HTTP_200_OK)
+        else:
+            errors_dict = dict()
+            for key, value in serializer.errors.items():
+                if key == 'media':
+                    errors_dict['media'] = value
+
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, format=None):
+        try:
+            media = Media.objects.get(uuid=request.GET.get('id'),
+                                      doctor__profile__user=request.user)
+            media.isDeleted = True
+            media.save()
 
             return Response(status=status.HTTP_200_OK)
         except Exception:
