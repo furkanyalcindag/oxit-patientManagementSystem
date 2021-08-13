@@ -54,10 +54,10 @@ class PatientApi(APIView):
                 lim_start = count * (int(active_page) - 1)
                 lim_end = lim_start + int(count)
 
-                data = Patient.objects.filter(profile__user__first_name__icontains=name, profile__user__groups__id=10,
+                data = Patient.objects.filter(profile__user__first_name__icontains=name, profile__user__groups__id=5,
                                               isDeleted=False).order_by('-id')[lim_start:lim_end]
                 filtered_count = Patient.objects.filter(profile__user__first_name__icontains=name,
-                                                        profile__user__groups=10,
+                                                        profile__user__groups=5,
                                                         isDeleted=False).count()
                 arr = []
 

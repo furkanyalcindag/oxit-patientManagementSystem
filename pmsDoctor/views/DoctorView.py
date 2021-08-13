@@ -248,6 +248,18 @@ class DoctorAboutApi(APIView):
             traceback.print_exc()
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    def post(self, request, format=None):
+        try:
+            serializer = DoctorAboutSerializer(data=request.data, context={'request': request})
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"message": "doctor information is created"}, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except:
+            traceback.print_exc()
+            return Response('error', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     def put(self, request, format=None):
         try:
             instance = Staff.objects.get(profile__user=request.user)
