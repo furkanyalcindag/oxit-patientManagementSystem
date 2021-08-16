@@ -144,14 +144,18 @@ class ClinicApi(APIView):
             return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, format=None):
-        instance = Clinic.objects.get(uuid=request.GET.get('id'))
-        serializer = ClinicSerializer(data=request.data, instance=instance, context={'request', request})
+        try:
+            instance = Clinic.objects.get(uuid=request.GET.get('id'))
+            serializer = ClinicSerializer(data=request.data, instance=instance, context={'request': request})
 
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'message': "Clinic is updated"}, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({'message': "Clinic is updated"}, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except:
+            traceback.print_exc()
+            return Response(status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, format=None):
         try:

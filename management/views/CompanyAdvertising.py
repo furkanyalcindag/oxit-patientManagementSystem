@@ -1,3 +1,4 @@
+import datetime
 import traceback
 
 from rest_framework.response import Response
@@ -81,9 +82,23 @@ class CompanyAdvertisingApi(APIView):
 
     def post(self, request, format=None):
         serializer = CompanyAdvertisingSerializer(data=request.data, context={'request': request})
-        if serializer.is_valid():
+
+        if datetime.datetime.strptime(request.data['publishStartDate'],
+                                      '%Y-%m-%d').date() < datetime.datetime.today().date():
+            return Response({"message": "error"}, status=status.HTTP_301_MOVED_PERMANENTLY)
+        elif datetime.datetime.strptime(request.data['publishEndDate'],
+                                        '%Y-%m-%d').date() < datetime.datetime.today().date():
+            return Response({"message": "error"}, status=status.HTTP_411_LENGTH_REQUIRED)
+        elif datetime.datetime.strptime(request.data['publishStartDate'],
+                                        '%Y-%m-%d').date() > datetime.datetime.strptime(request.data['publishEndDate'],
+                                                                                        '%Y-%m-%d').date():
+            return Response({"message": "error"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+
+        elif serializer.is_valid():
             serializer.save()
             return Response({"message": "advertising is created"}, status.HTTP_200_OK)
+
         else:
             errors = dict()
             for key, value in serializer.errors.items():

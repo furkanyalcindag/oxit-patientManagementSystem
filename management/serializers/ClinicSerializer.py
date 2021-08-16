@@ -8,7 +8,8 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueValidator
 
 from management.serializers.GeneralSerializer import SelectSerializer, PageSerializer
-from pms.models import Clinic, District, City, Staff, Profile
+from pms.models import District, City, Profile
+from pms.models.Clinic import Clinic
 
 
 class ClinicSerializer(serializers.Serializer):
@@ -22,22 +23,30 @@ class ClinicSerializer(serializers.Serializer):
     city = SelectSerializer(read_only=True)
     district = SelectSerializer(read_only=True)
     cityDistrict = serializers.CharField(allow_blank=False, read_only=True, allow_null=True)
-    email = serializers.CharField(required=True, validators=[UniqueValidator(queryset=User.objects.all())])
+    email = serializers.CharField()
     staffName = serializers.CharField(required=True, allow_null=True, allow_blank=True)
     staffSurname = serializers.CharField(required=True, allow_null=True, allow_blank=True)
     telephoneNumber = serializers.CharField(required=True, allow_null=True, allow_blank=True)
 
     def update(self, instance, validated_data):
         try:
-            instance.name = validated_data.get('clinicName')
-            instance.taxNumber = validated_data.get('taxNumber')
-            instance.taxOffice = validated_data.get('taxOffice')
-            instance.address = validated_data.get('address')
-            instance.district = District.objects.get(id=validated_data.get('districtId'))
-            instance.city = City.objects.get(id=validated_data.get('cityId'))
-            instance.save()
+            with transaction.atomic():
+                user = instance.profile.user
+                user.first_name = validated_data.get('staffName')
+                user.last_name = validated_data.get('staffSurname')
+                user.email = validated_data.get('email')
+                user.username = validated_data.get('email')
+                user.save()
+                instance.name = validated_data.get('clinicName')
+                instance.taxNumber = validated_data.get('taxNumber')
+                instance.taxOffice = validated_data.get('taxOffice')
+                instance.telephoneNumber = validated_data.get('telephoneNumber')
+                instance.address = validated_data.get('address')
+                instance.district = District.objects.get(id=validated_data.get('districtId'))
+                instance.city = City.objects.get(id=validated_data.get('cityId'))
+                instance.save()
 
-            return instance
+                return instance
 
         except Exception as e:
             traceback.print_exc()
@@ -53,9 +62,11 @@ class ClinicSerializer(serializers.Serializer):
                 group = Group.objects.get(name='Clinic')
                 user.groups.add(group)
                 user.save()
-                profile = Profile.objects.create(user=user)
+                profile = Profile()
+                profile.user = user
                 profile.save()
-                clinic = Clinic(profile=profile)
+                clinic = Clinic()
+                clinic.profile = profile
                 clinic.name = validated_data.get('clinicName')
                 clinic.taxNumber = validated_data.get('taxNumber')
                 clinic.taxOffice = validated_data.get('taxOffice')
@@ -71,6 +82,20 @@ class ClinicSerializer(serializers.Serializer):
             traceback.print_exc()
             raise ValidationError("lütfen tekrar deneyiniz")
 
+    def validate_email(self, email):
+
+        user = None
+        if self.instance is not None:
+
+            user = Clinic.objects.get(uuid=self.context['request'].query_params['id']).profile.user
+
+            if User.objects.exclude(id=user.id).filter(username=email).count() > 0:
+                raise serializers.ValidationError("Bu email sistemde kayıtlıdır")
+
+        else:
+            if User.objects.filter(username=email).count() > 0:
+                raise serializers.ValidationError("Bu email sistemde kayıtlıdır")
+        return email
 
 class ClinicPageableSerializer(PageSerializer):
     data = ClinicSerializer(many=True)
@@ -80,3 +105,4 @@ class ClinicPageableSerializer(PageSerializer):
 
     def create(self, validated_data):
         pass
+

@@ -1,4 +1,3 @@
-# oxit staff view
 import traceback
 
 from rest_framework.response import Response
@@ -42,10 +41,11 @@ class SecretaryApi(APIView):
                 lim_start = count * (int(active_page) - 1)
                 lim_end = lim_start + int(count)
 
-                data = Profile.objects.filter(user__first_name__icontains=name, user__groups__id=9,
+                data = Profile.objects.filter(user__first_name__icontains=name, user__groups__name='Secretary',
                                               isDeleted=False).order_by('-id')[
                        lim_start:lim_end]
-                filtered_count = Profile.objects.filter(user__first_name__icontains=name, user__groups__id=9,
+                filtered_count = Profile.objects.filter(user__first_name__icontains=name,
+                                                        user__groups__name='Secretary',
                                                         isDeleted=False).count()
                 arr = []
 
@@ -59,7 +59,8 @@ class SecretaryApi(APIView):
                 api_object = APIObject()
                 api_object.data = arr
                 api_object.recordsFiltered = filtered_count
-                api_object.recordsTotal = Profile.objects.filter(isDeleted=False, user__groups__id=9).count()
+                api_object.recordsTotal = Profile.objects.filter(isDeleted=False,
+                                                                 user__groups__name='Secretary').count()
                 serializer = SecretaryPageableSerializer(api_object, context={'request': request})
                 return Response(serializer.data, status.HTTP_200_OK)
 

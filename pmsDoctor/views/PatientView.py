@@ -1,6 +1,5 @@
-# oxit doctor view
 import traceback
-
+import datetime
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
@@ -54,10 +53,10 @@ class PatientApi(APIView):
                 lim_start = count * (int(active_page) - 1)
                 lim_end = lim_start + int(count)
 
-                data = Patient.objects.filter(profile__user__first_name__icontains=name, profile__user__groups__id=5,
+                data = Patient.objects.filter(profile__user__first_name__icontains=name, profile__user__groups__name='Patient',
                                               isDeleted=False).order_by('-id')[lim_start:lim_end]
                 filtered_count = Patient.objects.filter(profile__user__first_name__icontains=name,
-                                                        profile__user__groups=5,
+                                                        profile__user__groups__name='Patient',
                                                         isDeleted=False).count()
                 arr = []
 
@@ -97,6 +96,9 @@ class PatientApi(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response({"message": "patient is created"}, status=status.HTTP_200_OK)
+        elif datetime.datetime.strptime(request.data['birthDate'],
+                                        '%Y-%m-%d').date() > datetime.datetime.today().date():
+            return Response({"message": "error"}, status=status.HTTP_301_MOVED_PERMANENTLY)
         else:
             errors = dict()
             for key, value in serializer.errors.items():

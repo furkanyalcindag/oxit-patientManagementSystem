@@ -146,7 +146,7 @@ class AppointmentApi(APIView):
                 return Response({"message": "error"}, status=status.HTTP_406_NOT_ACCEPTABLE)
             elif serializer.is_valid():
                 serializer.save()
-                return Response({"message": "Appointment is created"}, status=status.HTTP_200_OK)
+                return Response({"message": "Appointment is updated"}, status=status.HTTP_200_OK)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception:
@@ -230,3 +230,4 @@ class AppointmentCalendarApi(APIView):
             serializer = AppointmentSerializer(api_object, context={'request': request})
 
             return Response(serializer.data, status.HTTP_200_OK)
+
