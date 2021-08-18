@@ -103,9 +103,19 @@ class AppointmentApi(APIView):
                                             '%Y-%m-%d').date() == datetime.datetime.today().date() and datetime.datetime.strptime(
                 request.data['time'], '%H:%M').time() < datetime.datetime.today().time():
                 return Response({"message": "error"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            elif datetime.datetime.strptime(request.data['time'], '%Y-%m-%d').date() > datetime.datetime.strptime(
+                    request.data['endTime'], '%Y-%m-%d').date():
+                return Response({"message": "error"}, status=status.HTTP_301_MOVED_PERMANENTLY)
+            elif datetime.datetime.strptime(request.data['time'], '%Y-%m-%d').date() == datetime.datetime.strptime(
+                    request.data['endTime'], '%Y-%m-%d').date():
+                return Response({"message": "error"}, status=status.HTTP_510_NOT_EXTENDED)
             elif serializer.is_valid():
                 serializer.save()
                 return Response({"message": "Appointment is created"}, status=status.HTTP_200_OK)
+            elif datetime.datetime.strptime(request.data['date'],
+                                            '%Y-%m-%d').date() == datetime.datetime.today().date() and datetime.datetime.strptime(
+                request.data['time'], '%H:%M').time() < datetime.datetime.today().time():
+                return Response({"message": "error"}, status=status.HTTP_406_NOT_ACCEPTABLE)
             else:
                 errors = dict()
                 for key, value in serializer.errors.items():
