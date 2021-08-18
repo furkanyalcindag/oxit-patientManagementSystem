@@ -42,10 +42,11 @@ class SecretaryApi(APIView):
                 lim_start = count * (int(active_page) - 1)
                 lim_end = lim_start + int(count)
 
-                data = Profile.objects.filter(user__first_name__icontains=name, user__groups__id=9,
+                data = Profile.objects.filter(user__first_name__icontains=name, user__groups__name='Secretary',
                                               isDeleted=False).order_by('-id')[
                        lim_start:lim_end]
-                filtered_count = Profile.objects.filter(user__first_name__icontains=name, user__groups__id=9,
+                filtered_count = Profile.objects.filter(user__first_name__icontains=name,
+                                                        user__groups__name='Secretary',
                                                         isDeleted=False).count()
                 arr = []
 
