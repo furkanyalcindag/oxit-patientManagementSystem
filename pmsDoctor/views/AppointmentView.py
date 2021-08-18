@@ -140,10 +140,17 @@ class AppointmentApi(APIView):
             serializer = AppointmentSerializer(data=request.data, instance=instance, context={'request': request})
             if datetime.datetime.strptime(request.data['date'], '%Y-%m-%d').date() < datetime.datetime.today().date():
                 return Response({"message": "error"}, status=status.HTTP_417_EXPECTATION_FAILED)
+            elif datetime.datetime.strptime(request.data['time'], '%Y-%m-%d').date() > datetime.datetime.strptime(
+                    request.data['endTime'], '%Y-%m-%d').date():
+                return Response({"message": "error"}, status=status.HTTP_301_MOVED_PERMANENTLY)
             elif datetime.datetime.strptime(request.data['date'],
                                             '%Y-%m-%d').date() == datetime.datetime.today().date() and datetime.datetime.strptime(
                 request.data['time'], '%H:%M').time() < datetime.datetime.today().time():
                 return Response({"message": "error"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            elif datetime.datetime.strptime(request.data['date'],
+                                            '%Y-%m-%d').date() == datetime.datetime.today().date() and datetime.datetime.strptime(
+                request.data['endTime'], '%H:%M').time() < datetime.datetime.today().time():
+                return Response({"message": "error"}, status=status.HTTP_304_NOT_MODIFIED)
             elif serializer.is_valid():
                 serializer.save()
                 return Response({"message": "Appointment is created"}, status=status.HTTP_200_OK)

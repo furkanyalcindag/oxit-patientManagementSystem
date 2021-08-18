@@ -1,5 +1,5 @@
 import traceback
-
+import datetime
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
@@ -7,7 +7,6 @@ from rest_framework.views import APIView
 from management.models.APIObject import APIObject
 from management.serializers.CompanyAdvertisingSerializer import CompanyAdvertisingSerializer, \
     CompanyAdvertisingPageableSerializer
-from pms.models.Advertising import Advertising
 from pms.models.CompanyAdvertising import CompanyAdvertising
 
 
@@ -81,7 +80,17 @@ class CompanyAdvertisingApi(APIView):
 
     def post(self, request, format=None):
         serializer = CompanyAdvertisingSerializer(data=request.data, context={'request': request})
-        if serializer.is_valid():
+        if datetime.datetime.strptime(request.data['publishEndDate'],
+                                      '%Y-%m-%d').date() < datetime.datetime.today().date():
+            return Response({"message": "error"}, status=status.HTTP_417_EXPECTATION_FAILED)
+        elif datetime.datetime.strptime(request.data['publishStartDate'],
+                                        '%Y-%m-%d').date() < datetime.datetime.today().date():
+            return Response({"message": "error"}, status=status.HTTP_301_MOVED_PERMANENTLY)
+        elif datetime.datetime.strptime(request.data['publishStartDate'],
+                                        '%Y-%m-%d').date() > datetime.datetime.strptime(request.data['publishEndDate'],
+                                                                                        '%Y-%m-%d').date():
+            return Response({"message": "error"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+        elif serializer.is_valid():
             serializer.save()
             return Response({"message": "advertising is created"}, status.HTTP_200_OK)
         else:
@@ -107,7 +116,17 @@ class CompanyAdvertisingApi(APIView):
             serializer = CompanyAdvertisingSerializer(data=request.data, instance=instance,
                                                       context={'request', request})
 
-            if serializer.is_valid():
+            if datetime.datetime.strptime(request.data['publishEndDate'],
+                                          '%Y-%m-%d').date() < datetime.datetime.today().date():
+                return Response({"message": "error"}, status=status.HTTP_417_EXPECTATION_FAILED)
+            elif datetime.datetime.strptime(request.data['publishStartDate'],
+                                            '%Y-%m-%d').date() < datetime.datetime.today().date():
+                return Response({"message": "error"}, status=status.HTTP_301_MOVED_PERMANENTLY)
+            elif datetime.datetime.strptime(request.data['publishStartDate'],
+                                            '%Y-%m-%d').date() > datetime.datetime.strptime(
+                request.data['publishEndDate'], '%Y-%m-%d').date():
+                return Response({"message": "error"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            elif serializer.is_valid():
                 serializer.save()
                 return Response({'message': 'company is updated'}, status.HTTP_200_OK)
             else:
@@ -118,7 +137,7 @@ class CompanyAdvertisingApi(APIView):
 
     def delete(self, request, format=None):
         try:
-            company = Advertising.objects.get(uuid=request.GET.get('id'))
+            company = CompanyAdvertising.objects.get(uuid=request.GET.get('id'))
             company.isDeleted = True
             company.save()
             return Response('delete is succes', status.HTTP_200_OK)
