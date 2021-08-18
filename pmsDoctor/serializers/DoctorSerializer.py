@@ -105,7 +105,10 @@ class DoctorGeneralInfoSerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         try:
-            instance.profileImage = validated_data.get('profileImage')
+            profile = instance.profile
+            profile.profileImage = validated_data.get('profileImage')
+            profile.save()
+            instance.profile = profile
             instance.department = Department.objects.get(id=validated_data.get('departmentId'))
             instance.profession = validated_data.get('profession')
             instance.title = validated_data.get('title')
