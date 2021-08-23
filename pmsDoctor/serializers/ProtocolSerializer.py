@@ -6,6 +6,7 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from pms.models import CheckingAccount, PaymentSituation
 from pms.models.ProtocolAssay import ProtocolAssay
 from pmsDoctor.serializers.AssaySerializer import AssaySerializer
 from pmsDoctor.serializers.GeneralSerializer import PageSerializer, SelectSerializer
@@ -22,6 +23,8 @@ class ProtocolSerializer(serializers.Serializer):
     assayList = AssaySerializer(many=True, read_only=True, required=False)
     description = serializers.CharField()
     protocolId = serializers.IntegerField(read_only=True)
+    price = serializers.DecimalField(max_digits=10, decimal_places=2)
+    isPaid = serializers.BooleanField(default=False)
 
     # barcode = serializers.CharField()
 
@@ -35,6 +38,10 @@ class ProtocolSerializer(serializers.Serializer):
                     instance.assay = assay
                     instance.save()
                 instance.description = validated_data.get('description')
+                if not instance.isPaid:
+                    instance.price = 0
+                else:
+                    instance.price = validated_data.get('price')
                 instance.save()
                 return instance
 
@@ -49,9 +56,20 @@ class ProtocolSerializer(serializers.Serializer):
             with transaction.atomic():
                 protocol = Protocol()
 
-                protocol.patient = Patient.objects.get(uuid=validated_data.get('patientId'))
+                protocol.patient = Patient.objects.get(profile__user_id=validated_data.get('patientId'))
                 protocol.description = validated_data.get('description')
+                protocol.isPaid = validated_data.get('isPaid')
+                if not protocol.isPaid:
+                    protocol.price = 0
+                else:
+                    protocol.price = validated_data.get('price')
                 protocol.save()
+                checking_account = CheckingAccount()
+                checking_account.protocol = protocol
+                checking_account.total = protocol.price
+                checking_account.remainingDebt = protocol.price
+                checking_account.paymentSituation = PaymentSituation.objects.get(name__exact='Ödenmedi')
+                checking_account.save()
                 if validated_data.get('assays') is not None:
                     for assayUUID in validated_data.get('assays'):
                         assay = Assay.objects.get(uuid=assayUUID)
