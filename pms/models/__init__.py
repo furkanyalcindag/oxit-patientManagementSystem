@@ -35,3 +35,5 @@ from .Staff import Staff
 from .ClinicStaff import ClinicStaff
 from .Notification import Notification
 from .Media import Media
+from .PaymentMovement import PaymentMovement
+from .PaymentSituation import PaymentSituation

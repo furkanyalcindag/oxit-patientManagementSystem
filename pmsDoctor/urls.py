@@ -1,5 +1,7 @@
 from django.urls import path
 
+from pmsDoctor.views.CheckingAccountViews import PaymentAccountApi, PaymentTypeSelectApi, PaymentAccountDiscountApi, \
+    CheckingAccountApi
 from pmsDoctor.views.DepartmentView import DepartmentSelectApi
 from pmsDoctor.views.DoctorView import DoctorApi, DoctorSelectApi, DoctorGeneralInfoApi, DoctorContactInfoApi, \
     DoctorAboutApi, EducationTypeSelectApi, DoctorEducationApi, DoctorPrizeApi, DoctorArticleApi, \
@@ -45,5 +47,9 @@ urlpatterns = [
     path('article-api/', DoctorArticleApi.as_view(), name='article-api'),
     path('article-timeline-api/', DoctorArticleTimelineApi.as_view(), name='article-timeline-api'),
     path('media-api/', DoctorMediaApi.as_view(), name='media-api'),
+    path('payment-api/', PaymentAccountApi.as_view(), name='media-api'),
+    path('payment-discount-api/', PaymentAccountDiscountApi.as_view(), name='payment-discount-api'),
+    path('payment-type-select-api/', PaymentTypeSelectApi.as_view(), name='payment-type-select-api'),
+    path('checking-account-api/', CheckingAccountApi.as_view(), name='checking-account-api'),
 
 ]

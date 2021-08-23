@@ -27,11 +27,6 @@ class AppointmentSerializer(serializers.Serializer):
         instance.date = validated_data.get('date')
         instance.time = validated_data.get('time')
         instance.endTime = validated_data.get('endTime')
-        instance.isPaid = validated_data.get('isPaid')
-        if not instance.isPaid:
-            instance.price = 0
-        else:
-            instance.price = validated_data.get('price')
         instance.save()
 
         return instance
@@ -55,11 +50,6 @@ class AppointmentSerializer(serializers.Serializer):
                     appointment.date = date
                     appointment.time = time
                     appointment.endTime = endTime
-                    appointment.isPaid = validated_data.get('isPaid')
-                    if not appointment.isPaid:
-                        appointment.price = 0
-                    else:
-                        appointment.price = validated_data.get('price')
 
                     appointment.save()
 
