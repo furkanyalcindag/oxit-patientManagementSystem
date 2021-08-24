@@ -25,6 +25,7 @@ class ProtocolSerializer(serializers.Serializer):
     protocolId = serializers.IntegerField(read_only=True)
     price = serializers.DecimalField(max_digits=10, decimal_places=2)
     isPaid = serializers.BooleanField(default=False)
+    taxRate = serializers.DecimalField(max_digits=10, decimal_places=2, write_only=True)
 
     # barcode = serializers.CharField()
 
@@ -62,21 +63,25 @@ class ProtocolSerializer(serializers.Serializer):
                 if not protocol.isPaid:
                     protocol.price = 0
                 else:
-                    protocol.price = validated_data.get('price')
+                    protocol.price = validated_data.get('price') + (
+                            validated_data.get('price') * validated_data.get('taxRate') / 100)
                 protocol.save()
-                checking_account = CheckingAccount()
-                checking_account.protocol = protocol
-                checking_account.total = protocol.price
-                checking_account.remainingDebt = protocol.price
-                checking_account.paymentSituation = PaymentSituation.objects.get(name__exact='Ödenmedi')
-                checking_account.save()
+                assayPrice = 0
                 if validated_data.get('assays') is not None:
                     for assayUUID in validated_data.get('assays'):
                         assay = Assay.objects.get(uuid=assayUUID)
+                        assayPrice += assay.price
                         protocolAssay = ProtocolAssay()
                         protocolAssay.assay = assay
                         protocolAssay.protocol = protocol
                         protocolAssay.save()
+                totalPrice = assayPrice + protocol.price
+                checking_account = CheckingAccount()
+                checking_account.protocol = protocol
+                checking_account.paymentSituation = PaymentSituation.objects.get(name__exact='Ödenmedi')
+                checking_account.total = totalPrice
+                checking_account.remainingDebt = totalPrice
+                checking_account.save()
                 protocol.save()
                 return protocol
 
