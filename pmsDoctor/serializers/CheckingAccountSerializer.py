@@ -83,6 +83,7 @@ class CheckingAccountSerializer(serializers.Serializer):
     total = serializers.DecimalField(max_digits=10, decimal_places=2)
     paymentSituation = serializers.CharField()
     discount = serializers.DecimalField(read_only=True, max_digits=10, decimal_places=2)
+    protocolId = serializers.IntegerField(read_only=True)
 
     def update(self, instance, validated_data):
         pass

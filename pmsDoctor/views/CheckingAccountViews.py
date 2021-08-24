@@ -101,6 +101,7 @@ class CheckingAccountApi(APIView):
                                                               paymentType__name='İndirim').aggregate(
                 discount=Sum('paymentAmount'))['discount']
             data['discount'] = payment_movement
+            data['protocolId'] = checking_account.protocol.id
             data['remainingDebt'] = checking_account.remainingDebt
             data['date'] = checking_account.protocol.creationDate.strftime("%d-%m-%Y %H:%M:%S")
             data['total'] = checking_account.total
