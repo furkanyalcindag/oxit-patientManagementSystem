@@ -106,6 +106,7 @@ class CheckingAccountApi(APIView):
             data['date'] = checking_account.protocol.creationDate.strftime("%d-%m-%Y %H:%M:%S")
             data['total'] = checking_account.total
             data['paymentSituation'] = checking_account.paymentSituation.name
+            data['protocolTaxRate'] = checking_account.protocol.taxRate
             checking_account_array.append(data)
 
         api_object = APIObject()
