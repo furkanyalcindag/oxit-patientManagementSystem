@@ -92,7 +92,7 @@ class PaymentTypeSelectApi(APIView):
 class CheckingAccountApi(APIView):
 
     def get(self, request, format=None):
-        checking_accounts = CheckingAccount.objects.all().order_by('-id')
+        checking_accounts = CheckingAccount.objects.filter(protocol__patient__uuid=request.GET.get('id'))
         checking_account_array = []
         for checking_account in checking_accounts:
             data = dict()
@@ -127,7 +127,7 @@ class PaymentMovementApi(APIView):
             data['movementUUID'] = movement.uuid
             data['paymentAmount'] = movement.paymentAmount
             data['date'] = movement.creationDate.strftime("%d-%m-%Y %H:%M:%S")
-            data['paymentTypeDesc'] = PaymentType.objects.get(id=movement.paymentType.id)
+            data['paymentTypeDesc'] = PaymentType.objects.get(id=movement.paymentType.id).name
             payment_movements_array.append(data)
 
         api_object = APIObject()
