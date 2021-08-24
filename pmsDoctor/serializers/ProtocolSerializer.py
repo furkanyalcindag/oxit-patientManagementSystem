@@ -56,7 +56,7 @@ class ProtocolSerializer(serializers.Serializer):
             with transaction.atomic():
                 protocol = Protocol()
 
-                protocol.patient = Patient.objects.get(profile__user_id=validated_data.get('patientId'))
+                protocol.patient = Patient.objects.get(uuid=validated_data.get('patientId'))
                 protocol.description = validated_data.get('description')
                 protocol.isPaid = validated_data.get('isPaid')
                 if not protocol.isPaid:
