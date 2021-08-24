@@ -21,6 +21,7 @@ class ProtocolApi(APIView):
                     api_object = dict()
                     api_object['uuid'] = data.uuid
                     api_object['description'] = data.description
+                    api_object['price'] = data.price
                     api_patient_data = dict()
                     api_patient_data['label'] = data.patient.profile.user.first_name
                     api_patient_data['value'] = data.patient.id
@@ -34,6 +35,7 @@ class ProtocolApi(APIView):
                 api_object = dict()
                 api_object['uuid'] = protocol.uuid
                 api_object['description'] = protocol.description
+                api_object['price'] = protocol.price
                 api_object['protocolId'] = protocol.id
                 api_patient_data = dict()
                 api_patient_data['label'] = protocol.patient.profile.user.first_name
@@ -68,6 +70,7 @@ class ProtocolApi(APIView):
                     api_object = dict()
                     api_object['uuid'] = protocol.uuid
                     api_object['description'] = protocol.description
+                    api_object['price'] = protocol.price
                     api_object['assay'] = protocol.description
                     api_patient_data = dict()
                     api_patient_data['label'] = protocol.patient.profile.user.first_name
@@ -97,6 +100,8 @@ class ProtocolApi(APIView):
                     errors['description'] = value
                 elif key == 'patientId':
                     errors['patientId'] = value
+                elif key == 'price':
+                    errors['price'] = value
                 # elif key == 'assays':
                 #     errors['assays'] = value
             return Response(errors, status=status.HTTP_400_BAD_REQUEST)
