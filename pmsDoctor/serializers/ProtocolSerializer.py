@@ -60,6 +60,7 @@ class ProtocolSerializer(serializers.Serializer):
                 protocol.patient = Patient.objects.get(uuid=validated_data.get('patientId'))
                 protocol.description = validated_data.get('description')
                 protocol.isPaid = validated_data.get('isPaid')
+                protocol.taxRate = validated_data.get('taxRate')
                 if not protocol.isPaid:
                     protocol.price = 0
                 else:
