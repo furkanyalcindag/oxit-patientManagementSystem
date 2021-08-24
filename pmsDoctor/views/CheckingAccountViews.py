@@ -1,6 +1,7 @@
 # oxit doctor view
 import traceback
 
+from django.db.models import Sum
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
@@ -10,7 +11,7 @@ from pms.models.SelectObject import SelectObject
 from pmsDoctor.models.APIObject import APIObject
 from pms.models.Patient import Patient
 from pmsDoctor.serializers.CheckingAccountSerializer import PaymentSerializer, PaymentDiscountSerializer, \
-    CheckingAccountSerializer, CheckingAccountPageSerializer
+    CheckingAccountSerializer, CheckingAccountPageSerializer, PaymentMovementPageSerializer
 from pmsDoctor.serializers.GeneralSerializer import SelectSerializer
 from pmsDoctor.serializers.PatientSerializer import PatientSerializer, PatientPageableSerializer
 
@@ -96,6 +97,10 @@ class CheckingAccountApi(APIView):
         for checking_account in checking_accounts:
             data = dict()
             data['checkingAccountUUID'] = checking_account.uuid
+            payment_movement = PaymentMovement.objects.filter(checkingAccount_id=checking_account.id,
+                                                              paymentType__name='İndirim').aggregate(
+                discount=Sum('paymentAmount'))['discount']
+            data['discount'] = payment_movement
             data['remainingDebt'] = checking_account.remainingDebt
             data['date'] = checking_account.protocol.creationDate.strftime("%d-%m-%Y %H:%M:%S")
             data['total'] = checking_account.total
@@ -108,4 +113,25 @@ class CheckingAccountApi(APIView):
         api_object.recordsTotal = checking_accounts.count()
 
         serializer = CheckingAccountPageSerializer(api_object, context={'request': request})
+        return Response(serializer.data, status.HTTP_200_OK)
+
+
+class PaymentMovementApi(APIView):
+    def get(self, request, format=None):
+        payment_movements = PaymentMovement.objects.filter(checkingAccount__uuid=request.GET.get('id')).order_by('-id')
+        payment_movements_array = []
+        for movement in payment_movements:
+            data = dict()
+            data['movementUUID'] = movement.uuid
+            data['paymentAmount'] = movement.paymentAmount
+            data['date'] = movement.creationDate.strftime("%d-%m-%Y %H:%M:%S")
+            data['paymentTypeDesc'] = PaymentType.objects.get(id=movement.paymentType.id)
+            payment_movements_array.append(data)
+
+        api_object = APIObject()
+        api_object.data = payment_movements_array
+        api_object.recordsFiltered = payment_movements.count()
+        api_object.recordsTotal = payment_movements.count()
+
+        serializer = PaymentMovementPageSerializer(api_object, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)

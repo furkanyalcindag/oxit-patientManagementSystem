@@ -82,6 +82,7 @@ class CheckingAccountSerializer(serializers.Serializer):
     remainingDebt = serializers.DecimalField(max_digits=10, decimal_places=2)
     total = serializers.DecimalField(max_digits=10, decimal_places=2)
     paymentSituation = serializers.CharField()
+    discount = serializers.DecimalField(read_only=True, max_digits=10, decimal_places=2)
 
     def update(self, instance, validated_data):
         pass
@@ -92,6 +93,31 @@ class CheckingAccountSerializer(serializers.Serializer):
 
 class CheckingAccountPageSerializer(serializers.Serializer):
     data = CheckingAccountSerializer(many=True)
+    recordsTotal = serializers.IntegerField()
+    recordsFiltered = serializers.IntegerField()
+
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
+
+
+class PaymentMovementSerializer(serializers.Serializer):
+    movementUUID = serializers.UUIDField(read_only=True)
+    date = serializers.DateTimeField()
+    paymentAmount = serializers.DecimalField(max_digits=10, decimal_places=2)
+    paymentTypeDesc = serializers.CharField()
+
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
+
+
+class PaymentMovementPageSerializer(serializers.Serializer):
+    data = PaymentMovementSerializer(many=True)
     recordsTotal = serializers.IntegerField()
     recordsFiltered = serializers.IntegerField()
 
