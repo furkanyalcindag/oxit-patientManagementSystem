@@ -17,7 +17,6 @@ class AppointmentSerializer(serializers.Serializer):
     doctor = SelectSerializer(read_only=True)
     date = serializers.DateField()
     time = serializers.TimeField()
-    price = serializers.IntegerField(required=False)
     endTime = serializers.TimeField()
 
     def update(self, instance, validated_data):

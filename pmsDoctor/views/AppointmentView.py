@@ -24,7 +24,6 @@ class AppointmentApi(APIView):
                 api_object['date'] = appointment.date
                 api_object['time'] = appointment.time
                 api_object['endTime'] = appointment.endTime
-                api_object['price'] = appointment.price
                 api_patient_data = dict()
                 api_patient_data[
                     'label'] = appointment.patient.profile.user.first_name + ' ' + appointment.patient.profile.user.last_name
@@ -68,7 +67,6 @@ class AppointmentApi(APIView):
                     api_object['date'] = appointment.date
                     api_object['time'] = appointment.time
                     api_object['endTime'] = appointment.endTime
-                    api_object['price'] = appointment.price
                     api_patient_data = dict()
                     api_patient_data[
                         'label'] = appointment.patient.profile.user.first_name + ' ' + appointment.patient.profile.user.last_name
@@ -218,7 +216,6 @@ class AppointmentCalendarApi(APIView):
             appointment = Appointment.objects.get(uuid=request.GET.get('id'))
             api_object = dict()
             api_object['uuid'] = appointment.uuid
-            api_object['price'] = appointment.price
             api_object['date'] = appointment.date
             api_object['time'] = appointment.time
             api_object['endTime'] = appointment.endTime
