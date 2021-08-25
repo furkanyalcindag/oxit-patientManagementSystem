@@ -24,7 +24,6 @@ class AppointmentApi(APIView):
                 api_object['date'] = appointment.date
                 api_object['time'] = appointment.time
                 api_object['endTime'] = appointment.endTime
-                api_object['isPaid'] = appointment.isPaid
                 api_object['price'] = appointment.price
                 api_patient_data = dict()
                 api_patient_data[
@@ -69,7 +68,6 @@ class AppointmentApi(APIView):
                     api_object['date'] = appointment.date
                     api_object['time'] = appointment.time
                     api_object['endTime'] = appointment.endTime
-                    api_object['isPaid'] = appointment.isPaid
                     api_object['price'] = appointment.price
                     api_patient_data = dict()
                     api_patient_data[
@@ -126,8 +124,6 @@ class AppointmentApi(APIView):
                         errors['time'] = value
                     elif key == 'endTime':
                         errors['endTime'] = value
-                    elif key == 'isPaid':
-                        errors['isPaid'] = value
                 return Response(errors, status=status.HTTP_400_BAD_REQUEST)
         except AppointmentValidationException as e:
             return Response("", status=status.HTTP_406_NOT_ACCEPTABLE)
@@ -223,7 +219,6 @@ class AppointmentCalendarApi(APIView):
             api_object = dict()
             api_object['uuid'] = appointment.uuid
             api_object['price'] = appointment.price
-            api_object['isPaid'] = appointment.isPaid
             api_object['date'] = appointment.date
             api_object['time'] = appointment.time
             api_object['endTime'] = appointment.endTime
