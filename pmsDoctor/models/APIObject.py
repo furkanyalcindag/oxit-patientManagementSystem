@@ -3,3 +3,5 @@ class APIObject(object):
     recordsFiltered = 0
     data = ""
     activePage = 1
+    remainingDebt = 0
+    total = 0
