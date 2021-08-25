@@ -11,12 +11,10 @@ from rest_framework.views import APIView
 from pms.models import PaymentType, CheckingAccount, PaymentMovement
 from pms.models.SelectObject import SelectObject
 from pmsDoctor.models.APIObject import APIObject
-from pms.models.Patient import Patient
 from pmsDoctor.serializers.CheckingAccountSerializer import PaymentSerializer, PaymentDiscountSerializer, \
     CheckingAccountSerializer, CheckingAccountPageSerializer, PaymentMovementPageSerializer, \
-    TotalCheckingAccountSerializer
+    AllCheckingAccountSerializer
 from pmsDoctor.serializers.GeneralSerializer import SelectSerializer
-from pmsDoctor.serializers.PatientSerializer import PatientSerializer, PatientPageableSerializer
 
 
 class PaymentAccountApi(APIView):
@@ -92,10 +90,16 @@ class PaymentTypeSelectApi(APIView):
             return Response("error", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-class CheckingAccountApi(APIView):
+class PatientCheckingAccountApi(APIView):
 
     def get(self, request, format=None):
         checking_accounts = CheckingAccount.objects.filter(protocol__patient__uuid=request.GET.get('id'))
+        remainingDebt_sum = \
+        CheckingAccount.objects.filter(protocol__patient__uuid=request.GET.get('id')).aggregate(Sum('remainingDebt'))[
+            'remainingDebt__sum']
+        total_sum = \
+        CheckingAccount.objects.filter(protocol__patient__uuid=request.GET.get('id')).aggregate(Sum('total'))[
+            'total__sum']
         checking_account_array = []
         for checking_account in checking_accounts:
             data = dict()
@@ -116,6 +120,8 @@ class CheckingAccountApi(APIView):
         api_object.data = checking_account_array
         api_object.recordsFiltered = checking_accounts.count()
         api_object.recordsTotal = checking_accounts.count()
+        api_object.remainingDebt = remainingDebt_sum
+        api_object.total = total_sum
 
         serializer = CheckingAccountPageSerializer(api_object, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
@@ -200,6 +206,54 @@ class TotalCheckingAccountApi(APIView):
             data['paidYearly'] = paid_yearly
 
             return Response(data, status.HTTP_200_OK)
+        except:
+            traceback.print_exc()
+            return Response("error", status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class MomentaryCheckingAccountApi(APIView):
+    def get(self, request, format=None):
+        try:
+            today_min = datetime.datetime.combine(datetime.date.today(), datetime.time.min)
+            today_max = datetime.datetime.combine(datetime.date.today(), datetime.time.max)
+            given_date = datetime.datetime.today().date()
+            daily_movement = PaymentMovement.objects.filter(creationDate__range=(today_min, today_max))
+            daily_movement_array = []
+            for movement in daily_movement:
+                data = dict()
+                data['movementUUID'] = movement.uuid
+                data['paymentAmount'] = movement.paymentAmount
+                data['date'] = movement.creationDate.strftime("%d-%m-%Y %H:%M:%S")
+                data[
+                    'patient'] = movement.checkingAccount.protocol.patient.profile.user.first_name + ' ' + movement.checkingAccount.protocol.patient.profile.user.last_name
+                data['paymentTypeDesc'] = PaymentType.objects.get(id=movement.paymentType.id).name
+                daily_movement_array.append(data)
+
+            return Response(daily_movement_array, status.HTTP_200_OK)
+        except:
+            traceback.print_exc()
+            return Response("error", status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class AllCheckingAccountApi(APIView):
+    def get(self, request, format=None):
+        try:
+
+            all_checking_accounts = CheckingAccount.objects.all()
+
+            all_checking_accounts_array = []
+            for checking_account in all_checking_accounts:
+                data = dict()
+                data['date'] = checking_account.creationDate.strftime("%d-%m-%Y %H:%M:%S")
+                data['remainingDebt'] = checking_account.remainingDebt
+                data['total'] = checking_account.total
+                data['patient'] = checking_account.protocol.patient.profile.user.first_name + ' ' + checking_account.protocol.patient.profile.user.last_name
+                data['paymentTypeDesc'] = PaymentType.objects.get(id=checking_account.paymentSituation.id).name
+                data['protocol'] = checking_account.protocol_id
+                all_checking_accounts_array.append(data)
+            serializer = AllCheckingAccountSerializer(all_checking_accounts_array, many=True,
+                                                      context={'request': request})
+            return Response(serializer.data, status.HTTP_200_OK)
         except:
             traceback.print_exc()
             return Response("error", status.HTTP_500_INTERNAL_SERVER_ERROR)

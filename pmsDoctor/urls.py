@@ -1,7 +1,8 @@
 from django.urls import path
 
 from pmsDoctor.views.CheckingAccountViews import PaymentAccountApi, PaymentTypeSelectApi, PaymentAccountDiscountApi, \
-    CheckingAccountApi, PaymentMovementApi, TotalCheckingAccountApi
+    PatientCheckingAccountApi, PaymentMovementApi, TotalCheckingAccountApi, MomentaryCheckingAccountApi, \
+    AllCheckingAccountApi
 from pmsDoctor.views.DepartmentView import DepartmentSelectApi
 from pmsDoctor.views.DoctorView import DoctorApi, DoctorSelectApi, DoctorGeneralInfoApi, DoctorContactInfoApi, \
     DoctorAboutApi, EducationTypeSelectApi, DoctorEducationApi, DoctorPrizeApi, DoctorArticleApi, \
@@ -50,9 +51,12 @@ urlpatterns = [
     path('payment-api/', PaymentAccountApi.as_view(), name='media-api'),
     path('payment-discount-api/', PaymentAccountDiscountApi.as_view(), name='payment-discount-api'),
     path('payment-type-select-api/', PaymentTypeSelectApi.as_view(), name='payment-type-select-api'),
-    path('checking-account-api/', CheckingAccountApi.as_view(), name='checking-account-api'),
+    path('checking-account-api/', PatientCheckingAccountApi.as_view(), name='checking-account-api'),
     path('payment-movement-api/', PaymentMovementApi.as_view(), name='payment-movement-api'),
     path('total-checking-account-api/', TotalCheckingAccountApi.as_view(), name='total-checking-account-api'),
-
+    path('momentary-checking-account-api/', MomentaryCheckingAccountApi.as_view(),
+         name='momentary-checking-account-api'),
+    path('all-checking-account-api/', AllCheckingAccountApi.as_view(),
+         name='all-checking-account-api'),
 
 ]
