@@ -128,3 +128,15 @@ class PaymentMovementPageSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         pass
+
+
+class TotalCheckingAccountSerializer(serializers.Serializer):
+    totalPrice = serializers.DecimalField(max_digits=10, decimal_places=2)
+    remainingDebtPrice = serializers.DecimalField(max_digits=10, decimal_places=2)
+    # paidPrice = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass

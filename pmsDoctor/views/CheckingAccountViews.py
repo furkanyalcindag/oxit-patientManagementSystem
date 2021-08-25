@@ -1,7 +1,9 @@
 # oxit doctor view
+import calendar
+import datetime
 import traceback
 
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
@@ -11,7 +13,8 @@ from pms.models.SelectObject import SelectObject
 from pmsDoctor.models.APIObject import APIObject
 from pms.models.Patient import Patient
 from pmsDoctor.serializers.CheckingAccountSerializer import PaymentSerializer, PaymentDiscountSerializer, \
-    CheckingAccountSerializer, CheckingAccountPageSerializer, PaymentMovementPageSerializer
+    CheckingAccountSerializer, CheckingAccountPageSerializer, PaymentMovementPageSerializer, \
+    TotalCheckingAccountSerializer
 from pmsDoctor.serializers.GeneralSerializer import SelectSerializer
 from pmsDoctor.serializers.PatientSerializer import PatientSerializer, PatientPageableSerializer
 
@@ -137,3 +140,66 @@ class PaymentMovementApi(APIView):
 
         serializer = PaymentMovementPageSerializer(api_object, context={'request': request})
         return Response(serializer.data, status.HTTP_200_OK)
+
+
+class TotalCheckingAccountApi(APIView):
+
+    def get(self, request, format=None):
+        try:
+            today = datetime.date.today()
+            paid_monthly = 0
+            paid_daily = 0
+            paid_yearly = 0
+
+            today_min = datetime.datetime.combine(datetime.date.today(), datetime.time.min)
+            today_max = datetime.datetime.combine(datetime.date.today(), datetime.time.max)
+            given_date = datetime.datetime.today().date()
+            first_day_of_month = given_date - datetime.timedelta(days=int(given_date.strftime("%d")) - 1)
+            last_day_of_month = calendar.monthrange(given_date.year, given_date.month)[1]
+            first = datetime.datetime(int(given_date.year), int(given_date.month), int(first_day_of_month.day))
+            last = datetime.datetime(int(given_date.year), int(given_date.month), int(last_day_of_month))
+            first_day_of_month = given_date - datetime.timedelta(days=int(given_date.strftime("%d")) - 1)
+            last_day_of_mount = calendar.monthrange(given_date.year, 12)[1]
+
+            first_yearly = datetime.datetime(int(given_date.year), int(1), int(1))
+            last_yearly = datetime.datetime(int(given_date.year), int(12), int(last_day_of_mount))
+            monthly_total_price = CheckingAccount.objects.filter(~Q(paymentSituation__name='Ödendi')).filter(
+                creationDate__range=(first, last)).aggregate(
+                Sum('total'))['total__sum']
+            daily_total_price = CheckingAccount.objects.filter(~Q(paymentSituation__name='Ödendi')).filter(
+                creationDate__range=(today_min, today_max)).aggregate(
+                Sum('total'))['total__sum']
+            yearly_total_price = CheckingAccount.objects.filter(~Q(paymentSituation__name='Ödendi')).filter(
+                creationDate__range=(first_yearly, last_yearly)).aggregate(
+                Sum('total'))['total__sum']
+            monthly_remaining_debt = CheckingAccount.objects.filter(~Q(paymentSituation__name='Ödendi')).filter(
+                creationDate__range=(first, last)).aggregate(
+                Sum('remainingDebt'))['remainingDebt__sum']
+            daily_remaining_debt = CheckingAccount.objects.filter(~Q(paymentSituation__name='Ödendi')).filter(
+                creationDate__range=(today_min, today_max)).aggregate(
+                Sum('remainingDebt'))['remainingDebt__sum']
+            yearly_remaining_debt = CheckingAccount.objects.filter(~Q(paymentSituation__name='Ödendi')).filter(
+                creationDate__range=(first_yearly, last_yearly)).aggregate(
+                Sum('remainingDebt'))['remainingDebt__sum']
+
+            if monthly_total_price is not None or monthly_remaining_debt is not None:
+                paid_monthly = monthly_total_price - monthly_remaining_debt
+            if daily_total_price is not None or daily_remaining_debt is not None:
+                paid_daily = daily_total_price - daily_remaining_debt
+            if yearly_total_price is not None or yearly_remaining_debt is not None:
+                paid_yearly = yearly_total_price - yearly_remaining_debt
+            data = dict()
+            data['totalMonthly'] = monthly_total_price
+            data['totalDaily'] = daily_total_price
+            data['totalYearly'] = yearly_total_price
+            data['remainingDebtMonthly'] = monthly_remaining_debt
+            data['remainingDebtDaily'] = daily_remaining_debt
+            data['remainingDebtYearly'] = yearly_remaining_debt
+            data['paidMonthly'] = paid_monthly
+            data['paidDaily'] = paid_daily
+            data['paidYearly'] = paid_yearly
+
+            return Response(data, status.HTTP_200_OK)
+        except:
+            traceback.print_exc()
+            return Response("error", status.HTTP_500_INTERNAL_SERVER_ERROR)
