@@ -17,15 +17,21 @@ class AssaySerializer(serializers.Serializer):
     selectName = SelectSerializer(read_only=True)
     taxRate = serializers.DecimalField(max_digits=10, decimal_places=2)
     price = serializers.DecimalField(max_digits=10, decimal_places=2)
+    isPrice = serializers.BooleanField(default=False)
 
     def update(self, instance, validated_data):
         try:
             with transaction.atomic():
 
                 instance.name = validated_data.get('name')
-                instance.price = validated_data.get('price') + (validated_data.get('price') * validated_data.get(
-                    'taxRate') / 100)
-                instance.taxRate = validated_data.get('taxRate')
+                instance.isPrice = validated_data.get('isPrice')
+                if not instance.isPrice:
+                    instance.price = 0
+                    instance.taxRate = 0
+                else:
+                    instance.price = validated_data.get('price') + (validated_data.get('price') * validated_data.get(
+                        'taxRate') / 100)
+                    instance.taxRate = validated_data.get('taxRate')
                 instance.save()
                 return instance
 
@@ -40,9 +46,14 @@ class AssaySerializer(serializers.Serializer):
             with transaction.atomic():
                 assay = Assay()
                 assay.name = validated_data.get('name')
-                assay.taxRate = validated_data.get('taxRate')
-                assay.price = validated_data.get('price') + (validated_data.get('price') * validated_data.get(
-                    'taxRate') / 100)
+                assay.isPrice = validated_data.get('isPrice')
+                if not assay.isPrice:
+                    assay.price = 0
+                    assay.taxRate = 0
+                else:
+                    assay.taxRate = validated_data.get('taxRate')
+                    assay.price = validated_data.get('price') + (validated_data.get('price') * validated_data.get(
+                        'taxRate') / 100)
                 assay.save()
                 return assay
 

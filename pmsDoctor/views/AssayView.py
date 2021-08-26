@@ -23,6 +23,7 @@ class AssayApi(APIView):
                 api_object['name'] = assay.name
                 api_object['price'] = assay.price
                 api_object['taxRate'] = assay.taxRate
+                api_object['isPrice'] = assay.isPrice
                 serializer = AssaySerializer(api_object, context={'request': request})
                 return Response(serializer.data, status.HTTP_200_OK)
 
@@ -52,6 +53,7 @@ class AssayApi(APIView):
                     api_object['name'] = assay.name
                     api_object['price'] = assay.price
                     api_object['taxRate'] = assay.taxRate
+                    api_object['isPrice'] = assay.isPrice
                     arr.append(api_object)
                 api_object = APIObject()
                 api_object.data = arr
