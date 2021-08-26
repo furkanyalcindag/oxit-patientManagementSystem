@@ -41,25 +41,20 @@ class PatientApi(APIView):
 
             else:
                 active_page = 1
-                count = 10
+                count = 0
 
                 name = ''
-                if request.GET.get('page') is not None:
-                    active_page = int(request.GET.get('page'))
-                if request.GET.get('name') is not None:
-                    name = request.GET.get('name')
-                if request.GET.get('count') is not None:
-                    count = int(request.GET.get('count'))
+                if request.GET.get('activePage') is not None:
+                    active_page = int(request.GET.get('activePage'))
 
-                lim_start = count * (int(active_page) - 1)
-                lim_end = lim_start + int(count)
+                lim_start = 10 * (int(active_page) - 1)
+                lim_end = lim_start + 10
 
                 data = Patient.objects.filter(profile__user__first_name__icontains=name,
                                               profile__user__groups__name='Patient',
                                               isDeleted=False).order_by('-id')[lim_start:lim_end]
-                filtered_count = Patient.objects.filter(profile__user__first_name__icontains=name,
-                                                        profile__user__groups__name='Patient',
-                                                        isDeleted=False).count()
+                count = Patient.objects.filter(isDeleted=False).count()
+
                 arr = []
 
                 for patient in data:
@@ -84,8 +79,12 @@ class PatientApi(APIView):
                     arr.append(api_object)
                 api_object = APIObject()
                 api_object.data = arr
-                api_object.recordsFiltered = filtered_count
-                api_object.recordsTotal = Patient.objects.filter(isDeleted=False).count()
+                api_object.recordsFiltered = data.count()
+                api_object.recordsTotal = count
+                if count % 10 == 0:
+                    api_object.activePage = count / 10
+                else:
+                    api_object.activePage = (count / 10) + 1
                 serializer = PatientPageableSerializer(api_object, context={'request': request})
                 return Response(serializer.data, status.HTTP_200_OK)
 

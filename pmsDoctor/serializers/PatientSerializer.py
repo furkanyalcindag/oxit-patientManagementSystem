@@ -99,6 +99,9 @@ class PatientSerializer(serializers.Serializer):
 
 class PatientPageableSerializer(PageSerializer):
     data = PatientSerializer(many=True)
+    recordsTotal = serializers.IntegerField()
+    recordsFiltered = serializers.IntegerField()
+    activePage = serializers.IntegerField()
 
     def update(self, instance, validated_data):
         pass

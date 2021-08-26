@@ -59,6 +59,9 @@ class AppointmentSerializer(serializers.Serializer):
 
 class AppointmentPageSerializer(PageSerializer):
     data = AppointmentSerializer(many=True)
+    recordsTotal = serializers.IntegerField()
+    recordsFiltered = serializers.IntegerField()
+    activePage = serializers.IntegerField()
 
     def update(self, instance, validated_data):
         pass
