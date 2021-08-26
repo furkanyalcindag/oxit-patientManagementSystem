@@ -49,26 +49,20 @@ class ClinicApi(APIView):
                 return Response(serializer.data, status.HTTP_200_OK)
             else:
                 active_page = 1
-                count = 10
+                count = 0
 
                 name = ''
 
-                if request.GET.get('page') is not None:
-                    active_page = int(request.GET.get('page'))
+                if request.GET.get('activePage') is not None:
+                    active_page = int(request.GET.get('activePage'))
 
-                if request.GET.get('name') is not None:
-                    name = request.GET.get('name')
-
-                if request.GET.get('count') is not None:
-                    count = int(request.GET.get('count'))
-
-                lim_start = count * (int(active_page) - 1)
-                lim_end = lim_start + int(count)
+                lim_start = 10 * (int(active_page) - 1)
+                lim_end = lim_start + 10
 
                 data = Clinic.objects.filter(name__icontains=name, isDeleted=False).order_by('-id')[
                        lim_start:lim_end]
 
-                filtered_count = Clinic.objects.filter(name__icontains=name, isDeleted=False).count()
+                count = Clinic.objects.filter(isDeleted=False).count()
                 arr = []
 
                 for clinic in data:
@@ -98,9 +92,12 @@ class ClinicApi(APIView):
 
                 api_object = APIObject()
                 api_object.data = arr
-                api_object.recordsFiltered = filtered_count
-                api_object.recordsTotal = Clinic.objects.filter(isDeleted=False).count()
-                api_object.activePage = 1
+                api_object.recordsFiltered = data.count()
+                api_object.recordsTotal = count
+                if count % 10 == 0:
+                    api_object.activePage = count / 10
+                else:
+                    api_object.activePage = (count / 10) + 1
 
                 serializer = ClinicPageableSerializer(
                     api_object, context={'request': request})

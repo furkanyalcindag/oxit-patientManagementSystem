@@ -70,6 +70,9 @@ class SecretarySerializer(serializers.Serializer):
 
 class SecretaryPageableSerializer(PageSerializer):
     data = SecretarySerializer(many=True)
+    recordsTotal = serializers.IntegerField()
+    recordsFiltered = serializers.IntegerField()
+    activePage = serializers.IntegerField()
 
     def update(self, instance, validated_data):
         pass
