@@ -109,7 +109,7 @@ class AssaySelectApi(APIView):
             for assay in data:
                 select_object = SelectObject()
                 select_object.value = assay.uuid
-                select_object.label = assay.name
+                select_object.label = assay.name + ' ' + '(' + str(assay.price) + ' TL)'
                 select_arr.append(select_object)
 
             serializer = SelectSerializer(select_arr, many=True, context={'request': request})

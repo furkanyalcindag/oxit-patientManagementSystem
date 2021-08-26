@@ -110,7 +110,7 @@ class PatientCheckingAccountApi(APIView):
             data['discount'] = payment_movement
             data['protocolId'] = checking_account.protocol.id
             data['remainingDebt'] = checking_account.remainingDebt
-            data['date'] = checking_account.protocol.creationDate.strftime("%d-%m-%Y %H:%M:%S")
+            data['date'] = checking_account.creationDate.strftime("%d-%m-%Y %H:%M:%S")
             data['total'] = checking_account.total
             data['paymentSituation'] = checking_account.paymentSituation.name
             data['protocolTaxRate'] = checking_account.protocol.taxRate
