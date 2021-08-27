@@ -8,6 +8,7 @@ from pms.models import Protocol
 from pms.models.Diagnosis import Diagnosis
 from pms.models.Medicine import Medicine
 from pms.models.MedicineDiagnosis import MedicineDiagnosis
+from pms.models.ProtocolSituation import ProtocolSituation
 from pmsDoctor.serializers.MedicineSerializer import MedicineSerializer
 
 
@@ -24,8 +25,11 @@ class DiagnosisSerializer(serializers.Serializer):
     def create(self, validated_data):
         try:
             diagnosis = Diagnosis()
-            diagnosis.protocol = Protocol.objects.get(uuid=validated_data.get('protocolId'))
+            protocol = Protocol.objects.get(uuid=validated_data.get('protocolId'))
+            protocol.situation = ProtocolSituation.objects.get(name__exact='Sonuçlandı')
+            protocol.save()
             diagnosis.diagnosis = validated_data.get('diagnosis')
+            diagnosis.protocol = protocol
             diagnosis.save()
             if validated_data.get('medicines') is not None:
                 for medicineName in validated_data.get('medicines'):

@@ -22,13 +22,19 @@ class ClinicSerializer(serializers.Serializer):
     city = SelectSerializer(read_only=True)
     district = SelectSerializer(read_only=True)
     cityDistrict = serializers.CharField(allow_blank=False, read_only=True, allow_null=True)
-    email = serializers.CharField(required=True, validators=[UniqueValidator(queryset=User.objects.all())])
+    email = serializers.CharField()
     staffName = serializers.CharField(required=True, allow_null=True, allow_blank=True)
     staffSurname = serializers.CharField(required=True, allow_null=True, allow_blank=True)
     telephoneNumber = serializers.CharField(required=True, allow_null=True, allow_blank=True)
 
     def update(self, instance, validated_data):
         try:
+            user = instance.profile.user
+            user.first_name = validated_data.get('staffName')
+            user.last_name = validated_data.get('staffSurname')
+            user.email = validated_data.get('email')
+            user.username = validated_data.get('email')
+            user.save()
             instance.name = validated_data.get('clinicName')
             instance.taxNumber = validated_data.get('taxNumber')
             instance.taxOffice = validated_data.get('taxOffice')
@@ -70,6 +76,21 @@ class ClinicSerializer(serializers.Serializer):
         except Exception as e:
             traceback.print_exc()
             raise ValidationError("lütfen tekrar deneyiniz")
+
+    def validate_email(self, email):
+
+        user = None
+        if self.instance is not None:
+
+            user = Clinic.objects.get(uuid=self.context['request'].query_params['id']).profile.user
+
+            if User.objects.exclude(id=user.id).filter(username=email).count() > 0:
+                raise serializers.ValidationError("Bu email sistemde kayıtlıdır")
+
+        else:
+            if User.objects.filter(username=email).count() > 0:
+                raise serializers.ValidationError("Bu email sistemde kayıtlıdır")
+        return email
 
 
 class ClinicPageableSerializer(PageSerializer):
