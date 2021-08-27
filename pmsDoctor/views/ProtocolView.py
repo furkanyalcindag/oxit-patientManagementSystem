@@ -21,7 +21,7 @@ class ProtocolApi(APIView):
                     api_object = dict()
                     api_object['uuid'] = data.uuid
                     api_object['description'] = data.description
-                    api_object['situation'] = data.situaiton.name
+                    api_object['situation'] = data.situation.name
                     api_object['price'] = data.price
                     api_patient_data = dict()
                     api_patient_data['label'] = data.patient.profile.user.first_name
