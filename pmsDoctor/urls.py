@@ -3,7 +3,7 @@ from django.urls import path
 from pmsDoctor.views.BlogView import BlogApi
 from pmsDoctor.views.CheckingAccountViews import PaymentAccountApi, PaymentTypeSelectApi, PaymentAccountDiscountApi, \
     PatientCheckingAccountApi, PaymentMovementApi, TotalCheckingAccountApi, MomentaryCheckingAccountApi, \
-    AllCheckingAccountApi
+    AllCheckingAccountApi, AllMomentaryCheckingAccountApi
 from pmsDoctor.views.DepartmentView import DepartmentSelectApi
 from pmsDoctor.views.DoctorView import DoctorApi, DoctorSelectApi, DoctorGeneralInfoApi, DoctorContactInfoApi, \
     DoctorAboutApi, EducationTypeSelectApi, DoctorEducationApi, DoctorPrizeApi, DoctorArticleApi, \
@@ -60,5 +60,6 @@ urlpatterns = [
     path('all-checking-account-api/', AllCheckingAccountApi.as_view(),
          name='all-checking-account-api'),
     path('blog-api/', BlogApi.as_view(), name='blog-api'),
+    path('all-movement-api/', AllMomentaryCheckingAccountApi.as_view(), name='all-movement-api'),
 
 ]

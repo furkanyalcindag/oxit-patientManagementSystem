@@ -233,7 +233,25 @@ class MomentaryCheckingAccountApi(APIView):
         except:
             traceback.print_exc()
             return Response("error", status.HTTP_500_INTERNAL_SERVER_ERROR)
+class AllMomentaryCheckingAccountApi(APIView):
+    def get(self, request, format=None):
+        try:
+            all_movement = PaymentMovement.objects.all()
+            all_movement_array = []
+            for movement in all_movement:
+                data = dict()
+                data['movementUUID'] = movement.uuid
+                data['paymentAmount'] = movement.paymentAmount
+                data['date'] = movement.creationDate.strftime("%d-%m-%Y %H:%M:%S")
+                data[
+                    'patient'] = movement.checkingAccount.protocol.patient.profile.user.first_name + ' ' + movement.checkingAccount.protocol.patient.profile.user.last_name
+                data['paymentTypeDesc'] = movement.paymentType.name
+                all_movement_array.append(data)
 
+            return Response(all_movement_array, status.HTTP_200_OK)
+        except:
+            traceback.print_exc()
+            return Response("error", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class AllCheckingAccountApi(APIView):
     def get(self, request, format=None):
