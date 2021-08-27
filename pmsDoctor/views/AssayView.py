@@ -41,7 +41,7 @@ class AssayApi(APIView):
                 lim_start = 10 * (int(active_page) - 1)
                 lim_end = lim_start + 10
 
-                data = Assay.objects.filter(name_exact=name, isDeleted=False).order_by('-id')[
+                data = Assay.objects.filter(name__exact=name, isDeleted=False).order_by('-id')[
                        lim_start:lim_end]
                 count = Assay.objects.filter(isDeleted=False).count()
                 arr = []
