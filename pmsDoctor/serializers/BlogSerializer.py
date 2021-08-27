@@ -17,6 +17,7 @@ class BlogSerializer(serializers.Serializer):
     keyword = serializers.CharField()
     isPublish = serializers.BooleanField(default=False)
     description = serializers.CharField()
+    title = serializers.CharField()
 
     def update(self, instance, validated_data):
         instance.doctor = Profile.objects.get(user=self.context['request'].user)
@@ -24,6 +25,7 @@ class BlogSerializer(serializers.Serializer):
         instance.image = validated_data.get('image')
         instance.keyword = validated_data.get('keyword')
         instance.isPublish = validated_data.get('isPublish')
+        instance.title = validated_data.get('title')
         instance.description = validated_data.get('description')
         instance.save()
 
@@ -39,6 +41,7 @@ class BlogSerializer(serializers.Serializer):
                 blog.image = validated_data.get('image')
                 blog.isPublish = validated_data.get('isPublish')
                 blog.keyword = validated_data.get('keyword')
+                blog.title = validated_data.get('title')
                 blog.description = validated_data.get('description')
                 blog.save()
                 return blog
