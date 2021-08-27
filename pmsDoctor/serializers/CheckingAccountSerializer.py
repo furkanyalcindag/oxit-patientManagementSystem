@@ -136,7 +136,7 @@ class AllCheckingAccountSerializer(serializers.Serializer):
     date = serializers.DateField()
     remainingDebt = serializers.DecimalField(max_digits=10, decimal_places=2)
     total = serializers.DecimalField(max_digits=10, decimal_places=2)
-    paymentTypeDesc = serializers.CharField()
+    paymentSituation = serializers.CharField()
     protocol = serializers.IntegerField()
     patient = serializers.CharField()
 

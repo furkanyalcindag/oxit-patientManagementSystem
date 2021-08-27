@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 
-from pms.models import PaymentType, CheckingAccount, PaymentMovement
+from pms.models import PaymentType, CheckingAccount, PaymentMovement, PaymentSituation
 from pms.models.SelectObject import SelectObject
 from pmsDoctor.models.APIObject import APIObject
 from pmsDoctor.serializers.CheckingAccountSerializer import PaymentSerializer, PaymentDiscountSerializer, \
@@ -248,7 +248,7 @@ class AllCheckingAccountApi(APIView):
                 data['remainingDebt'] = checking_account.remainingDebt
                 data['total'] = checking_account.total
                 data['patient'] = checking_account.protocol.patient.profile.user.first_name + ' ' + checking_account.protocol.patient.profile.user.last_name
-                data['paymentTypeDesc'] = PaymentType.objects.get(id=checking_account.paymentSituation.id).name
+                data['paymentSituation'] = checking_account.paymentSituation.name
                 data['protocol'] = checking_account.protocol_id
                 all_checking_accounts_array.append(data)
             serializer = AllCheckingAccountSerializer(all_checking_accounts_array, many=True,
