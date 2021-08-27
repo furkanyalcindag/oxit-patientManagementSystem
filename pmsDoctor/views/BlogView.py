@@ -24,6 +24,7 @@ class BlogApi(APIView):
                 api_object['uuid'] = blog.uuid
                 api_object['description'] = blog.description
                 api_object['image'] = blog.image
+                api_object['title'] = blog.title
                 api_object['keyword'] = blog.keyword
                 api_object['isPublish'] = blog.isPublish
                 api_department_data = dict()
@@ -54,6 +55,7 @@ class BlogApi(APIView):
                     api_object = dict()
                     api_object['uuid'] = blog.uuid
                     api_object['description'] = blog.description
+                    api_object['title'] = blog.title
                     api_object['image'] = blog.image
                     api_object['keyword'] = blog.keyword
                     api_object['isPublish'] = blog.isPublish
