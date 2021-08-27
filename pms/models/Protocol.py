@@ -3,6 +3,7 @@ from django.db import models
 from pms.models.Patient import Patient
 from pms.models.Assay import Assay
 from pms.models.BaseModel import BaseModel
+from pms.models.ProtocolSituation import ProtocolSituation
 
 
 class Protocol(BaseModel):
@@ -12,3 +13,4 @@ class Protocol(BaseModel):
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     isPaid = models.BooleanField(default=False)
     taxRate = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    situation = models.ForeignKey(ProtocolSituation, on_delete=models.CASCADE)

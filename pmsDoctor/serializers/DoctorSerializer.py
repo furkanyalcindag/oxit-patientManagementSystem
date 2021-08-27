@@ -248,7 +248,7 @@ class DoctorPrizeSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         try:
-            doctor = Staff.objects.get(profile__user=self.context['request'].user)
+            doctor = Profile.objects.get(user=self.context['request'].user)
 
             prize = Prize()
             prize.title = validated_data.get('title')

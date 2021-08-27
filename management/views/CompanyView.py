@@ -80,7 +80,7 @@ class CompanyApi(APIView):
     def put(self, request, format=None):
         try:
             instance = Company.objects.get(uuid=request.GET.get('id'))
-            serializer = CompanySerializer(data=request.data, instance=instance, context={'request', request})
+            serializer = CompanySerializer(data=request.data, instance=instance, context={'request': request})
 
             if serializer.is_valid():
                 serializer.save()
