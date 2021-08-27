@@ -142,7 +142,7 @@ class ClinicApi(APIView):
 
     def put(self, request, format=None):
         instance = Clinic.objects.get(uuid=request.GET.get('id'))
-        serializer = ClinicSerializer(data=request.data, instance=instance, context={'request', request})
+        serializer = ClinicSerializer(data=request.data, instance=instance, context={'request': request})
 
         if serializer.is_valid():
             serializer.save()

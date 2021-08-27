@@ -8,6 +8,7 @@ from rest_framework.exceptions import ValidationError
 
 from pms.models import CheckingAccount, PaymentSituation
 from pms.models.ProtocolAssay import ProtocolAssay
+from pms.models.ProtocolSituation import ProtocolSituation
 from pmsDoctor.serializers.AssaySerializer import AssaySerializer
 from pmsDoctor.serializers.GeneralSerializer import PageSerializer, SelectSerializer
 from pms.models.Patient import Patient
@@ -26,6 +27,7 @@ class ProtocolSerializer(serializers.Serializer):
     price = serializers.DecimalField(max_digits=10, decimal_places=2)
     isPaid = serializers.BooleanField(default=False)
     taxRate = serializers.DecimalField(max_digits=10, decimal_places=2, write_only=True)
+    situation= serializers.CharField(read_only=True)
 
     # barcode = serializers.CharField()
 
@@ -58,6 +60,7 @@ class ProtocolSerializer(serializers.Serializer):
                 protocol = Protocol()
 
                 protocol.patient = Patient.objects.get(uuid=validated_data.get('patientId'))
+                protocol.situation = ProtocolSituation.objects.get(name__exact='Devam Ediyor')
                 protocol.description = validated_data.get('description')
                 protocol.isPaid = validated_data.get('isPaid')
                 if not protocol.isPaid:

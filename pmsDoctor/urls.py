@@ -1,5 +1,6 @@
 from django.urls import path
 
+from pmsDoctor.views.BlogView import BlogApi
 from pmsDoctor.views.CheckingAccountViews import PaymentAccountApi, PaymentTypeSelectApi, PaymentAccountDiscountApi, \
     PatientCheckingAccountApi, PaymentMovementApi, TotalCheckingAccountApi, MomentaryCheckingAccountApi, \
     AllCheckingAccountApi
@@ -58,5 +59,6 @@ urlpatterns = [
          name='momentary-checking-account-api'),
     path('all-checking-account-api/', AllCheckingAccountApi.as_view(),
          name='all-checking-account-api'),
+    path('blog-api/', BlogApi.as_view(), name='blog-api'),
 
 ]

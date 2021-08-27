@@ -49,6 +49,21 @@ class CompanySerializer(serializers.Serializer):
             traceback.print_exc()
             raise ValidationError("lütfen tekrar deneyiniz")
 
+    def validate_email(self, email):
+
+        user = None
+        if self.instance is not None:
+
+            user = Company.objects.get(uuid=self.context['request'].query_params['id']).user
+
+            if User.objects.exclude(id=user.id).filter(username=email).count() > 0:
+                raise serializers.ValidationError("Bu email sistemde kayıtlıdır")
+
+        else:
+            if User.objects.filter(username=email).count() > 0:
+                raise serializers.ValidationError("Bu email sistemde kayıtlıdır")
+        return email
+
 
 class CompanyPageableSerializer(PageSerializer):
     data = CompanySerializer(many=True)
