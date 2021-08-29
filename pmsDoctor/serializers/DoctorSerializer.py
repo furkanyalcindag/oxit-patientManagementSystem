@@ -202,12 +202,14 @@ class DoctorEducationSerializer(serializers.Serializer):
     def create(self, validated_data):
         try:
             with transaction.atomic():
+                doctor = Staff.objects.get(profile__user=self.context['request'].user)
 
                 education = DoctorEducation()
                 education.universityName = validated_data.get('universityName')
                 education.facultyName = validated_data.get('facultyName')
                 education.departmentName = validated_data.get('departmentName')
                 education.educationType = EducationType.objects.get(id=validated_data.get('educationTypeId'))
+                education.doctor = doctor
                 education.save()
 
                 return education

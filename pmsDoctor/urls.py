@@ -1,13 +1,14 @@
 from django.urls import path
 
-from pmsDoctor.views.BlogView import BlogApi
+from management.views.ClinicView import ClinicGeneralInfoApi, ClinicMediaApi
+from pmsDoctor.views.BlogView import BlogApi, PublishBlogApi, SponsoredBlogApi
 from pmsDoctor.views.CheckingAccountViews import PaymentAccountApi, PaymentTypeSelectApi, PaymentAccountDiscountApi, \
     PatientCheckingAccountApi, PaymentMovementApi, TotalCheckingAccountApi, MomentaryCheckingAccountApi, \
     AllCheckingAccountApi, AllMomentaryCheckingAccountApi
 from pmsDoctor.views.DepartmentView import DepartmentSelectApi
 from pmsDoctor.views.DoctorView import DoctorApi, DoctorSelectApi, DoctorGeneralInfoApi, DoctorContactInfoApi, \
     DoctorAboutApi, EducationTypeSelectApi, DoctorEducationApi, DoctorPrizeApi, DoctorArticleApi, \
-    DoctorArticleTimelineApi, DoctorMediaApi
+    DoctorArticleTimelineApi, DoctorMediaApi, DoctorProfileApi
 from pmsDoctor.views.SecretaryView import SecretaryApi
 from pmsDoctor.views.GenderView import GenderSelectApi
 from pmsDoctor.views.PatientView import PatientApi, PatientSelectApi
@@ -61,5 +62,10 @@ urlpatterns = [
          name='all-checking-account-api'),
     path('blog-api/', BlogApi.as_view(), name='blog-api'),
     path('all-movement-api/', AllMomentaryCheckingAccountApi.as_view(), name='all-movement-api'),
+    path('clinic-general-info-api/', ClinicGeneralInfoApi.as_view(), name='clinic-general-info-api'),
+    path('clinic-media-api/', ClinicMediaApi.as_view(), name='clinic-media-api'),
+    path('doctor-profile-api/', DoctorProfileApi.as_view(), name='dcotor-profile-api'),
+    path('publish-blog-api/', PublishBlogApi.as_view(), name='publish-blog-api'),
+    path('sponsored-blog-api/', SponsoredBlogApi.as_view(), name='sponsored-blog-api'),
 
 ]

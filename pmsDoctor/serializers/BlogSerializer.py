@@ -18,6 +18,7 @@ class BlogSerializer(serializers.Serializer):
     isPublish = serializers.BooleanField(default=False)
     description = serializers.CharField()
     title = serializers.CharField()
+    isSponsored = serializers.BooleanField(default=False)
 
     def update(self, instance, validated_data):
         instance.doctor = Profile.objects.get(user=self.context['request'].user)
@@ -27,6 +28,8 @@ class BlogSerializer(serializers.Serializer):
         instance.isPublish = validated_data.get('isPublish')
         instance.title = validated_data.get('title')
         instance.description = validated_data.get('description')
+        instance.isSponsored = validated_data.get('isSponsored')
+
         instance.save()
 
         return instance
@@ -43,6 +46,8 @@ class BlogSerializer(serializers.Serializer):
                 blog.keyword = validated_data.get('keyword')
                 blog.title = validated_data.get('title')
                 blog.description = validated_data.get('description')
+                blog.isSponsored = validated_data.get('isSponsored')
+
                 blog.save()
                 return blog
         except:
