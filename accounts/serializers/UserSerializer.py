@@ -2,7 +2,6 @@ import traceback
 
 from django.contrib.auth.models import Group, User
 from django.db import transaction
-from keyring.backends import null
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueValidator
