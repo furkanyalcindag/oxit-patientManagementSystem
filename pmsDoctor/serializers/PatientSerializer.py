@@ -8,7 +8,7 @@ from rest_framework.validators import UniqueValidator
 from rest_framework.exceptions import ValidationError
 
 from management.serializers.GeneralSerializer import PageSerializer, SelectSerializer
-from pms.models import Profile, Patient
+from pms.models import Profile, Patient, Clinic
 from pms.models.BloodGroup import BloodGroup
 from pms.models.Gender import Gender
 
@@ -55,6 +55,7 @@ class PatientSerializer(serializers.Serializer):
     def create(self, validated_data):
         try:
             with transaction.atomic():
+                clinic = Clinic.objects.get(profile__user=self.context['request'].user)
                 user = User.objects.create_user(username=validated_data.get('email'), email=validated_data.get('email'))
                 user.first_name = validated_data.get('firstName')
                 user.last_name = validated_data.get('lastName')
@@ -73,7 +74,7 @@ class PatientSerializer(serializers.Serializer):
                 patient.birthDate = validated_data.get('birthDate')
                 patient.bloodGroup = BloodGroup.objects.get(id=validated_data.get('bloodGroupId'))
                 patient.gender = Gender.objects.get(id=validated_data.get('genderId'))
-
+                patient.clinic = clinic
                 patient.save()
                 return patient
 

@@ -154,7 +154,7 @@ class AppointmentApi(APIView):
                 return Response({"message": "error"}, status=status.HTTP_304_NOT_MODIFIED)
             elif serializer.is_valid():
                 serializer.save()
-                return Response({"message": "Appointment is created"}, status=status.HTTP_200_OK)
+                return Response({"message": "Appointment is updated"}, status=status.HTTP_200_OK)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception:

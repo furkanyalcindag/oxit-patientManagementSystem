@@ -1,5 +1,6 @@
 from django.db import models
 
+from pms.models.Clinic import Clinic
 from pms.models.BaseModel import BaseModel
 from pms.models.BloodGroup import BloodGroup
 from pms.models.Gender import Gender
@@ -12,3 +13,4 @@ class Patient(BaseModel):
     gender = models.ForeignKey(Gender, on_delete=models.CASCADE)
     bloodGroup = models.ForeignKey(BloodGroup, on_delete=models.CASCADE)
     debtPaidOff = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE)
