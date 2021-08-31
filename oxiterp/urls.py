@@ -21,6 +21,8 @@ from django.conf.urls import url, include
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework import routers
+
+from accounts.views import ChangePasswordApi, UserApi
 from oxiterp.views import CustomTokenObtainPairView
 from rest_framework_simplejwt.views import TokenRefreshView
 
@@ -42,7 +44,8 @@ urlpatterns = [
     path('management/', include('management.urls')),
     path('pmsDoctor/', include('pmsDoctor.urls')),
     path('pmsMobile/', include('pmsMobile.urls')),
-
+    path('api/auth/change-password/', ChangePasswordApi.as_view()),
+    path('user-api/', UserApi.as_view()),
     # path('car-service/', include('carService.urls')),
 
 ]

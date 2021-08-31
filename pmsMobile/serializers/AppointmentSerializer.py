@@ -9,10 +9,8 @@ from pmsDoctor.exceptions import AppointmentValidationException
 from pmsDoctor.serializers.GeneralSerializer import SelectSerializer, PageSerializer
 
 
-class AppointmentSerializer(serializers.Serializer):
+class PatientAppointmentSerializer(serializers.Serializer):
     uuid = serializers.UUIDField(read_only=True)
-    patientId = serializers.CharField(write_only=True)
-    patient = SelectSerializer(read_only=True)
     doctorId = serializers.IntegerField(write_only=True)
     doctor = SelectSerializer(read_only=True)
     date = serializers.DateField()
@@ -21,7 +19,6 @@ class AppointmentSerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         instance.doctor = Staff.objects.get(profile__user_id=validated_data.get('doctorId'))
-        instance.patient = Patient.objects.get(uuid=validated_data.get('patientId'))
         instance.date = validated_data.get('date')
         instance.time = validated_data.get('time')
         instance.endTime = validated_data.get('endTime')
@@ -35,7 +32,7 @@ class AppointmentSerializer(serializers.Serializer):
 
                 appointment = Appointment()
                 doctor = Staff.objects.get(profile__user_id=validated_data.get('doctorId'))
-                appointment.patient = Patient.objects.get(uuid=validated_data.get('patientId'))
+                appointment.patient = Patient.objects.get(profile__user_id=self.context['request'].user.id)
                 date = validated_data.get('date')
                 time = validated_data.get('time')
                 endTime = validated_data.get('endTime')
@@ -57,8 +54,8 @@ class AppointmentSerializer(serializers.Serializer):
             raise ValidationError("lütfen tekrar deneyiniz")
 
 
-class AppointmentPageSerializer(PageSerializer):
-    data = AppointmentSerializer(many=True)
+class PatientAppointmentPageSerializer(PageSerializer):
+    data = PatientAppointmentSerializer(many=True)
     recordsTotal = serializers.IntegerField()
     recordsFiltered = serializers.IntegerField()
     activePage = serializers.IntegerField()
@@ -68,23 +65,3 @@ class AppointmentPageSerializer(PageSerializer):
 
     def create(self, validated_data):
         pass
-
-
-class AppointmentCalendarSerializer(serializers.Serializer):
-    uuid = serializers.UUIDField(read_only=True)
-    start = serializers.CharField()
-    end = serializers.CharField()
-    title = serializers.CharField()
-    id = serializers.CharField(read_only=False)
-    doctorName = serializers.CharField(read_only=True, required=False)
-
-    def to_representation(self, obj):
-        return {
-
-            'uuid': obj['uuid'],
-            'start': obj['start'],
-            'end': obj['end'],
-            'title': obj['title'],
-            'class': obj['id'],
-
-        }
