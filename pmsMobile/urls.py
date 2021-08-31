@@ -1,5 +1,8 @@
 from django.urls import path
 
+from pmsMobile.views.CheckingAccountView import PatientCheckingAccountApi, PatientTotalCheckingAccountApi, \
+    PatientPaymentMovementApi
+from pmsMobile.views.AppointmentView import PatientAppointmentApi
 from pmsMobile.views.BlogView import PublishBlogApi, SponsoredBlogApi
 from pmsMobile.views.ClinicView import ClinicGeneralInfoApi, ClinicMediaApi
 from pmsMobile.views.DoctorView import DoctorProfileApi, ClinicsDoctorsApi
@@ -18,4 +21,10 @@ urlpatterns = [
     path('clinics-doctors-api/', ClinicsDoctorsApi.as_view(), name='clinics-doctors-api'),
     path('patient-profile-api/', PatientProfileApi.as_view(), name='patient-profile-api'),
     path('patient-protocol-api/', PatientProtocolApi.as_view(), name='patient-protocol-api'),
+    path('patient-appointment-api/', PatientAppointmentApi.as_view(), name='patient-appointment-api'),
+    path('patient-checking-account-api/', PatientCheckingAccountApi.as_view(), name='patient-checking-account-api'),
+    path('patient-total-checking-account-api/', PatientTotalCheckingAccountApi.as_view(),
+         name='patient-total-checking-account-api'),
+    path('patient-payment-movement-api/', PatientPaymentMovementApi.as_view(), name='patient-payment-movement-api'),
+
 ]

@@ -4,11 +4,12 @@ from django.contrib import auth, messages
 from django.contrib.auth.models import Group, User
 from django.shortcuts import render, redirect
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 # Create your Views here.
-from accounts.serializers.UserSerializer import GroupSerializer
+from accounts.serializers.UserSerializer import GroupSerializer, PasswordChangeSerializer, UserSerializer
 
 
 def index(request):
@@ -117,6 +118,40 @@ class GroupAPI(APIView):
             return Response("error", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+class ChangePasswordApi(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def put(self, request, format=None):
+        instance = request.user
+
+        serializer = PasswordChangeSerializer(data=request.data, instance=instance, context={'request': request})
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "password is updated"}, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
+class UserApi(APIView):
+    def post(self, request, format=None):
+        serializer = UserSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'x': 'user is created'}, status=status.HTTP_200_OK)
+        else:
+            errors = dict()
+            for key, value in serializer.errors.items():
+                if key == 'firstName':
+                    errors['firstName'] = value
+                elif key == 'lastName':
+                    errors['lastName'] = value
+                elif key == 'password':
+                    errors['password'] = value
+                elif key == 'email':
+                    errors['email'] = value
+                elif key == 'genderId':
+                    errors['genderId'] = value
+                elif key == 'bloodGroupId':
+                    errors['bloodGroupId'] = value
+            return Response({'errorr': 'error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

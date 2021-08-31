@@ -2,9 +2,15 @@ import traceback
 
 from django.contrib.auth.models import Group, User
 from django.db import transaction
+from keyring.backends import null
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueValidator
 
+from accounts.exceptions import PasswordConfirmException, PasswordValidationException
+from pms.models import Patient
+from pms.models.BloodGroup import BloodGroup
+from pms.models.Gender import Gender
 from pms.models.Profile import Profile
 
 
@@ -34,38 +40,66 @@ class GroupSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.Serializer):
-    id = serializers.CharField(read_only=True)
     email = serializers.EmailField(validators=[UniqueValidator(queryset=User.objects.all())])
     firstName = serializers.CharField()
     lastName = serializers.CharField()
-    groupId = serializers.CharField(write_only=True)
-    groupName = serializers.CharField(read_only=True)
-
+    password = serializers.CharField()
+    genderId = serializers.IntegerField()
+    bloodGroupId = serializers.IntegerField()
     def update(self, instance, validated_data):
         pass
 
     def create(self, validated_data):
         try:
             with transaction.atomic():
-                group = Group.objects.get(id=int(validated_data.get('groupId')))
 
-                user = User()
+                user = User.objects.create_user(email=validated_data.get('email'), username=validated_data.get('email'),
+                                                password=validated_data.get('password'))
+                user.save()
                 user.first_name = validated_data.get('firstName')
                 user.last_name = validated_data.get('lastName')
-                user.email = validated_data.get('email')
-                user.username = validated_data.get('email')
-                user.set_password('oxit2016')
+                user.groups.add(Group.objects.get(name='Patient'))
                 user.save()
-
-                user.groups.add(group)
-                user.save()
-
-                profile = Profile()
-                profile.user = user
+                profile = Profile.objects.create(user=user)
                 profile.save()
+                patient = Patient.objects.create(profile=profile)
+                patient.gender = Gender.objects.get(id=validated_data.get('genderId'))
+                patient.bloodGroup = BloodGroup.objects.get(id=validated_data.get('bloodGroupId'))
+                # patient.birthDate = validated_data.get('birthDate')
+                patient.save()
+                return user
+        except Exception as e:
+            raise ValidationError("Lütfen tekrar deneyiniz")
 
-                return profile
 
-        except:
+class PasswordChangeSerializer(serializers.Serializer):
+    confirmPassword = serializers.CharField()
+    password = serializers.CharField()
+
+    def update(self, instance, validated_data):
+        try:
+            password = validated_data.get('password')
+            confirm = validated_data.get('confirmPassword')
+
+            if password != confirm:
+                raise PasswordConfirmException()
+
+            if len(password) < 6:
+                raise PasswordValidationException()
+
+            instance.set_password(validated_data.get('password'))
+            instance.save()
+            return instance
+        except PasswordConfirmException:
+            traceback.print_exc()
+            raise serializers.ValidationError("Şifreler eşleşmiyor")
+
+        except PasswordValidationException:
+            traceback.print_exc()
+            raise serializers.ValidationError("En az 6 karakter olmalı")
+        except Exception:
             traceback.print_exc()
             raise serializers.ValidationError("lütfen tekrar deneyiniz")
+
+    def create(self, validated_data):
+        pass
