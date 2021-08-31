@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'management',
     'pms',
+    'pmsMobile',
     'rest_framework',
 
 
