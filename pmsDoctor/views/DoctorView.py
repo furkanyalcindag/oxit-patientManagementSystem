@@ -55,9 +55,10 @@ class DoctorApi(APIView):
                 lim_start = 10 * (int(active_page) - 1)
                 lim_end = lim_start + 10
 
-                data = Staff.objects.filter(profile__user__first_name__icontains=name, isDeleted=False).order_by('-id')[
+                data = Staff.objects.filter(clinic__profile__user=request.user,
+                                            profile__user__first_name__icontains=name, isDeleted=False).order_by('-id')[
                        lim_start:lim_end]
-                count = Staff.objects.filter(isDeleted=False).count()
+                count = Staff.objects.filter(clinic__profile__user=request.user, isDeleted=False).count()
                 arr = []
 
                 for staff in data:
@@ -90,10 +91,10 @@ class DoctorApi(APIView):
             return Response("", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def post(self, request, format=None):
-        serializer = DoctorSerializer(data=request.data, context={'request', request})
+        serializer = DoctorSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
-            return Response({"message": "prize is created"}, status=status.HTTP_200_OK)
+            return Response({"message": "doctor is created"}, status=status.HTTP_200_OK)
         else:
             errors = dict()
             for key, value in serializer.errors.items():
@@ -332,7 +333,7 @@ class DoctorEducationApi(APIView):
             return Response("", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def post(self, request, format=None):
-        serializer = DoctorEducationSerializer(data=request.data, context={'request', request})
+        serializer = DoctorEducationSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response({"message": "Doctor is created"}, status=status.HTTP_200_OK)
@@ -695,3 +696,72 @@ class DoctorProfileApi(APIView):
         except:
             traceback.print_exc()
             return Response('error', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ClinicsDoctorsApi(APIView):
+    def get(self, request, format=None):
+        try:
+            if request.GET.get('id') is not None:
+                staff = Staff.objects.get(uuid=request.GET.get('id'))
+                api_object = dict()
+                api_object['uuid'] = staff.uuid
+                api_object['firstName'] = staff.profile.user.first_name
+                api_object['lastName'] = staff.profile.user.last_name
+                api_object['email'] = staff.profile.user.email
+                api_object['diplomaNo'] = staff.diplomaNo
+                api_object['insuranceNumber'] = staff.insuranceNumber
+                api_object['title'] = staff.title
+                api_department_data = dict()
+                api_department_data['label'] = staff.department.name
+                api_department_data['value'] = staff.department.id
+
+                api_object['department'] = api_department_data
+
+                serializer = DoctorSerializer(api_object, context={'request': request})
+                return Response(serializer.data, status.HTTP_200_OK)
+
+            else:
+                active_page = 1
+                count = 0
+                name = ''
+
+                if request.GET.get('activePage') is not None:
+                    active_page = int(request.GET.get('activePage'))
+
+                lim_start = 10 * (int(active_page) - 1)
+                lim_end = lim_start + 10
+
+                data = Staff.objects.filter(clinic__uuid=request.GET.get('clinicId'),
+                                            isDeleted=False).order_by('-id')[
+                       lim_start:lim_end]
+                count = Staff.objects.filter(clinic__uuid=request.GET.get('clinicId'), isDeleted=False).count()
+                arr = []
+
+                for staff in data:
+                    api_object = dict()
+                    api_object['uuid'] = staff.uuid
+                    api_object['firstName'] = staff.profile.user.first_name
+                    api_object['lastName'] = staff.profile.user.last_name
+                    api_object['diplomaNo'] = staff.diplomaNo
+                    api_object['insuranceNumber'] = staff.insuranceNumber
+                    api_object['title'] = staff.title
+                    api_object['email'] = staff.profile.user.email
+                    api_department_data = dict()
+                    api_department_data['label'] = staff.department.name
+                    api_department_data['value'] = staff.department.id
+                    api_object['department'] = api_department_data
+                    arr.append(api_object)
+                api_object = APIObject()
+                api_object.data = arr
+                api_object.recordsFiltered = data.count()
+                api_object.recordsTotal = count
+                if count % 10 == 0:
+                    api_object.activePage = count / 10
+                else:
+                    api_object.activePage = (count / 10) + 1
+                serializer = DoctorPageSerializer(api_object, context={'request': request})
+                return Response(serializer.data, status.HTTP_200_OK)
+
+        except Exception as e:
+            traceback.print_exc()
+            return Response("", status.HTTP_500_INTERNAL_SERVER_ERROR)

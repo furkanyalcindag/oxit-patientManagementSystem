@@ -8,14 +8,14 @@ from pmsDoctor.views.CheckingAccountViews import PaymentAccountApi, PaymentTypeS
 from pmsDoctor.views.DepartmentView import DepartmentSelectApi
 from pmsDoctor.views.DoctorView import DoctorApi, DoctorSelectApi, DoctorGeneralInfoApi, DoctorContactInfoApi, \
     DoctorAboutApi, EducationTypeSelectApi, DoctorEducationApi, DoctorPrizeApi, DoctorArticleApi, \
-    DoctorArticleTimelineApi, DoctorMediaApi, DoctorProfileApi
+    DoctorArticleTimelineApi, DoctorMediaApi, DoctorProfileApi, ClinicsDoctorsApi
 from pmsDoctor.views.SecretaryView import SecretaryApi
 from pmsDoctor.views.GenderView import GenderSelectApi
-from pmsDoctor.views.PatientView import PatientApi, PatientSelectApi
+from pmsDoctor.views.PatientView import PatientApi, PatientSelectApi, PatientProfileApi
 from pmsDoctor.views.BloodGroupView import BloodGroupSelectApi
 from pmsDoctor.views.AppointmentView import AppointmentApi, AppointmentCalendarApi
 from pmsDoctor.views.AssayView import AssaySelectApi, AssayApi, PatientAssayApi
-from pmsDoctor.views.ProtocolView import ProtocolApi
+from pmsDoctor.views.ProtocolView import ProtocolApi, PatientProtocolApi
 from pmsDoctor.views.AssayResultView import AssayResultApi
 from pmsDoctor.views.DiagnosisView import DiagnosisApi
 from pmsDoctor.views.MedicineView import MedicineDiagnosisApi
@@ -67,5 +67,7 @@ urlpatterns = [
     path('doctor-profile-api/', DoctorProfileApi.as_view(), name='dcotor-profile-api'),
     path('publish-blog-api/', PublishBlogApi.as_view(), name='publish-blog-api'),
     path('sponsored-blog-api/', SponsoredBlogApi.as_view(), name='sponsored-blog-api'),
-
+    path('clinics-doctors-api/', ClinicsDoctorsApi.as_view(), name='clinics-doctors-api'),
+    path('patient-profile-api/', PatientProfileApi.as_view(), name='patient-profile-api'),
+    path('patient-protocol-api/', PatientProtocolApi.as_view(), name='patient-protocol-api'),
 ]
