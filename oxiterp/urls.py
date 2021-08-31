@@ -41,6 +41,7 @@ urlpatterns = [
     path('api/token/refresh', TokenRefreshView.as_view()),
     path('management/', include('management.urls')),
     path('pmsDoctor/', include('pmsDoctor.urls')),
+    path('pmsMobile/', include('pmsMobile.urls')),
 
     # path('car-service/', include('carService.urls')),
 
