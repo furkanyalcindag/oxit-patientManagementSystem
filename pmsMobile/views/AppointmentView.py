@@ -5,16 +5,16 @@ from rest_framework import status
 from rest_framework.views import APIView
 
 from pms.models import Appointment
-from pmsDoctor.exceptions import AppointmentValidationException
+from pmsMobile.exceptions import AppointmentValidationException
 
 from pmsDoctor.models.APIObject import APIObject
-from pmsDoctor.serializers.AppointmentSerializer import AppointmentSerializer, AppointmentPageSerializer, \
-    AppointmentCalendarSerializer
 
 import datetime
 
+from pmsMobile.serializers.AppointmentSerializer import PatientAppointmentSerializer, PatientAppointmentPageSerializer
 
-class AppointmentApi(APIView):
+
+class PatientAppointmentApi(APIView):
     def get(self, request, format=None):
         try:
             if request.GET.get('id') is not None:
@@ -35,7 +35,7 @@ class AppointmentApi(APIView):
                 api_doctor_data['value'] = appointment.doctor.profile.user.id
                 api_object['doctor'] = api_doctor_data
 
-                serializer = AppointmentSerializer(api_object, context={'request': request})
+                serializer = PatientAppointmentSerializer(api_object, context={'request': request})
                 return Response(serializer.data, status.HTTP_200_OK)
 
             else:
@@ -49,11 +49,9 @@ class AppointmentApi(APIView):
                 lim_start = 10 * (int(active_page) - 1)
                 lim_end = lim_start + 10
 
-                data = Appointment.objects.filter(patient__profile__user__first_name__icontains=name,
-                                                  isDeleted=False).order_by(
-                    '-id')[
+                data = Appointment.objects.filter(patient__profile__user=request.user, isDeleted=False).order_by('-id')[
                        lim_start:lim_end]
-                count = Appointment.objects.filter(patient__profile__user__first_name__icontains=name,
+                count = Appointment.objects.filter(patient__profile__user=request.user,
                                                    isDeleted=False).count()
                 arr = []
 
@@ -82,7 +80,7 @@ class AppointmentApi(APIView):
                     api_object.activePage = count / 10
                 else:
                     api_object.activePage = (count / 10) + 1
-                serializer = AppointmentPageSerializer(api_object, context={'request': request})
+                serializer = PatientAppointmentPageSerializer(api_object, context={'request': request})
                 return Response(serializer.data, status.HTTP_200_OK)
 
         except Exception as e:
@@ -91,7 +89,7 @@ class AppointmentApi(APIView):
 
     def post(self, request, format=None):
         try:
-            serializer = AppointmentSerializer(data=request.data, context={'request': request})
+            serializer = PatientAppointmentSerializer(data=request.data, context={'request': request})
 
             if datetime.datetime.strptime(request.data['date'], '%Y-%m-%d').date() < datetime.datetime.today().date():
                 return Response({"message": "error"}, status=status.HTTP_417_EXPECTATION_FAILED)
@@ -112,9 +110,7 @@ class AppointmentApi(APIView):
             else:
                 errors = dict()
                 for key, value in serializer.errors.items():
-                    if key == 'patientId':
-                        errors['patientId'] = value
-                    elif key == 'doctorId':
+                    if key == 'doctorId':
                         errors['doctorId'] = value
                     elif key == 'date':
                         errors['date'] = value
@@ -138,7 +134,8 @@ class AppointmentApi(APIView):
     def put(self, request, format=None):
         try:
             instance = Appointment.objects.get(uuid=request.GET.get('id'))
-            serializer = AppointmentSerializer(data=request.data, instance=instance, context={'request': request})
+            serializer = PatientAppointmentSerializer(data=request.data, instance=instance,
+                                                      context={'request': request})
             if datetime.datetime.strptime(request.data['date'], '%Y-%m-%d').date() < datetime.datetime.today().date():
                 return Response({"message": "error"}, status=status.HTTP_417_EXPECTATION_FAILED)
             elif datetime.datetime.strptime(request.data['time'], '%H:%M').time() > datetime.datetime.strptime(
@@ -181,58 +178,3 @@ class AppointmentApi(APIView):
         except:
             traceback.print_exc()
             return Response(status.HTTP_400_BAD_REQUEST)
-
-
-class AppointmentCalendarApi(APIView):
-    def get(self, request, format=None):
-        date = request.GET.get('date')
-
-        if request.GET.get('id') is None:
-
-            date_start = request.GET.get('startTime').split(' ')[0]
-            date_end = request.GET.get('endTime').split(' ')[0]
-            appointments = Appointment.objects.filter(date__gte=date_start, date__lte=date_end,
-                                                      isDeleted=False)
-
-            appointment_arr = []
-            for appointment in appointments:
-                api_object = dict()
-                api_object['uuid'] = appointment.uuid
-                api_object[
-                    'title'] = appointment.patient.profile.user.first_name + ' ' + appointment.patient.profile.user.last_name
-                api_object['start'] = str(appointment.date) + ' ' + str(appointment.time)
-                api_object['end'] = str(appointment.date) + ' ' + str(appointment.endTime)
-                api_object[
-                    'doctorName'] = appointment.doctor.profile.user.first_name + ' ' + appointment.doctor.profile.user.last_name
-                api_object['id'] = 'undone'
-
-                appointment_arr.append(api_object)
-
-            serializer = AppointmentCalendarSerializer(appointment_arr, many=True, context={'request': request})
-
-            return Response(serializer.data, status.HTTP_200_OK)
-
-        else:
-            appointment = Appointment.objects.get(uuid=request.GET.get('id'))
-            api_object = dict()
-            api_object['uuid'] = appointment.uuid
-            api_object['date'] = appointment.date
-            api_object['time'] = appointment.time
-            api_object['endTime'] = appointment.endTime
-
-            select_doctor = dict()
-
-            select_doctor[
-                'label'] = appointment.doctor.profile.user.first_name + ' ' + appointment.doctor.profile.user.last_name
-            select_doctor['value'] = appointment.doctor.profile.user.id
-            select_patient = dict()
-
-            select_patient[
-                'label'] = appointment.patient.profile.user.first_name + ' ' + appointment.patient.profile.user.last_name
-            select_patient['value'] = appointment.patient.profile.user.id
-
-            api_object['doctor'] = select_doctor
-            api_object['patient'] = select_patient
-            serializer = AppointmentSerializer(api_object, context={'request': request})
-
-            return Response(serializer.data, status.HTTP_200_OK)
