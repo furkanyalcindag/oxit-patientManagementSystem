@@ -1,5 +1,6 @@
 from django.db import models
 
+from pms.models.Clinic import Clinic
 from pms.models.Department import Department
 from pms.models.BaseModel import BaseModel
 from pms.models.Profile import Profile
@@ -13,3 +14,4 @@ class Staff(BaseModel):
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
     profession = models.CharField(max_length=256)
     about = models.CharField(max_length=1028)
+    clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE)

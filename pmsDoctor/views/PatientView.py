@@ -50,10 +50,11 @@ class PatientApi(APIView):
                 lim_start = 10 * (int(active_page) - 1)
                 lim_end = lim_start + 10
 
-                data = Patient.objects.filter(profile__user__first_name__icontains=name,
+                data = Patient.objects.filter(clinic__profile__user=request.user,
+                                              profile__user__first_name__icontains=name,
                                               profile__user__groups__name='Patient',
                                               isDeleted=False).order_by('-id')[lim_start:lim_end]
-                count = Patient.objects.filter(isDeleted=False).count()
+                count = Patient.objects.filter(clinic__profile__user=request.user, isDeleted=False).count()
 
                 arr = []
 
@@ -93,7 +94,7 @@ class PatientApi(APIView):
             return Response("", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def post(self, request, format=None):
-        serializer = PatientSerializer(data=request.data, context={'request', request})
+        serializer = PatientSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response({"message": "patient is created"}, status=status.HTTP_200_OK)
@@ -161,3 +162,33 @@ class PatientSelectApi(APIView):
             return Response(serializer.data, status.HTTP_200_OK)
         except Exception as e:
             return Response("error", status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class PatientProfileApi(APIView):
+    def get(self, request, format=None):
+        try:
+            patient = Patient.objects.get(profile__user=request.user)
+            api_data = dict()
+            api_data['firstName'] = patient.profile.user.first_name
+            api_data['lastName'] = patient.profile.user.last_name
+            api_data['identityNumber'] = patient.profile.profileImage
+            api_data['email'] = patient.profile.identityNumber
+            api_data['address'] = patient.profile.address
+            api_data['mobilePhone'] = patient.profile.mobilePhone
+            api_data['birthDate'] = patient.birthDate
+            api_gender_data = dict()
+            api_gender_data['label'] = patient.gender.name
+            api_gender_data['value'] = patient.gender.id
+            api_data['gender'] = api_gender_data
+            api_blood_data = dict()
+            api_blood_data['label'] = patient.bloodGroup.name
+            api_blood_data['value'] = patient.bloodGroup.id
+            api_data['bloodGroup'] = api_blood_data
+
+            serializer = PatientSerializer(api_data, context={'request': request})
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            traceback.print_exc()
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
