@@ -9,6 +9,7 @@ from rest_framework.validators import UniqueValidator
 
 from management.serializers.GeneralSerializer import SelectSerializer, PageSerializer
 from pms.models import Clinic, District, City, Staff, Profile
+from pms.models.ClinicMedia import ClinicMedia
 
 
 class ClinicSerializer(serializers.Serializer):
@@ -101,3 +102,83 @@ class ClinicPageableSerializer(PageSerializer):
 
     def create(self, validated_data):
         pass
+
+
+class ClinicGeneralInfoSerializer(serializers.Serializer):
+    clinicName = serializers.CharField()
+    uuid = serializers.UUIDField(read_only=True)
+    taxNumber = serializers.CharField()
+    taxOffice = serializers.CharField()
+    address = serializers.CharField()
+    cityId = serializers.IntegerField(write_only=True)
+    districtId = serializers.IntegerField(write_only=True)
+    city = SelectSerializer(read_only=True)
+    district = SelectSerializer(read_only=True)
+    cityDistrict = serializers.CharField(allow_blank=False, read_only=True, allow_null=True)
+    email = serializers.CharField()
+    staffName = serializers.CharField(required=True, allow_null=True, allow_blank=True)
+    staffSurname = serializers.CharField(required=True, allow_null=True, allow_blank=True)
+    telephoneNumber = serializers.CharField(required=True, allow_null=True, allow_blank=True)
+
+    def update(self, instance, validated_data):
+        try:
+            user = instance.profile.user
+            user.first_name = validated_data.get('staffName')
+            user.last_name = validated_data.get('staffSurname')
+            user.email = validated_data.get('email')
+            user.username = validated_data.get('email')
+            user.save()
+            instance.name = validated_data.get('clinicName')
+            instance.taxNumber = validated_data.get('taxNumber')
+            instance.taxOffice = validated_data.get('taxOffice')
+            instance.address = validated_data.get('address')
+            instance.district = District.objects.get(id=validated_data.get('districtId'))
+            instance.city = City.objects.get(id=validated_data.get('cityId'))
+            instance.save()
+
+            return instance
+
+        except Exception as e:
+            traceback.print_exc()
+            raise ValidationError("lütfen tekrar deneyiniz")
+
+    def create(self, validated_data):
+        pass
+
+    def validate_email(self, email):
+
+        user = None
+        if self.instance is not None:
+
+            user = Clinic.objects.get(profile__user_id=self.context['request'].user.id)
+
+            if User.objects.exclude(id=user.id).filter(username=email).count() > 0:
+                raise serializers.ValidationError("Bu email sistemde kayıtlıdııııır")
+
+        else:
+            if User.objects.filter(username=email).count() > 0:
+                raise serializers.ValidationError("Bu email sistemde kayıtlıdırrrr")
+        return email
+
+
+class ClinicMediaSerializer(serializers.Serializer):
+    media = serializers.CharField()
+    uuid = serializers.UUIDField(read_only=True)
+
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        try:
+            clinic = Clinic.objects.get(profile__user=self.context['request'].user)
+            clinicMedia = ClinicMedia()
+            clinicMedia.media = validated_data.get('media')
+            clinicMedia.clinic = clinic
+
+            clinicMedia.save()
+
+            return clinicMedia
+
+        except Exception as e:
+            traceback.print_exc()
+            raise ValidationError("lütfen tekrar deneyiniz")

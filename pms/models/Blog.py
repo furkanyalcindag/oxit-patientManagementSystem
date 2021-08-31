@@ -13,3 +13,4 @@ class Blog(BaseModel):
     isPublish = models.BooleanField(default=False)
     description = models.TextField()
     title = models.CharField(max_length=1028)
+    isSponsored = models.BooleanField(default=False)

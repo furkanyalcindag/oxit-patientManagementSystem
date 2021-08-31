@@ -37,3 +37,4 @@ from .Notification import Notification
 from .Media import Media
 from .PaymentMovement import PaymentMovement
 from .PaymentSituation import PaymentSituation
+from .ClinicMedia import ClinicMedia

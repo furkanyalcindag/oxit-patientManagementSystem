@@ -5,7 +5,7 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from pms.models import Staff, Department, Profile, Prize
+from pms.models import Staff, Department, Profile, Prize, Clinic
 from pms.models.DoctorArticle import DoctorArticle
 from pms.models.DoctorEducation import DoctorEducation
 from pms.models.EducationType import EducationType
@@ -42,6 +42,7 @@ class DoctorSerializer(serializers.Serializer):
     def create(self, validated_data):
         try:
             with transaction.atomic():
+                clinic = Clinic.objects.get(profile__user=self.context['request'].user)
                 user = User.objects.create_user(username=validated_data.get('email'),
                                                 email=validated_data.get('email'))
                 user.first_name = validated_data.get('firstName')
@@ -59,6 +60,7 @@ class DoctorSerializer(serializers.Serializer):
                 staff.insuranceNumber = validated_data.get('insuranceNumber')
                 staff.title = validated_data.get('title')
                 staff.department = Department.objects.get(id=int(validated_data.get('departmentId')))
+                staff.clinic = clinic
                 staff.save()
 
                 return staff
@@ -202,12 +204,14 @@ class DoctorEducationSerializer(serializers.Serializer):
     def create(self, validated_data):
         try:
             with transaction.atomic():
+                doctor = Staff.objects.get(profile__user=self.context['request'].user)
 
                 education = DoctorEducation()
                 education.universityName = validated_data.get('universityName')
                 education.facultyName = validated_data.get('facultyName')
                 education.departmentName = validated_data.get('departmentName')
                 education.educationType = EducationType.objects.get(id=validated_data.get('educationTypeId'))
+                education.doctor = doctor
                 education.save()
 
                 return education
