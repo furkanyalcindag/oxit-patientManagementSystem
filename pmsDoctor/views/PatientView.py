@@ -52,7 +52,7 @@ class PatientApi(APIView):
                 lim_end = lim_start + 10
                 doctor = None
 
-                if Staff.objects.get(profile__user=request.user) is not None:
+                if request.user.groups.values('name')[0]['name'] == 'Doctor':
                     doctor = Staff.objects.get(profile__user=request.user)
                     data = Patient.objects.filter(clinic=doctor.clinic, profile__user__first_name__icontains=name,
                                                   profile__user__groups__name='Patient',

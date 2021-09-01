@@ -55,8 +55,8 @@ class PaymentDiscountSerializer(serializers.Serializer):
         payment_movement = PaymentMovement()
         try:
             checking_account = CheckingAccount.objects.get(uuid=validated_data.get('checkingAccountUUID'))
-            if checking_account.paymentSituation.name == 'Ödenmedi' or checking_account.paymentSituation.name == 'Kısmi Ödendi' and validated_data.get(
-                    'paymentAmount') <= checking_account.remainingDebt:
+            if checking_account.paymentSituation.name != 'Ödendi' and int(validated_data.get(
+                    'paymentAmount')) <= checking_account.remainingDebt:
                 payment_type = PaymentType.objects.get(name='İndirim')
                 payment_movement.checkingAccount = checking_account
                 payment_movement.paymentType = payment_type
@@ -64,9 +64,12 @@ class PaymentDiscountSerializer(serializers.Serializer):
                 payment_movement.save()
                 checking_account.remainingDebt = checking_account.remainingDebt - validated_data.get('paymentAmount')
                 checking_account.save()
-            if checking_account.remainingDebt == 0:
-                checking_account.paymentSituation = PaymentSituation.objects.get(name='Ödendi')
-                checking_account.paymentSituation.save()
+                if checking_account.remainingDebt == 0:
+                    checking_account.paymentSituation = PaymentSituation.objects.get(name='Ödendi')
+                    checking_account.save()
+            else:
+                traceback.print_exc()
+                raise serializers.ValidationError("Ödeme Miktarı Kalan Tutardan Fazla Olamaz")
             return checking_account
         except:
             traceback.print_exc()
