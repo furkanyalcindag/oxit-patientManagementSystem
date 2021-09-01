@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 
+from pms.models import Staff
 from pms.models.SelectObject import SelectObject
 from pmsDoctor.models.APIObject import APIObject
 from pms.models.Patient import Patient
@@ -49,12 +50,20 @@ class PatientApi(APIView):
 
                 lim_start = 10 * (int(active_page) - 1)
                 lim_end = lim_start + 10
+                doctor = None
 
-                data = Patient.objects.filter(clinic__profile__user=request.user,
-                                              profile__user__first_name__icontains=name,
-                                              profile__user__groups__name='Patient',
-                                              isDeleted=False).order_by('-id')[lim_start:lim_end]
-                count = Patient.objects.filter(clinic__profile__user=request.user, isDeleted=False).count()
+                if Staff.objects.get(profile__user=request.user) is not None:
+                    doctor = Staff.objects.get(profile__user=request.user)
+                    data = Patient.objects.filter(clinic=doctor.clinic, profile__user__first_name__icontains=name,
+                                                  profile__user__groups__name='Patient',
+                                                  isDeleted=False).order_by('-id')[lim_start:lim_end]
+                    count = Patient.objects.filter(clinic=doctor.clinic, isDeleted=False).count()
+                else:
+                    data = Patient.objects.filter(clinic__profile__user=request.user,
+                                                  profile__user__first_name__icontains=name,
+                                                  profile__user__groups__name='Patient',
+                                                  isDeleted=False).order_by('-id')[lim_start:lim_end]
+                    count = Patient.objects.filter(clinic__profile__user=request.user, isDeleted=False).count()
 
                 arr = []
 
