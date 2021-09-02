@@ -1,5 +1,6 @@
 from django.urls import path
 
+from pmsMobile.views.AnswerView import AnswerApi
 from pmsMobile.views.CheckingAccountView import PatientCheckingAccountApi, PatientTotalCheckingAccountApi, \
     PatientPaymentMovementApi
 from pmsMobile.views.AppointmentView import PatientAppointmentApi
@@ -8,6 +9,7 @@ from pmsMobile.views.ClinicView import ClinicGeneralInfoApi, ClinicMediaApi
 from pmsMobile.views.DoctorView import DoctorProfileApi, ClinicsDoctorsApi
 from pmsMobile.views.PatientView import PatientProfileApi
 from pmsMobile.views.ProtocolView import PatientProtocolApi
+from pmsMobile.views.QuestionView import PatientQuestionApi, AllQuestionApi
 
 app_name = 'pmsMobile'
 
@@ -26,5 +28,8 @@ urlpatterns = [
     path('patient-total-checking-account-api/', PatientTotalCheckingAccountApi.as_view(),
          name='patient-total-checking-account-api'),
     path('patient-payment-movement-api/', PatientPaymentMovementApi.as_view(), name='patient-payment-movement-api'),
+    path('patient-question-api/', PatientQuestionApi.as_view(), name='patient-question-api'),
+    path('all-question-api/', AllQuestionApi.as_view(), name='all-question-api'),
+    path('answer-api/', AnswerApi.as_view(), name='answer-api'),
 
 ]

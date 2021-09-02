@@ -11,6 +11,7 @@ from management.serializers.GeneralSerializer import PageSerializer, SelectSeria
 from pms.models import Profile, Patient, Clinic
 from pms.models.BloodGroup import BloodGroup
 from pms.models.Gender import Gender
+from pms.models.PatientClinic import PatientClinic
 
 
 class PatientSerializer(serializers.Serializer):
@@ -55,6 +56,7 @@ class PatientSerializer(serializers.Serializer):
     def create(self, validated_data):
         try:
             with transaction.atomic():
+                patientClinic = PatientClinic()
                 clinic = Clinic.objects.get(profile__user=self.context['request'].user)
                 user = User.objects.create_user(username=validated_data.get('email'), email=validated_data.get('email'))
                 user.first_name = validated_data.get('firstName')
@@ -76,6 +78,9 @@ class PatientSerializer(serializers.Serializer):
                 patient.gender = Gender.objects.get(id=validated_data.get('genderId'))
                 patient.clinic = clinic
                 patient.save()
+                patientClinic.patient = patient
+                patientClinic.clinic = clinic
+                patientClinic.save()
                 return patient
 
         except Exception as e:
