@@ -59,7 +59,7 @@ class PatientApi(APIView):
                                                         patient__profile__user__first_name__icontains=name,
                                                         patient__profile__user__groups__name='Patient',
                                                         patient__isDeleted=False).order_by('-id')[lim_start:lim_end]
-                    count = PatientClinic.objects.filter(clinic=doctor.clinic, isDeleted=False).count()
+                    count = PatientClinic.objects.filter(clinic=doctor.clinic, patient__isDeleted=False).count()
                 else:
                     data = PatientClinic.objects.filter(clinic__profile__user=request.user,
                                                         patient__profile__user__first_name__icontains=name,
