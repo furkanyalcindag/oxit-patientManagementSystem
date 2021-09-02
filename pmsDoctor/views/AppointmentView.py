@@ -49,12 +49,10 @@ class AppointmentApi(APIView):
                 lim_start = 10 * (int(active_page) - 1)
                 lim_end = lim_start + 10
 
-                data = Appointment.objects.filter(patient__profile__user__first_name__icontains=name,
-                                                  isDeleted=False).order_by(
-                    '-id')[
-                       lim_start:lim_end]
-                count = Appointment.objects.filter(patient__profile__user__first_name__icontains=name,
-                                                   isDeleted=False).count()
+                data = Appointment.objects.filter(doctor__profile__user=request.user,
+                                                  patient__profile__user__first_name__icontains=name,
+                                                  isDeleted=False).order_by('-id')[ lim_start:lim_end]
+                count = Appointment.objects.filter(patient__profile__user__first_name__icontains=name,isDeleted=False).count()
                 arr = []
 
                 for appointment in data:
