@@ -161,12 +161,21 @@ class PatientSelectApi(APIView):
     def get(self, request, format=None):
         try:
             select_arr = []
-            data = Patient.objects.filter(isDeleted=False)
+            if request.user.groups.values('name')[0]['name'] == 'Doctor':
+                doctor = Staff.objects.get(profile__user=request.user)
+                data = PatientClinic.objects.filter(clinic=doctor.clinic,
+                                                    patient__profile__user__groups__name='Patient',
+                                                    patient__isDeleted=False).order_by('-id')
+
+            else:
+                data = PatientClinic.objects.filter(clinic__profile__user=request.user,
+                                                    patient__profile__user__groups__name='Patient',
+                                                    patient__isDeleted=False).order_by('-id')
 
             for patient in data:
                 select_object = SelectObject()
-                select_object.value = patient.profile.user.id
-                select_object.label = patient.profile.user.first_name + ' ' + patient.profile.user.last_name
+                select_object.value = patient.patient.profile.user.id
+                select_object.label = patient.patient.profile.user.first_name + ' ' + patient.patient.profile.user.last_name
                 select_arr.append(select_object)
 
             serializer = SelectSerializer(select_arr, many=True, context={'request': request})
