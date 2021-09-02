@@ -35,7 +35,7 @@ class AppointmentSerializer(serializers.Serializer):
 
                 appointment = Appointment()
                 doctor = Staff.objects.get(profile__user_id=validated_data.get('doctorId'))
-                appointment.patient = Patient.objects.get(uuid=validated_data.get('patientId'))
+                appointment.patient = Patient.objects.get(profile__user_id=validated_data.get('patientId'))
                 date = validated_data.get('date')
                 time = validated_data.get('time')
                 endTime = validated_data.get('endTime')
