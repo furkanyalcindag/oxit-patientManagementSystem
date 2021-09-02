@@ -49,12 +49,22 @@ class AppointmentApi(APIView):
                 lim_start = 10 * (int(active_page) - 1)
                 lim_end = lim_start + 10
 
-                data = Appointment.objects.filter(patient__profile__user__first_name__icontains=name,
-                                                  isDeleted=False).order_by(
-                    '-id')[
-                       lim_start:lim_end]
-                count = Appointment.objects.filter(patient__profile__user__first_name__icontains=name,
-                                                   isDeleted=False).count()
+                if request.user.groups.values('name')[0]['name'] == 'Doctor':
+
+                    data = Appointment.objects.filter(doctor__profile__user=request.user,
+                                                      patient__profile__user__first_name__icontains=name,
+                                                      isDeleted=False).order_by('-id')[lim_start:lim_end]
+                    count = Appointment.objects.filter(doctor__profile__user=request.user,
+                                                       patient__profile__user__first_name__icontains=name,
+                                                       isDeleted=False).count()
+                else:
+                    data = Appointment.objects.filter(doctor__clinic__profile__user=request.user,
+                                                      patient__profile__user__first_name__icontains=name,
+                                                      isDeleted=False).order_by('-id')[lim_start:lim_end]
+                    count = Appointment.objects.filter(doctor__clinic__profile__user=request.user,
+                                                       patient__profile__user__first_name__icontains=name,
+                                                       isDeleted=False).count()
+
                 arr = []
 
                 for appointment in data:
@@ -191,8 +201,17 @@ class AppointmentCalendarApi(APIView):
 
             date_start = request.GET.get('startTime').split(' ')[0]
             date_end = request.GET.get('endTime').split(' ')[0]
-            appointments = Appointment.objects.filter(date__gte=date_start, date__lte=date_end,
-                                                      isDeleted=False)
+            if request.user.groups.values('name')[0]['name'] == 'Doctor':
+
+                appointments = Appointment.objects.filter(doctor__profile__user=request.user, date__gte=date_start,
+                                                          date__lte=date_end,
+
+                                                          isDeleted=False).order_by('-id')
+            else:
+                appointments = Appointment.objects.filter(doctor__clinic__profile__user=request.user,
+                                                          date__gte=date_start,
+                                                          date__lte=date_end,
+                                                          isDeleted=False).order_by('-id')
 
             appointment_arr = []
             for appointment in appointments:
@@ -229,7 +248,7 @@ class AppointmentCalendarApi(APIView):
 
             select_patient[
                 'label'] = appointment.patient.profile.user.first_name + ' ' + appointment.patient.profile.user.last_name
-            select_patient['value'] = appointment.patient.profile.user.id
+            select_patient['value'] = appointment.patient.uuid
 
             api_object['doctor'] = select_doctor
             api_object['patient'] = select_patient
